@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="设备资料库">
+<title>设备资料库 · 检修记录与查询</title>
+<style>
+/* ===== 主题变量（浅色为默认） ===== */
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#68727f; --line:#e3e8f0;
+  --brand:#2563eb; --brand-d:#1d4ed8; --brand-l:#e8f0ff;
+  --ok:#0f9d58; --ok-l:#e7f7ee; --ok-ink:#0b6b3d; --ok-line:#c6ead7;
+  --warn:#b45309; --warn-l:#fdf3e3; --warn-ink:#7c4a03; --warn-line:#f5dfba;
+  --danger:#d92d20; --danger-l:#fdeceb; --danger-line:#f4c9c6;
+  --info-l:#e8f0ff; --info-ink:#1e40af; --info-line:#cfe0ff;
+  --header-bg:rgba(244,246,251,.92); --nav-bg:rgba(255,255,255,.96);
+  --sug-bg:#fffdf7; --sug-line:#f59e0b;
+  --toast-bg:#111827; --toast-ink:#ffffff;
+  --tag-bg:#f1f5f9; --tag-ink:#475467; --faint:#98a2b3; --faint-line:#c3cbd6;
+  --mark-bg:#fff3a3; --mark-ink:#1f2733; --grab:#e4e7ec; --strong:#344054;
+  --focus:rgba(37,99,235,.18); --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --card:#18202b; --ink:#e8edf5; --muted:#97a3b4; --line:#2a3544;
+  --brand:#60a5fa; --brand-d:#93c5fd; --brand-l:#1b2c44;
+  --ok:#4ade80; --ok-l:#14301f; --ok-ink:#86efac; --ok-line:#245c3a;
+  --warn:#fbbf24; --warn-l:#3a2c10; --warn-ink:#fde68a; --warn-line:#5b431a;
+  --danger:#f87171; --danger-l:#3b1a1a; --danger-line:#6b2626;
+  --info-l:#1b2c44; --info-ink:#bfdbfe; --info-line:#2c4a72;
+  --header-bg:rgba(15,20,27,.92); --nav-bg:rgba(24,32,43,.96);
+  --sug-bg:#1d2532; --sug-line:#b45309;
+  --toast-bg:#e8edf5; --toast-ink:#111827;
+  --tag-bg:#222c38; --tag-ink:#c3ccd8; --faint:#7b8798; --faint-line:#3c4859;
+  --mark-bg:#7a6414; --mark-ink:#ffe9a3; --grab:#333f4f; --strong:#d7dee8;
+  --focus:rgba(96,165,250,.25);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px rgba(0,0,0,.32);
+  color-scheme:dark;   /* 让日期选择器等浏览器原生控件也跟随深色 */
+}
+/* ===== 字号：小（默认）/ 中 / 大 ===== */
+:root{ --fs:15px; --fs-s:13px; --fs-xs:12px; --fs-l:16px; }
+:root[data-size="small"] { --fs:15px;    --fs-s:13px;    --fs-xs:12px;    --fs-l:16px; }
+:root[data-size="medium"]{ --fs:16.5px;  --fs-s:14.2px;  --fs-xs:13px;    --fs-l:18px; }
+:root[data-size="large"] { --fs:18.5px;  --fs-s:15.8px;  --fs-xs:14.5px;  --fs-l:20.5px; }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink); font-size:var(--fs); line-height:1.55;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  transition:background-color .18s ease, color .18s ease;
+}
+a{color:var(--brand)}
+.wrap{max-width:940px;margin:0 auto;padding:14px}
+/* ---------- 顶部 ---------- */
+header.top{
+  position:sticky; top:0; z-index:30; background:var(--header-bg);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  padding:10px 14px calc(10px) 14px;
+}
+.topin{max-width:940px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.logo{
+  width:36px;height:36px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+  background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;font-weight:700;font-size:16px;
+}
+.title{font-weight:700;font-size:var(--fs-l);line-height:1.2}
+.sub{color:var(--muted);font-size:var(--fs-xs)}
+.grow{flex:1 1 auto}
+/* ---------- 卡片 ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:var(--fs-l);display:flex;align-items:center;gap:8px}
+.card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.hint{color:var(--muted);font-size:var(--fs-xs);margin:6px 0 0}
+/* ---------- 搜索框 / 输入框 ---------- */
+.searchbar{display:flex;gap:8px;align-items:stretch}
+.searchbox{flex:1 1 auto;position:relative;display:flex;align-items:center}
+.searchbox .ico{position:absolute;left:12px;color:var(--faint);font-size:16px;pointer-events:none}
+input[type=text],input[type=date],input[type=search],textarea,select{
+  width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:11px;padding:11px 12px;font-size:var(--fs-l);font-family:inherit;outline:none;
+}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+input[type=search]{padding-left:36px}
+input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--focus)}
+textarea{resize:vertical;min-height:84px;line-height:1.6}
+label.f{display:block;font-size:var(--fs-xs);color:var(--muted);margin:0 0 5px}
+.field{margin-bottom:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+/* ---------- 按钮 ---------- */
+button{font-family:inherit;font-size:var(--fs-l);cursor:pointer;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px}
+button:active{transform:translateY(1px)}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+:root[data-theme="dark"] .btn-primary{color:#0b1220}
+.btn-primary:hover{background:var(--brand-d)}
+.btn-danger{border-color:var(--danger-line);color:var(--danger)}
+.btn-sm{padding:7px 11px;font-size:var(--fs-s);border-radius:9px}
+.btn-block{width:100%;justify-content:center;display:flex;align-items:center;gap:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:var(--fs-xs);color:var(--strong);cursor:pointer}
+.chip:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l)}
+.chip.static{cursor:default}
+.chip.static:hover{border-color:var(--line);color:var(--strong);background:var(--card)}
+/* ---------- 结果 ---------- */
+.result{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
+.result.match{border-left:4px solid var(--ok)}
+.result.sug{border-left:4px solid var(--sug-line);background:var(--sug-bg)}
+.rhead{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.rname{font-weight:700;font-size:var(--fs-l)}
+.rmodel{color:var(--muted);font-size:var(--fs-s)}
+.badge{font-size:var(--fs-xs);border-radius:999px;padding:3px 9px;background:var(--brand-l);color:var(--brand);font-weight:600;white-space:nowrap}
+.badge.ok{background:var(--ok-l);color:var(--ok-ink)}
+.badge.warn{background:var(--warn-l);color:var(--warn-ink)}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;margin-top:9px;font-size:var(--fs-s)}
+.kv .k{color:var(--muted);font-size:var(--fs-xs)}
+.kv .v{word-break:break-word;white-space:pre-wrap}
+.kv .v.empty{color:var(--faint)}
+mark{background:var(--mark-bg);color:var(--mark-ink);border-radius:3px;padding:0 1px}
+.scoreline{font-size:var(--fs-xs);color:var(--muted);margin-top:2px}
+/* ---------- 空状态 / 提示条 ---------- */
+.empty{text-align:center;padding:26px 14px;color:var(--muted)}
+.empty .big{font-size:34px;line-height:1;margin-bottom:8px}
+.banner{border-radius:12px;padding:11px 13px;font-size:var(--fs-s);display:flex;gap:9px;align-items:flex-start;margin-bottom:12px}
+.banner.warn{background:var(--warn-l);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.banner.info{background:var(--info-l);color:var(--info-ink);border:1px solid var(--info-line)}
+.banner.ok{background:var(--ok-l);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.banner .x{margin-left:auto;background:transparent;border:0;color:inherit;padding:0 4px;font-size:16px;line-height:1}
+.section-title{font-size:var(--fs-xs);color:var(--muted);font-weight:600;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+/* ---------- 列表 ---------- */
+.list-item{display:flex;gap:10px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.li-main{flex:1 1 auto;min-width:0}
+.li-name{font-weight:600;font-size:var(--fs-l);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-sub{color:var(--muted);font-size:var(--fs-xs);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- 底部导航 ---------- */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--nav-bg);
+  backdrop-filter:blur(8px);border-top:1px solid var(--line);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+}
+nav.tabs button{
+  flex:1;border:0;background:transparent;padding:6px 2px;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:var(--fs-xs)
+}
+nav.tabs button .ti{font-size:19px;line-height:1.1}
+nav.tabs button.active{color:var(--brand);background:var(--brand-l);font-weight:700}
+/* ---------- 详情（抽屉） ---------- */
+.sheet-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;display:none}
+.sheet-mask.show{display:block}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--card);border-radius:18px 18px 0 0;
+  max-height:88vh;overflow:auto;transform:translateY(102%);transition:transform .22s ease;
+  padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+  border:1px solid var(--line);border-bottom:0;
+}
+.sheet.show{transform:translateY(0)}
+@media(min-width:760px){
+  .sheet{left:50%;right:auto;bottom:auto;top:50%;width:720px;max-height:86vh;border-radius:18px;
+    transform:translate(-50%,-46%) scale(.98);opacity:0;transition:all .2s ease}
+  .sheet.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.sheet-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.grab{width:44px;height:4px;border-radius:999px;background:var(--grab);margin:0 auto 10px}
+.icobtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
+/* ---------- 设置里的分段选择（主题 / 字号） ---------- */
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1 1 0;min-width:96px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;font-size:var(--fs-s);color:var(--muted)}
+.seg button .si{font-size:20px;line-height:1.1}
+.seg button.active{border-color:var(--brand);background:var(--brand-l);color:var(--brand);font-weight:700}
+/* ---------- 杂项 ---------- */
+.hidden{display:none !important}
+.muted{color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace}
+.tag{display:inline-block;background:var(--tag-bg);color:var(--tag-ink);border-radius:999px;padding:2px 9px;font-size:var(--fs-xs);margin:0 5px 5px 0}
+.copy{cursor:pointer;border-bottom:1px dashed var(--faint-line)}
+.copy:active{color:var(--brand)}
+footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:8px 0 20px}
+.toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(10px);z-index:90;
+  background:var(--toast-bg);color:var(--toast-ink);padding:9px 16px;border-radius:999px;font-size:var(--fs-s);opacity:0;
+  transition:all .2s ease;pointer-events:none;max-width:86vw;text-align:center
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* 脚本没跑起来时才会出现的提示（脚本一旦执行就会把它移除） */
+#nojs{
+  background:#b45309;color:#fff;font-size:14px;line-height:1.7;
+  padding:12px 14px;text-align:center;position:relative;z-index:50;
+}
+#nojs b{color:#fff3c4}
+#appStatus{font-size:12.5px;line-height:1.9;color:var(--muted);word-break:break-all}
+#appStatus .ok{color:var(--ok-ink);font-weight:600}
+#appStatus .bad{color:var(--danger);font-weight:600}
+#appStatus code{background:var(--tag-bg);color:var(--tag-ink);border-radius:5px;padding:1px 5px}
+</style>
+</head>
+<body>
+
+<div id="nojs">
+  页面脚本没有运行：如果界面能看、但所有按钮都点不动，请把本文件保存到手机里，用
+  <b>Chrome / Edge / 三星浏览器 / Safari</b> 打开；不要用微信、QQ 内置的预览窗口打开。
+  文件也可能在传输中被截断，建议重新拷贝一份。
+</div>
+
+<header class="top">
+  <div class="topin">
+    <div class="logo">设</div>
+    <div>
+      <div class="title">设备资料库</div>
+      <div class="sub" id="topSub">检修记录 · 备件参数 · 经验总结</div>
+    </div>
+    <div class="grow"></div>
+    <button class="icobtn" id="btnBackupQuick" title="导出备份">⬇</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ 搜索页 ============ -->
+  <section id="page-search">
+    <div class="card">
+      <div class="searchbar">
+        <div class="searchbox">
+          <span class="ico">🔍</span>
+          <input type="search" id="q" placeholder="输入关键字：设备名 / 型号 / 轴承 / 螺丝 / 经验…" autocomplete="off">
+        </div>
+        <button class="btn-sm btn-ghost" id="btnClearQ">清空</button>
+      </div>
+      <div class="hint">模糊搜索：型号、轴承、螺丝记不全，或打错一两个字，也能搜出相近设备；经验总结里的词同样可搜。</div>
+      <div class="chips" id="recentChips"></div>
+    </div>
+
+    <div id="searchBanner"></div>
+    <div id="searchOut"></div>
+
+    <div class="card" id="quickCard">
+      <h2><span class="dot"></span>快速浏览</h2>
+      <div class="chips" id="fieldChips"></div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn-sm" id="btnRecentFix">最近检修（30 天内）</button>
+        <button class="btn-sm" id="btnAllDevices2">查看全部设备</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 录入页 ============ -->
+  <section id="page-add" class="hidden">
+    <div class="card">
+      <h2><span class="dot"></span><span id="formTitle">录入新设备</span></h2>
+      <div id="formBody"></div>
+      <div class="actions" style="margin-top:14px">
+        <button class="btn-primary" id="btnSave">💾 保存记录</button>
+        <button class="btn-ghost" id="btnResetForm">重置</button>
+        <button class="btn-ghost hidden" id="btnCancelEdit">取消编辑</button>
+      </div>
+      <div class="hint" id="formHint">带 * 的字段建议填写；自定义字段可在「设置」里增删。</div>
+    </div>
+  </section>
+
+  <!-- ============ 列表页 ============ -->
+  <section id="page-list" class="hidden">
+    <div class="card">
+      <div class="searchbar">
+        <div class="searchbox">
+          <span class="ico">🔍</span>
+          <input type="search" id="qList" placeholder="在清单中筛选…" autocomplete="off">
+        </div>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn-sm" id="btnNewTop">＋ 新增设备</button>
+        <button class="btn-sm" id="btnSortName">按名称排序</button>
+        <button class="btn-sm" id="btnSortDate">按检修日期排序</button>
+      </div>
+      <div class="hint" id="listCount"></div>
+    </div>
+    <div class="card" id="listBody"></div>
+  </section>
+
+  <!-- ============ 设置页 ============ -->
+  <section id="page-set" class="hidden">
+    <div class="card">
+      <h2><span class="dot"></span>数据备份与恢复</h2>
+      <div class="hint" style="margin-bottom:12px">数据保存在当前浏览器的本地存储里。<b>换电脑、换手机、清理浏览器数据前，请先导出备份。</b></div>
+      <div class="actions">
+        <button class="btn-sm" id="btnImport">⬆ 导入备份（JSON）</button>
+        <button class="btn-sm btn-primary" id="btnExport">⬇ 导出备份（JSON）</button>
+        <button class="btn-sm" id="btnExportCsv">导出为 CSV 表格</button>
+        <input type="file" id="fileImport" accept=".json,application/json" class="hidden">
+      </div>
+      <div class="hint" id="storageInfo"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>手机之间的数据交换</h2>
+      <div class="hint" style="margin-bottom:10px">微信/QQ 内置预览会拦下载，如果「导出备份」没反应，用下面几种方式。</div>
+      <div class="actions">
+        <button class="btn-sm btn-primary" id="btnShare">↗ 用系统分享发送备份</button>
+        <button class="btn-sm" id="btnCopyBackup">⧉ 复制备份内容（粘到聊天窗口）</button>
+        <button class="btn-sm" id="btnPasteImport">⇩ 从剪贴板粘贴导入</button>
+        <button class="btn-sm" id="btnCopyText">⧉ 复制全部记录为文本</button>
+      </div>
+      <div class="hint">推荐流程：在电脑或手机浏览器里打开 → 导出 JSON 文件 → 用微信/蓝牙/数据线传到另一台设备 → 在那里打开本页面用「导入备份（JSON）」读入。小规模数据也可以直接复制文本。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>外观 · 背景颜色</h2>
+      <div class="seg" id="segTheme">
+        <button type="button" data-theme-val="light"><span class="si">☀️</span>浅色</button>
+        <button type="button" data-theme-val="dark"><span class="si">🌙</span>深色</button>
+      </div>
+      <div class="hint">深色适合夜间或机房光线较暗时查看，选择后立即生效并自动记住。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>外观 · 字号大小</h2>
+      <div class="seg" id="segSize">
+        <button type="button" data-size-val="small">小<span class="si" style="font-size:14px">Aa</span></button>
+        <button type="button" data-size-val="medium">中<span class="si" style="font-size:18px">Aa</span></button>
+        <button type="button" data-size-val="large">大<span class="si" style="font-size:23px">Aa</span></button>
+      </div>
+      <div class="hint">默认「小」。字号变大后，列表一屏能看的内容会相应减少。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>自定义字段</h2>
+      <div class="hint" style="margin-bottom:10px">除内置字段外，你可以再添加自己的字段（例如：所属系统、额定功率、润滑油牌号）。</div>
+      <div class="row">
+        <div><label class="f">字段名称</label><input type="text" id="cfName" placeholder="如：额定功率"></div>
+        <div><label class="f">提示文字（可选）</label><input type="text" id="cfHint" placeholder="如：kW"></div>
+      </div>
+      <div class="actions" style="margin-top:8px"><button class="btn-sm btn-primary" id="btnAddField">＋ 添加字段</button></div>
+      <div id="cfList" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>搜索偏好</h2>
+      <div class="hint">模糊推荐阈值：<b id="thVal">0.34</b>（数值越小，推荐越多、越宽松）</div>
+      <input type="range" id="thr" min="0.15" max="0.6" step="0.01" style="width:100%;margin-top:8px">
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>使用说明</h2>
+      <div class="hint" style="line-height:1.85">
+        1. <b>录入</b>：点底部「＋」，填写设备名称（必填）以及上次检修日期、轴承型号、螺丝大小、检修经验总结等，点「保存记录」。<br>
+        2. <b>查询</b>：在「查询」页输入任意关键字（设备名、型号、轴承号、螺丝规格、经验里的词都可以），输入即搜。<br>
+        3. <b>没有怎么办</b>：若没有直接匹配，会明确提示「没有查到」，并把<b>模糊相似</b>的记录列在下面供参考；也可一键用该关键字新建记录。<br>
+        4. <b>备份</b>：数据存在本浏览器里。换设备或清理浏览器前，先点「导出备份（JSON）」，在新设备上「导入备份」即可。<br>
+        5. <b>手机使用（重要）</b>：不要用微信/QQ 内置的预览窗口打开，那里会禁止本地存储，会出现「界面能看、按钮点不动」的问题。正确做法：在微信里点右上角「⋯」→ <b>用其他应用打开</b> → 选 <b>Chrome / 系统浏览器</b>；或先把文件保存到手机「文件 / 下载」目录，再从浏览器里打开。<br>
+        6. <b>外观</b>：在同一页上方可切换<b>背景颜色</b>（浅色 / 深色）与<b>字号大小</b>（小 / 中 / 大），选择后立即生效并自动记住。<br>
+        7. <b>换手机搬数据</b>：用上方的「导出备份 / 系统分享 / 复制备份内容」，在新手机打开本页面后用「导入备份」或「从剪贴板粘贴导入」。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>危险操作</h2>
+      <div class="actions">
+        <button class="btn-sm" id="btnLoadDemo">载入 3 条示例数据</button>
+        <button class="btn-sm btn-danger" id="btnWipe">清空全部数据</button>
+      </div>
+      <div class="hint">「清空」只影响本浏览器，请先导出备份。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>运行状态 / 排错</h2>
+      <div id="appStatus">正在检查…</div>
+      <div class="hint">如果手机上出现过「按钮点不动」，把这里的「脚本运行」和「数据保存」两行内容发给我，就能定位原因。</div>
+    </div>
+
+    <footer class="foot">设备资料库 · 单文件本地应用 · 无需联网</footer>
+  </section>
+
+</div>
+
+<!-- ============ 详情抽屉 ============ -->
+<div class="sheet-mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="rname" id="shName">—</div>
+      <div class="rmodel" id="shModel"></div>
+    </div>
+    <button class="icobtn" id="shClose" title="关闭">✕</button>
+  </div>
+  <div id="shBody"></div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-primary btn-sm" id="shEdit">✎ 编辑</button>
+    <button class="btn-sm" id="shCopyExp">⧉ 复制经验总结</button>
+    <button class="btn-sm" id="shCopyAll">⧉ 复制全部信息</button>
+    <button class="btn-sm btn-danger" id="shDel">🗑 删除</button>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button data-page="search" class="active"><span class="ti">🔍</span>查询</button>
+  <button data-page="add"><span class="ti">＋</span>录入</button>
+  <button data-page="list"><span class="ti">📋</span>设备清单</button>
+  <button data-page="set"><span class="ti">⚙</span>设置</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* 脚本能执行到这里，就说明 JavaScript 没被禁用、文件也没被截断，
+   可以放心移除那条「脚本没有运行」的红色提示了。 */
+(function(){
+  var n = document.getElementById("nojs");
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+})();
+/* =======================================================================
+   设备资料库 —— 单文件本地应用
+   数据：localStorage（本机浏览器）  备份：JSON / CSV 导入导出
+   搜索：精确子串命中 + 字符二元组模糊相似度推荐
+   ======================================================================= */
+
+/* ---------------- 配置 ---------------- */
+var LS_DATA = "device_db_v1";
+var LS_META = "device_db_meta_v1";
+var LS_RECENT = "device_db_recent_v1";
+
+/* 内置字段 */
+var CORE_FIELDS = [
+  { key:"name",     label:"设备名称",           ph:"如：1# 皮带输送机",  core:true, weight:150, primary:true },
+  { key:"model",    label:"型号 / 规格",        ph:"如：DTII-800",       core:true, weight:110 },
+  { key:"lastFix",  label:"上次检修日期",       ph:"", type:"date",       core:true, weight:60 },
+  { key:"bearing",  label:"轴承型号",           ph:"如：22216 CA/W33",   core:true, weight:120 },
+  { key:"screw",    label:"螺丝大小",           ph:"如：M12×60 内六角",  core:true, weight:110 },
+  { key:"exp",      label:"检修经验总结",       ph:"如：拆卸前先松开张紧装置；轴承位易点蚀，建议备 2 套…", type:"textarea", core:true, weight:70 },
+  { key:"location", label:"所在位置",           ph:"如：二车间 A 区 3# 机柜", core:true, weight:70 },
+  { key:"ip",       label:"管理地址 / 后台",    ph:"如：192.168.1.10:8080", core:true, weight:90 },
+  { key:"account",  label:"账号",               ph:"如：admin", core:true, weight:50 },
+  { key:"password", label:"密码",               ph:"", core:true, weight:50 },
+  { key:"tags",     label:"标签 / 关键字",      ph:"用逗号分隔，如：输送,关键设备,备件常换", core:true, weight:95 },
+  { key:"note",     label:"其他备注",           ph:"", type:"textarea", core:true, weight:40 }
+];
+
+var state = {
+  devices: [],
+  meta: { fields: [], threshold: 0.34, theme: "light", size: "small" },
+  editingId: null,
+  query: "",
+  listQuery: "",
+  sort: "name"
+};
+
+/* 外观选项：背景颜色 与 字号大小 */
+var THEMES = { light:"浅色", dark:"深色" };
+var SIZES = { small:"小", medium:"中", large:"大" };
+var THEME_COLORS = { light:"#f4f6fb", dark:"#0f141b" };
+
+/* ---------------- 工具 ---------------- */
+function $(s){ return document.querySelector(s); }
+function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function uid(){
+  return "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function toast(msg){
+  var t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove("show"); }, 1900);
+}
+function allFields(){
+  return CORE_FIELDS.concat(state.meta.fields || []);
+}
+function fieldByKey(k){
+  var f = allFields(); for (var i=0;i<f.length;i++) if (f[i].key === k) return f[i];
+  return null;
+}
+function fmtNow(){
+  var d = new Date(), p = function(n){ return (n<10?"0":"") + n; };
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes());
+}
+function today(){ var d=new Date(), p=function(n){return (n<10?"0":"")+n;}; return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+function daysAgo(dateStr){
+  if (!dateStr) return null;
+  var t = Date.parse(dateStr + "T00:00:00");
+  if (isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+function copyText(text, tip){
+  var done = function(){ toast(tip || "已复制"); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+  } else { fallback(); }
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch(e){ toast("复制失败，请手动选择"); }
+    document.body.removeChild(ta);
+  }
+}
+
+/* ---------------- 安全存储层 ----------------
+   有些手机浏览器（微信/QQ 内置浏览器、无痕模式、禁用站点数据）会禁止
+   localStorage，甚至连读取这个属性都会抛异常。原来的代码在这种情况下
+   会在启动阶段中断，导致「界面能看、按钮全点不动」。
+   这里统一切换到内存存储，保证功能照常可用，只是刷新后数据不保留。 */
+var store = { mode:"local", ok:true, reason:"", data:{} };
+(function(){
+  try {
+    var k = "__dbtest__";
+    window.localStorage.setItem(k, "1");
+    window.localStorage.removeItem(k);
+    store.mode = "local";
+  } catch(e){
+    store.mode = "memory";
+    store.ok = false;
+    store.reason = (e && e.name) ? e.name : "不可用";
+  }
+})();
+function storeGet(key){
+  if (store.mode === "local"){
+    try { return localStorage.getItem(key); } catch(e){ return null; }
+  }
+  return Object.prototype.hasOwnProperty.call(store.data, key) ? store.data[key] : null;
+}
+function storeSet(key, val){
+  if (store.mode === "local"){
+    try { localStorage.setItem(key, val); return true; } catch(e){ return false; }
+  }
+  store.data[key] = String(val);
+  return true;
+}
+
+/* ---------------- 存储 ---------------- */
+function load(){
+  state.devices = Array.isArray(state.devices) ? state.devices : [];
+  try {
+    var raw = storeGet(LS_DATA);
+    var arr = raw ? JSON.parse(raw) : [];
+    state.devices = Array.isArray(arr) ? arr : [];
+  } catch(e){ state.devices = []; }
+  try {
+    var m = storeGet(LS_META);
+    if (m){
+      var o = JSON.parse(m);
+      if (o && typeof o === "object"){
+        if (Array.isArray(o.fields)) state.meta.fields = o.fields;
+        if (typeof o.threshold === "number") state.meta.threshold = o.threshold;
+        if (o.theme && THEMES[o.theme]) state.meta.theme = o.theme;
+        if (o.size && SIZES[o.size]) state.meta.size = o.size;
+      }
+    }
+  } catch(e){}
+  state.devices.forEach(function(d){
+    if (!d.cf || typeof d.cf !== "object") d.cf = {};
+  });
+  if (!Array.isArray(state.meta.fields)) state.meta.fields = [];
+}
+function saveData(){
+  var a = storeSet(LS_DATA, JSON.stringify(state.devices));
+  var b = storeSet(LS_META, JSON.stringify(state.meta));
+  if (!a || !b){
+    toast("保存失败：本机浏览器不允许存储，请先导出备份");
+  }
+  updateStorageInfo();
+  updateTopSub();
+  updateDiag();
+}
+function updateTopSub(){
+  var el = $("#topSub");
+  if (!el) return;
+  el.textContent = state.devices.length
+    ? "已收录 " + state.devices.length + " 条设备记录 · 输入关键字即可查询"
+    : "检修记录 · 备件参数 · 经验总结";
+}
+function saveMeta(){
+  storeSet(LS_META, JSON.stringify(state.meta));
+  updateStorageInfo();
+  updateDiag();
+}
+function updateStorageInfo(){
+  var n = state.devices.length;
+  var bytes = 0;
+  try { bytes = String(storeGet(LS_DATA) || "").length * 2; } catch(e){}
+  var kb = (bytes/1024).toFixed(1);
+  var el = $("#storageInfo");
+  if (el) el.textContent = "当前共 " + n + " 条记录，约占用 " + kb +
+    (store.mode === "local" ? " 本地空间。" : "（内存中，未落盘）。");
+}
+
+/* ---------------- 运行状态（排错用） ---------------- */
+function updateDiag(){
+  var el = $("#appStatus");
+  if (!el) return;
+  var mode = (store.mode === "local")
+    ? '<span class="ok">✔ 可保存</span>（保留在浏览器本地存储）'
+    : '<span class="bad">✘ 受限（' + esc(store.reason) + '）</span>：已自动切换为内存模式，'
+      + '功能可用但<b>刷新后数据会丢失</b>，请尽快用「导出备份」保存到文件。'
+      + '常见原因：用微信/QQ 内置浏览器打开、无痕模式、浏览器设置了「禁止站点保存数据」。';
+  var cf = (state.meta.fields || []).length;
+  el.innerHTML =
+    '脚本运行：<span class="ok">✔ 正常</span>（底部标签可点击）<br>' +
+    '数据保存：' + mode + '<br>' +
+    '设备记录：' + state.devices.length + ' 条　自定义字段：' + cf + ' 个<br>' +
+    '外观：' + (THEMES[state.meta.theme] || "浅色") + ' / 字号 ' + (SIZES[state.meta.size] || "小") + '<br>' +
+    '系统识别：<code>' + esc((navigator.userAgent || "未知").slice(0, 140)) + '</code>';
+}
+
+/* ---------------- 设置：背景颜色 与 字号大小 ---------------- */
+/* 把设置真正作用到页面上 */
+function applyAppearance(){
+  var t = THEMES[state.meta.theme] ? state.meta.theme : "light";
+  var s = SIZES[state.meta.size] ? state.meta.size : "small";
+  state.meta.theme = t;
+  state.meta.size = s;
+  var root = document.documentElement;
+  root.setAttribute("data-theme", t);
+  root.setAttribute("data-size", s);
+  /* 同步手机浏览器地址栏 / 状态栏颜色 */
+  var mc = document.querySelector('meta[name="theme-color"]');
+  if (mc) mc.setAttribute("content", THEME_COLORS[t] || THEME_COLORS.light);
+  /* 高亮当前选中的按钮 */
+  $$("#segTheme [data-theme-val]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-theme-val") === t);
+  });
+  $$("#segSize [data-size-val]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-size-val") === s);
+  });
+}
+/* 修改并保存外观设置 */
+function setAppearance(patch, quiet){
+  if (patch.theme && THEMES[patch.theme]) state.meta.theme = patch.theme;
+  if (patch.size && SIZES[patch.size]) state.meta.size = patch.size;
+  applyAppearance();
+  saveMeta();
+  if (!quiet){
+    toast("背景：" + THEMES[state.meta.theme] +
+          (patch.size ? "　字号：" + SIZES[state.meta.size] : ""));
+  }
+}
+
+/* ---------------- 模糊匹配核心 ---------------- */
+/* 归一化：小写、去空白与常见分隔符号 */
+function norm(s){
+  return String(s == null ? "" : s).toLowerCase()
+    .replace(/[\s\u3000]+/g,"")
+    .replace(/[，,。.、;；:：\/\\|()（）\[\]【】"'`~!！?？*#\-_+=<>@$%^&]/g,"");
+}
+/* 字符二元组集合 */
+function bigrams(s){
+  var out = [], n = s.length;
+  if (n === 0) return out;
+  if (n === 1) return [s];
+  for (var i=0;i<n-1;i++) out.push(s.substr(i,2));
+  return out;
+}
+function dice(a, b){
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  if (a.length < 2 && b.length < 2) return a === b ? 1 : 0;
+  var A = bigrams(a), B = bigrams(b);
+  if (!A.length || !B.length) return 0;
+  var pool = B.slice(), hit = 0;
+  for (var i=0;i<A.length;i++){
+    var idx = pool.indexOf(A[i]);
+    if (idx >= 0){ hit++; pool.splice(idx,1); }
+  }
+  return (2*hit) / (A.length + B.length);
+}
+/* 一个字段的相似度（0~1）：完全相等 / 包含 / 二元组 */
+function simField(q, qn, val){
+  if (!val) return 0;
+  var v = String(val).toLowerCase();
+  var vn = norm(v);
+  if (!vn) return 0;
+  if (vn === qn) return 1;
+  if (vn.indexOf(qn) >= 0 || qn.indexOf(vn) >= 0) return 0.92;
+  /* 逐个分隔片段也算包含（型号里常带空格/斜杠） */
+  var parts = v.split(/[\s\/,，、;；\|]+/).filter(Boolean);
+  for (var i=0;i<parts.length;i++){
+    var p = norm(parts[i]);
+    if (p && (p === qn || p.indexOf(qn) >= 0)) return 0.9;
+  }
+  return dice(qn, vn);
+}
+/* 判断某段文字里是否真的含有该关键字（用于决定是否显示相似度提示） */
+function hasExact(text, q){
+  var kw = String(q || "").trim();
+  if (!kw) return false;
+  try {
+    return new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(String(text == null ? "" : text));
+  } catch(e){ return false; }
+}
+/* 在字段文本中为关键字加高亮（仅用于确切命中） */
+function highlight(text, q){
+  var s = String(text == null ? "" : text);
+  var kw = String(q || "").trim();
+  if (!kw) return esc(s);
+  var out = esc(s);
+  var normKw = norm(kw);
+  if (!normKw) return out;
+  /* 优先直接匹配原文（不区分大小写） */
+  try {
+    var re = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    if (re.test(s)) return out.replace(re, function(m){ return "<mark>"+m+"</mark>"; });
+  } catch(e){}
+  return out;
+}
+
+/* 属于“主要识别信息”的字段：命中这些字段算直接匹配；
+   只命中位置/账号/备注/经验等描述性字段时，归入“相近参考” */
+var MAIN_KEYS = { name:1, model:1, bearing:1, screw:1, tags:1 };
+
+/* 单条设备打分：返回 {score, hits, keyHit} */
+function scoreDevice(d, rawQ){
+  var q = String(rawQ || "").trim();
+  var qn = norm(q);
+  if (!qn) return { score:0, hits:[], keyHit:false };
+  /* 单字查询时不做模糊猜测，避免命中过多无关记录 */
+  var fuzzyOK = qn.length >= 2;
+
+  var fields = allFields();
+  var best = 0, hits = [], keyHit = false;
+
+  fields.forEach(function(f){
+    var val = getVal(d, f);
+    if (!val) return;
+    var s = simField(q, qn, val);
+    if (!fuzzyOK && s < 0.9) return;
+    if (s <= 0.28) return;
+    var w = f.weight || 60;
+    var total = s * w;
+    if (s > 0.995) total += 60;            /* 完全相等加分 */
+    else if (s >= 0.9) total += 25;        /* 包含加分 */
+    if (f.key === "name") total *= 1.35;   /* 名称优先 */
+    if (total > best) best = total;
+    if (s >= 0.9 && MAIN_KEYS[f.key]){ keyHit = true; }
+    hits.push({ field:f.label, key:f.key, val:val, s:s, total:total });
+  });
+
+  /* 扩展字段（历史遗留、未登记的字段）也参与匹配 */
+  Object.keys(d.cf || {}).forEach(function(k){
+    if (fieldByKey(k)) return;
+    var val = d.cf[k];
+    if (!val) return;
+    var s = simField(q, qn, val);
+    if (!fuzzyOK && s < 0.9) return;
+    if (s > 0.28) hits.push({ field:k, key:k, val:val, s:s, total:s*55 });
+  });
+  /* 标签逐词匹配（标签归入主要识别信息） */
+  if (d.tags){
+    String(d.tags).split(/[,，、;；\s]+/).filter(Boolean).forEach(function(t){
+      var s = simField(q, qn, t);
+      if (s > 0.6 && (fuzzyOK || s >= 0.9)){
+        hits.push({ field:"标签", key:"tags", val:t, s:Math.min(1,s+0.1), total:s*100 });
+        keyHit = true;
+      }
+    });
+  }
+
+  hits.sort(function(a,b){ return b.total - a.total; });
+  return { score:best, hits:hits.slice(0,6), keyHit:keyHit };
+}
+
+function getVal(d, f){
+  if (f.core || f.key in d) return d[f.key];
+  return (d.cf || {})[f.key];
+}
+/* 任意字段只要有相似内容就算命中（清单页筛选用，比搜索宽松） */
+function anyMatch(d, q){
+  return scoreDevice(d, q).score > 0;
+}
+function setVal(d, f, v){
+  if (f.core) d[f.key] = v;
+  else { d.cf = d.cf || {}; d.cf[f.key] = v; }
+}
+
+/* 执行搜索 */
+function runSearch(rawQ){
+  var q = String(rawQ || "").trim();
+  state.query = q;
+  var banner = $("#searchBanner"), out = $("#searchOut");
+  if (!q){
+    banner.innerHTML = "";
+    out.innerHTML = "";
+    $("#quickCard").classList.remove("hidden");
+    renderFieldChips();
+    return;
+  }
+  $("#quickCard").classList.add("hidden");
+
+  var scored = state.devices.map(function(d){
+    var r = scoreDevice(d, q);
+    return { d:d, score:r.score, hits:r.hits, keyHit:r.keyHit, wholeHit:r.wholeHit };
+  }).filter(function(x){ return x.score > 0; })
+    .sort(function(a,b){ return b.score - a.score; });
+
+  var matched = scored.filter(function(x){ return x.keyHit; });
+  var sugg = scored.filter(function(x){ return !x.keyHit && (x.score / 150) >= state.meta.threshold; });
+
+  /* 找到就记录最近搜索关键字 */
+  if (matched.length) pushRecent(q);
+
+  var html = "";
+  if (!matched.length){
+    banner.innerHTML =
+      '<div class="banner warn"><span>⚠</span><div>' +
+      '<b>没有查到与「' + esc(q) + '」直接匹配的内容。</b>' +
+      (sugg.length ? '下面列出的是模糊匹配到的相近记录，可供核对参考。' : '') +
+      '</div><button class="x" data-dismiss="1" title="关闭提示">✕</button></div>';
+  } else {
+    banner.innerHTML = '<div class="banner ok"><span>✔</span><div>找到 <b>' + matched.length +
+      '</b> 条与「' + esc(q) + '」匹配的记录' +
+      (sugg.length ? '，另有 ' + sugg.length + ' 条相近记录可供参考。' : '。') + '</div></div>';
+    html += '<div class="section-title">匹配结果（' + matched.length + '）</div>';
+    html += matched.map(function(x){ return renderResult(x, true, q); }).join("");
+  }
+
+  if (sugg.length){
+    html += '<div class="section-title">' + (matched.length ? "相近内容 · 可参考" : "相关内容 · 供参考") + '（' + Math.min(sugg.length,8) + '）</div>';
+    html += sugg.slice(0,8).map(function(x){ return renderResult(x, false, q); }).join("");
+    if (!matched.length){
+      html += '<div class="hint" style="margin:2px 0 12px">以上为模糊匹配出的相近记录，仅供参考核对；若确实没有你要的设备，可直接新增一条。</div>' +
+              '<div class="actions" style="margin-bottom:14px">' +
+              '<button class="btn-sm btn-primary" data-newfrom="' + esc(q) + '">＋ 用「' + esc(short(q,18)) + '」新建记录</button>' +
+              '<button class="btn-sm btn-ghost" data-copyq="' + esc(q) + '">⧉ 复制关键字</button></div>';
+    }
+  } else if (!matched.length){
+    html += '<div class="card"><div class="empty"><div class="big">🗂</div>' +
+            '没有更多可参考的相近记录了。<br>可以换个关键字（例如只输入型号里的几个字符），或到「录入」页新增一条。</div></div>';
+  }
+  out.innerHTML = html;
+}
+
+function renderResult(x, isMatch, q){
+  var d = x.d;
+  var badge = isMatch ? '<span class="badge ok">匹配</span>' : '<span class="badge warn">相近参考</span>';
+  var h = '<div class="result ' + (isMatch ? "match" : "sug") + '" data-id="' + esc(d.id) + '">';
+  h += '<div class="rhead"><div class="grow"><div class="rname">' + highlight(d.name || "(未命名设备)", q) + '</div>';
+  if (d.model) h += '<div class="rmodel">型号：' + highlight(d.model, q) + '</div>';
+  h += '</div>' + badge + '</div>';
+
+  /* 命中摘要 */
+  if (x.hits && x.hits.length){
+    h += '<div class="chips" style="margin-top:8px">';
+    x.hits.slice(0,3).forEach(function(t){
+      h += '<span class="chip static">' + esc(t.field) + '：' + highlight(short(t.val, 34), q) + '</span>';
+    });
+    h += '</div>';
+  }
+
+  /* 关键参数摘要 */
+  var rows = [];
+  if (d.bearing) rows.push(["轴承型号", d.bearing]);
+  if (d.screw)   rows.push(["螺丝大小", d.screw]);
+  if (d.lastFix) {
+    var da = daysAgo(d.lastFix);
+    rows.push(["上次检修", d.lastFix + (da != null ? "（" + da + " 天前）" : "")]);
+  }
+  if (d.exp)     rows.push(["经验总结", short(d.exp, 120)]);
+  if (rows.length){
+    h += '<div class="kv">';
+    rows.forEach(function(r){
+      h += '<div class="k">' + esc(r[0]) + '</div><div class="v">' + highlight(r[1], q) + '</div>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="actions" style="margin-top:10px">' +
+       '<button class="btn-sm btn-ghost" data-act="detail">查看详情</button>' +
+       '<button class="btn-sm btn-ghost" data-act="edit">编辑</button>' +
+       '</div>';
+  /* 模糊命中（文字里并没有关键字原文）时，说明相似程度 */
+  var hitArr = x.hits || [];
+  var exactAny = hitArr.some(function(t){ return hasExact(t.val, q); });
+  if (!exactAny && hitArr.length){
+    h += '<div class="scoreline">与「' + esc(short(q,16)) + '」的相似度约 ' + Math.round(hitArr[0].s * 100) + '%（文字中没有完全一致的关键字）</div>';
+  }
+  h += '</div>';
+  return h;
+}
+function short(s, n){
+  s = String(s == null ? "" : s).replace(/\s+/g," ").trim();
+  return s.length > n ? s.slice(0,n) + "…" : s;
+}
+
+/* 最近搜索 */
+function readRecent(){
+  var list = [];
+  try { list = JSON.parse(storeGet(LS_RECENT) || "[]"); } catch(e){}
+  return Array.isArray(list) ? list : [];
+}
+function pushRecent(q){
+  var list = readRecent().filter(function(x){ return x !== q; });
+  list.unshift(q);
+  list = list.slice(0,10);
+  storeSet(LS_RECENT, JSON.stringify(list));
+  renderRecent();
+}
+function renderRecent(){
+  var list = readRecent();
+  var el = $("#recentChips");
+  if (!el) return;
+  if (!list.length){ el.innerHTML = ""; return; }
+  el.innerHTML = '<span class="muted" style="font-size:12.5px;align-self:center">最近：</span>' +
+    list.map(function(q){ return '<span class="chip" data-q="' + esc(q) + '">' + esc(short(q,16)) + '</span>'; }).join("");
+}
+
+/* 快速字段筛选 */
+function renderFieldChips(){
+  var keys = ["name","model","bearing","screw","lastFix"];
+  var el = $("#fieldChips");
+  el.innerHTML = '<span class="muted" style="font-size:12.5px;align-self:center">按字段浏览：</span>' +
+    keys.map(function(k){
+      var f = fieldByKey(k);
+      return f ? '<span class="chip" data-field="' + k + '">' + esc(f.label) + '</span>' : "";
+    }).join("");
+}
+
+/* ---------------- 结果区交互 ---------------- */
+function up(el, sel){ return (el && el.closest) ? el.closest(sel) : null; }
+document.addEventListener("click", function(ev){
+  var t = ev.target;
+
+  /* 底部标签切换（全局委托；万一某个浏览器没派发到委托，按钮自身还有后备监听） */
+  var tab = up(t, "nav.tabs button[data-page]");
+  if (tab){ ev.__navHandled = 1; go(tab.getAttribute("data-page")); return; }
+
+  /* 设置里的外观按钮 */
+  var tb = up(t, "#segTheme [data-theme-val]");
+  if (tb){
+    var tv = tb.getAttribute("data-theme-val");
+    if (tv !== state.meta.theme) setAppearance({ theme:tv });
+    return;
+  }
+  var sb = up(t, "#segSize [data-size-val]");
+  if (sb){
+    var sv = sb.getAttribute("data-size-val");
+    if (sv !== state.meta.size) setAppearance({ size:sv });
+    return;
+  }
+
+  var nf = up(t, "button[data-newfrom]");
+  if (nf){
+    var kw = nf.getAttribute("data-newfrom");
+    resetForm(); go("add");
+    var el0 = $("#fld_name"); if (el0) el0.value = kw;
+    toast("已把关键字填入设备名称，请补充其他信息");
+    return;
+  }
+  var cq = up(t, "button[data-copyq]");
+  if (cq){ copyText(cq.getAttribute("data-copyq"), "关键字已复制"); return; }
+
+  var dis = up(t, "[data-dismiss]");
+  if (dis){ var bn = up(dis, ".banner"); if (bn) bn.parentNode.removeChild(bn); return; }
+
+  var chip = up(t, ".chip[data-q]");
+  if (chip){ $("#q").value = chip.getAttribute("data-q"); runSearch(chip.getAttribute("data-q")); return; }
+
+  var fchip = up(t, ".chip[data-field]");
+  if (fchip){
+    var k = fchip.getAttribute("data-field"), f = fieldByKey(k);
+    if (!f) return;
+    var items = state.devices.filter(function(d){ return getVal(d, k); })
+      .sort(function(a,b){ return String(getVal(a,k)).localeCompare(String(getVal(b,k)), "zh"); });
+    $("#quickCard").classList.add("hidden");
+    $("#searchBanner").innerHTML = "";
+    $("#searchOut").innerHTML = '<div class="section-title">' + esc(f.label) + "（" + items.length + "）</div>" +
+      (items.length ? items.map(function(d){
+        return '<div class="result" data-id="' + esc(d.id) + '"><div class="rhead"><div class="grow">' +
+          '<div class="rname">' + esc(d.name || "(未命名)") + '</div><div class="rmodel">' + esc(f.label) + "：" + esc(short(getVal(d,k),60)) + '</div>' +
+          '</div><button class="btn-sm btn-ghost" data-act="detail">详情</button></div></div>';
+      }).join("") : '<div class="card"><div class="empty">该字段还没有任何数据</div></div>');
+    return;
+  }
+
+  var act = up(t, "button[data-act]");
+  if (act){
+    var host = act.closest(".result");
+    var id = host ? host.getAttribute("data-id") : null;
+    if (!id) return;
+    if (act.getAttribute("data-act") === "edit"){ startEdit(id); }
+    else { openDetail(id); }
+    return;
+  }
+
+  var res = up(t, ".result");
+  if (res && res.getAttribute("data-id") && !up(t, "button")){ openDetail(res.getAttribute("data-id")); }
+});
+
+/* ---------------- 表单 ---------------- */
+function buildForm(){
+  var body = $("#formBody");
+  var html = "";
+  /* 第一组：核心识别信息 */
+  html += '<div class="row">';
+  html += fieldHTML(fieldByKey("name")) + fieldHTML(fieldByKey("model"));
+  html += '</div>';
+  html += '<div class="row">';
+  html += fieldHTML(fieldByKey("lastFix")) + fieldHTML(fieldByKey("location"));
+  html += '</div>';
+  html += '<div class="row">';
+  html += fieldHTML(fieldByKey("bearing")) + fieldHTML(fieldByKey("screw"));
+  html += '</div>';
+  html += '<div class="section-title">检修经验（最关键的一栏）</div>';
+  html += fieldHTML(fieldByKey("exp"));
+  html += '<div class="row">';
+  html += fieldHTML(fieldByKey("ip")) + fieldHTML(fieldByKey("account"));
+  html += '</div>';
+  html += '<div class="row">';
+  html += fieldHTML(fieldByKey("password")) + fieldHTML(fieldByKey("tags"));
+  html += '</div>';
+  html += fieldHTML(fieldByKey("note"));
+
+  var cf = state.meta.fields || [];
+  if (cf.length){
+    html += '<div class="section-title">自定义字段</div>';
+    cf.forEach(function(f){ html += fieldHTML(f); });
+  }
+  body.innerHTML = html;
+}
+function fieldHTML(f){
+  if (!f) return "";
+  var id = "fld_" + f.key;
+  var label = esc(f.label) + (f.key === "name" ? ' <span style="color:#d92d20">*</span>' : "");
+  var ph = esc(f.ph || "");
+  var h = '<div class="field"><label class="f" for="' + id + '">' + label + '</label>';
+  if (f.type === "textarea"){
+    h += '<textarea id="' + id + '" data-key="' + esc(f.key) + '" placeholder="' + ph + '"></textarea>';
+  } else if (f.type === "date"){
+    h += '<input type="date" id="' + id + '" data-key="' + esc(f.key) + '">';
+  } else {
+    h += '<input type="text" id="' + id + '" data-key="' + esc(f.key) + '" placeholder="' + ph + '" autocomplete="off">';
+  }
+  return h + "</div>";
+}
+function readForm(){
+  var d = { cf:{} };
+  $$("#formBody [data-key]").forEach(function(el){
+    var k = el.getAttribute("data-key"), v = el.value.trim();
+    var f = fieldByKey(k);
+    if (f && f.core) d[k] = v;
+    else d.cf[k] = v;
+  });
+  return d;
+}
+function fillForm(d){
+  $$("#formBody [data-key]").forEach(function(el){
+    var k = el.getAttribute("data-key");
+    var f = fieldByKey(k);
+    var v = f && f.core ? (d[k] || "") : ((d.cf || {})[k] || "");
+    el.value = v;
+  });
+}
+function resetForm(){
+  state.editingId = null;
+  $("#formTitle").textContent = "录入新设备";
+  $("#btnCancelEdit").classList.add("hidden");
+  /* 清空所有输入框 */
+  $$("#formBody [data-key]").forEach(function(el){
+    if (el.tagName === "TEXTAREA" || el.tagName === "INPUT") el.value = "";
+  });
+  /* 日期默认填今天，方便现场随手录入 */
+  var d = $("#fld_lastFix"); if (d) d.value = today();
+}
+function startEdit(id){
+  var d = state.devices.filter(function(x){ return x.id === id; })[0];
+  if (!d) return;
+  state.editingId = id;
+  go("add");
+  $("#formTitle").textContent = "编辑：" + (d.name || "未命名设备");
+  $("#btnCancelEdit").classList.remove("hidden");
+  buildForm();
+  fillForm(d);
+  window.scrollTo({ top:0, behavior:"smooth" });
+  toast("已进入编辑模式");
+}
+function saveForm(){
+  var data = readForm();
+  if (!data.name){
+    toast("请至少填写「设备名称」");
+    var el = $("#fld_name"); if (el) el.focus();
+    return;
+  }
+  if (state.editingId){
+    var idx = -1;
+    state.devices.forEach(function(x,i){ if (x.id === state.editingId) idx = i; });
+    if (idx >= 0){
+      data.id = state.editingId;
+      data.createdAt = state.devices[idx].createdAt || fmtNow();
+      data.updatedAt = fmtNow();
+      state.devices[idx] = data;
+      toast("已更新「" + data.name + "」");
+    }
+  } else {
+    data.id = uid();
+    data.createdAt = fmtNow();
+    data.updatedAt = data.createdAt;
+    state.devices.push(data);
+    toast("已保存「" + data.name + "」");
+  }
+  saveData();
+  resetForm();
+  if (!$("#page-list").classList.contains("hidden")) renderList();
+  if ($("#q").value.trim()) runSearch($("#q").value);
+}
+
+/* ---------------- 列表 ---------------- */
+function renderList(){
+  var q = state.listQuery.trim();
+  var arr = state.devices.slice();
+  if (q){
+    arr = arr.filter(function(d){ return anyMatch(d, q); });
+  }
+  arr.sort(function(a,b){
+    if (state.sort === "date"){
+      var da = a.lastFix || "0000", db = b.lastFix || "0000";
+      return db.localeCompare(da);
+    }
+    return String(a.name || "").localeCompare(String(b.name || ""), "zh");
+  });
+  $("#listCount").textContent = "共 " + state.devices.length + " 条记录" + (q ? "，筛选出 " + arr.length + " 条" : "") + "。";
+  if (!arr.length){
+    $("#listBody").innerHTML = '<div class="empty"><div class="big">📭</div>' +
+      (state.devices.length ? "没有符合条件的记录" : "还没有任何设备记录<br>点「＋ 新增设备」开始录入") + '</div>';
+    return;
+  }
+  $("#listBody").innerHTML = arr.map(function(d){
+    var da = daysAgo(d.lastFix);
+    var sub = [];
+    if (d.model) sub.push("型号 " + d.model);
+    if (d.bearing) sub.push("轴承 " + d.bearing);
+    if (d.screw) sub.push("螺丝 " + d.screw);
+    if (d.lastFix) sub.push("检修 " + d.lastFix + (da != null ? "（" + da + " 天前）" : ""));
+    return '<div class="list-item" data-id="' + esc(d.id) + '">' +
+      '<div class="li-main"><div class="li-name">' + esc(d.name || "(未命名)") + '</div>' +
+      '<div class="li-sub">' + esc(sub.join(" · ") || "暂无参数") + '</div></div>' +
+      '<button class="btn-sm btn-ghost" data-list-act="detail">详情</button>' +
+      '<button class="btn-sm btn-ghost" data-list-act="edit">编辑</button>' +
+      '</div>';
+  }).join("");
+}
+document.addEventListener("click", function(ev){
+  var b = up(ev.target, "button[data-list-act]");
+  if (!b) return;
+  var host = up(b, ".list-item"); if (!host) return;
+  var id = host.getAttribute("data-id");
+  if (b.getAttribute("data-list-act") === "edit") startEdit(id); else openDetail(id);
+});
+
+/* ---------------- 详情抽屉 ---------------- */
+var sheetId = null;
+function openDetail(id){
+  var d = state.devices.filter(function(x){ return x.id === id; })[0];
+  if (!d) return;
+  sheetId = id;
+  var fields = allFields();
+  var html = "";
+  /* 基本情况 */
+  var rows = [];
+  fields.forEach(function(f){
+    if (f.key === "name") return;
+    var v = getVal(d, f);
+    if (v) rows.push([f.label, v, f.key]);
+  });
+  Object.keys(d.cf || {}).forEach(function(k){
+    if (fieldByKey(k)) return;
+    if (d.cf[k]) rows.push([k, d.cf[k], k]);
+  });
+  if (rows.length){
+    html += '<div class="kv">';
+    rows.forEach(function(r){
+      var isSecret = (r[2] === "password" || r[2] === "account" || r[2] === "ip");
+      html += '<div class="k">' + esc(r[0]) + '</div><div class="v">' +
+        (isSecret ? '<span class="copy mono" data-copy="' + esc(r[1]) + '">' + esc(r[1]) + ' ⧉</span>'
+                  : esc(r[1]).replace(/\n/g,"<br>")) + '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div class="muted">该记录除名称外暂无其他内容。</div>';
+  }
+  var da = daysAgo(d.lastFix);
+  if (d.lastFix) html += '<div class="banner info" style="margin-top:14px"><span>🛠</span><div>上次检修：<b>' + esc(d.lastFix) + '</b>' + (da != null ? "，距今 <b>" + da + "</b> 天" : "") + '</div></div>';
+  html += '<div class="muted" style="font-size:12px;margin-top:10px">创建：' + esc(d.createdAt || "-") + '　最后修改：' + esc(d.updatedAt || "-") + '</div>';
+  $("#shName").textContent = d.name || "(未命名设备)";
+  $("#shModel").textContent = d.model ? "型号：" + d.model : "";
+  $("#shBody").innerHTML = html;
+  $("#mask").classList.add("show");
+  $("#sheet").classList.add("show");
+}
+function closeDetail(){
+  $("#mask").classList.remove("show");
+  $("#sheet").classList.remove("show");
+  sheetId = null;
+}
+document.addEventListener("click", function(ev){
+  var c = up(ev.target, ".copy[data-copy]");
+  if (c){ copyText(c.getAttribute("data-copy"), "已复制"); }
+});
+
+/* ---------------- 导入 / 导出 ---------------- */
+function downloadFile(name, text, mime){
+  var blob = new Blob([text], { type: (mime || "application/json") + ";charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+}
+/* 组装备份内容 */
+function backupPayload(){
+  return {
+    app: "设备资料库", version: 1, exportedAt: fmtNow(),
+    meta: state.meta, devices: state.devices
+  };
+}
+function backupName(){
+  return "设备资料库备份_" + today().replace(/-/g,"") + ".json";
+}
+function exportJson(){
+  if (!state.devices.length){ toast("暂无数据可导出"); return; }
+  var payload = backupPayload();
+  downloadFile(backupName(), JSON.stringify(payload, null, 2));
+}
+/* 复制备份内容到剪贴板：微信里收不到文件时，可以粘贴到聊天窗口发给自己 */
+function copyBackupText(){
+  if (!state.devices.length){ toast("暂无数据可导出"); return; }
+  copyText(JSON.stringify(backupPayload()), "已复制备份内容（" + state.devices.length + " 条），可粘贴到聊天窗口发送");
+}
+/* 系统分享面板：可发到微信/QQ/蓝牙/其他设备，不依赖下载功能 */
+function shareBackup(){
+  if (!state.devices.length){ toast("暂无数据可导出"); return; }
+  var text = JSON.stringify(backupPayload());
+  var name = backupName();
+  try {
+    var file = new File([text], name, { type:"application/json" });
+    if (navigator.canShare && navigator.canShare({ files:[file] }) && navigator.share){
+      navigator.share({ files:[file], title:"设备资料库备份", text:"设备资料库备份（" + state.devices.length + " 条）" })
+        .then(function(){ toast("已打开系统分享"); }, function(){});
+      return;
+    }
+    if (navigator.share){
+      navigator.share({ title:"设备资料库备份", text:text }).then(function(){ toast("已打开系统分享"); }, function(){});
+      return;
+    }
+    copyText(text, "当前浏览器不支持系统分享，已改为复制备份内容");
+  } catch(e){
+    copyText(text, "当前浏览器不支持系统分享，已改为复制备份内容");
+  }
+}
+/* 从剪贴板里粘贴备份内容并导入（手机上最省事的数据交换方式） */
+function importFromClipboard(){
+  var apply = function(txt){
+    if (!txt || !txt.trim()){ toast("剪贴板里没有内容"); return; }
+    importJson(String(txt));
+  };
+  if (navigator.clipboard && navigator.clipboard.readText){
+    navigator.clipboard.readText().then(apply, function(){
+      var t = prompt("无法直接读取剪贴板，请把备份内容粘贴到下面：");
+      if (t) apply(t);
+    });
+  } else {
+    var t = prompt("请把备份内容粘贴到下面：");
+    if (t) apply(t);
+  }
+}
+function exportCsv(){
+  if (!state.devices.length){ toast("暂无数据可导出"); return; }
+  var cols = allFields().filter(function(f){ return f.key !== "name"; }).map(function(f){ return f.label; });
+  cols.unshift("设备名称");
+  var extraKeys = {};
+  state.devices.forEach(function(d){
+    Object.keys(d.cf || {}).forEach(function(k){
+      if (!fieldByKey(k) && d.cf[k]) extraKeys[k] = 1;
+    });
+  });
+  Object.keys(extraKeys).forEach(function(k){ cols.push(k); });
+  var lines = [cols.map(csvCell).join(",")];
+  state.devices.forEach(function(d){
+    var row = [csvCell(d.name || "")];
+    allFields().forEach(function(f){
+      if (f.key === "name") return;
+      row.push(csvCell(getVal(d, f) || ""));
+    });
+    Object.keys(extraKeys).forEach(function(k){ row.push(csvCell((d.cf || {})[k] || "")); });
+    lines.push(row.join(","));
+  });
+  var csv = "\ufeff" + lines.join("\r\n");
+  downloadFile("设备清单_" + today().replace(/-/g,"") + ".csv", csv, "text/csv");
+  toast("CSV 已导出（可用 Excel 打开）");
+}
+/* 导出为方便阅读的纯文本，用于发微信、贴备忘录用 */
+function copyAllAsText(){
+  if (!state.devices.length){ toast("暂无数据"); return; }
+  var out = ["设备资料库 · 共 " + state.devices.length + " 条", ""];
+  state.devices.forEach(function(d, i){
+    out.push("【" + (i+1) + "】" + (d.name || "(未命名)"));
+    allFields().forEach(function(f){
+      if (f.key === "name") return;
+      var v = getVal(d, f);
+      if (v) out.push("　" + f.label + "：" + String(v).replace(/\n/g, " / "));
+    });
+    Object.keys(d.cf || {}).forEach(function(k){
+      if (!fieldByKey(k) && d.cf[k]) out.push("　" + k + "：" + d.cf[k]);
+    });
+    if (i < state.devices.length - 1) out.push("");
+  });
+  copyText(out.join("\n"), "全部记录已复制为文本，可直接粘贴发送");
+}
+function csvCell(v){
+  var s = String(v == null ? "" : v);
+  return '"' + s.replace(/"/g,'""').replace(/\r?\n/g," ") + '"';
+}
+function importJson(text){
+  var obj = null;
+  try { obj = JSON.parse(text); } catch(e){ toast("导入失败：不是有效的 JSON 文件"); return; }
+  var arr = null;
+  if (Array.isArray(obj)) arr = obj;
+  else if (obj && Array.isArray(obj.devices)) arr = obj.devices;
+  else if (obj && Array.isArray(obj.data)) arr = obj.data;
+  if (!arr){ toast("导入失败：文件里没有找到设备列表"); return; }
+
+  if (obj && obj.meta && Array.isArray(obj.meta.fields)){
+    obj.meta.fields.forEach(function(f){
+      if (!f || !f.key) return;
+      if (!fieldByKey(f.key)) (state.meta.fields = state.meta.fields || []).push(f);
+    });
+  }
+  var added = 0, updated = 0;
+  arr.forEach(function(raw){
+    if (!raw || typeof raw !== "object") return;
+    var d = {
+      id: raw.id || uid(),
+      name: raw.name || "",
+      model: raw.model || "",
+      lastFix: raw.lastFix || "",
+      bearing: raw.bearing || "",
+      screw: raw.screw || "",
+      exp: raw.exp || "",
+      location: raw.location || "",
+      ip: raw.ip || "",
+      account: raw.account || "",
+      password: raw.password || "",
+      tags: raw.tags || "",
+      note: raw.note || "",
+      cf: (raw.cf && typeof raw.cf === "object") ? raw.cf : {},
+      createdAt: raw.createdAt || fmtNow(),
+      updatedAt: raw.updatedAt || fmtNow()
+    };
+    var existing = null;
+    state.devices.forEach(function(x){ if (x.id === d.id) existing = x; });
+    if (existing){
+      if (confirm("发现相同 ID 的记录「" + (existing.name || "未命名") + "」，是否覆盖？\n\n确定 = 覆盖；取消 = 作为新记录导入")){
+        for (var k in d) existing[k] = d[k];
+        updated++;
+      } else {
+        d.id = uid(); state.devices.push(d); added++;
+      }
+    } else { state.devices.push(d); added++; }
+  });
+  saveData(); renderList();
+  if ($("#q").value.trim()) runSearch($("#q").value);
+  toast("导入完成：新增 " + added + " 条，覆盖 " + updated + " 条");
+}
+
+/* ---------------- 页面切换 ---------------- */
+function go(page){
+  ["search","add","list","set"].forEach(function(p){
+    $("#page-" + p).classList.toggle("hidden", p !== page);
+  });
+  $$("nav.tabs button").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-page") === page);
+  });
+  if (page === "list") renderList();
+  if (page === "add" && !$("#formBody").children.length){ buildForm(); var e = $("#fld_lastFix"); if (e && !e.value) e.value = today(); }
+  if (page === "set"){ renderCfList(); updateStorageInfo(); applyAppearance(); updateDiag(); }
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ---------------- 自定义字段管理 ---------------- */
+function renderCfList(){
+  var cf = state.meta.fields || [];
+  var el = $("#cfList");
+  if (!cf.length){ el.innerHTML = '<div class="muted" style="font-size:13px">还没有自定义字段。</div>'; return; }
+  el.innerHTML = cf.map(function(f,i){
+    return '<div class="list-item"><div class="li-main"><div class="li-name">' + esc(f.label) + '</div>' +
+      '<div class="li-sub">键名 ' + esc(f.key) + (f.ph ? " · 提示：" + esc(f.ph) : "") + '</div></div>' +
+      '<button class="btn-sm btn-danger" data-delcf="' + i + '">删除</button></div>';
+  }).join("");
+}
+function addCf(){
+  var label = $("#cfName").value.trim();
+  if (!label){ toast("请填写字段名称"); return; }
+  var ph = $("#cfHint").value.trim();
+  var key = "cf_" + Date.now().toString(36);
+  (state.meta.fields = state.meta.fields || []).push({ key:key, label:label, ph:ph, core:false, weight:80 });
+  saveMeta(); $("#cfName").value = ""; $("#cfHint").value = "";
+  renderCfList(); buildForm();
+  var q = $("#q").value.trim(); if (q) runSearch(q);
+  toast("已添加字段：" + label);
+}
+
+/* ---------------- 示例数据 ---------------- */
+function loadDemo(){
+  var demo = [
+    { name:"1# 皮带输送机", model:"DTII-800", lastFix:"2025-03-14", bearing:"22216 CA/W33", screw:"M12×60 内六角（8.8 级）",
+      exp:"拆装顺序：先松张紧装置 → 卸滚筒端盖 → 顶出轴承。\n轴承位易点蚀，建议常备 2 套 22216。\n对轮螺栓力矩按 90 N·m 复紧，跑合 2 小时后复查。",
+      location:"二车间 A 区", tags:"输送,关键设备,备件常换" },
+    { name:"循环水泵 P-102", model:"IS100-65-200", lastFix:"2025-01-08", bearing:"6308-2RS", screw:"M10×35 外六角",
+      exp:"机械密封更换必须整体换新，不要只换动环。\n启动前务必盘车并排气，空转 30 秒就会烧密封。", location:"泵房 2# 基础", tags:"水泵,备用" },
+    { name:"车间路由器", model:"TP-LINK TL-ER6120", lastFix:"2025-06-02", bearing:"无", screw:"M6 挂耳螺丝",
+      exp:"后台地址被改过，登录失败时先按 Reset 长按 8 秒恢复出厂。\nWAN 口接光猫，LAN2 接交换机。", location:"配电间机柜", ip:"192.168.1.10:8080",
+      account:"admin", password:"admin123", tags:"网络,办公" }
+  ];
+  demo.forEach(function(d){
+    d.id = uid(); d.cf = {}; d.createdAt = fmtNow(); d.updatedAt = d.createdAt;
+    state.devices.push(d);
+  });
+  saveData(); renderList(); toast("已载入 3 条示例数据");
+}
+
+/* ---------------- 事件绑定 ---------------- */
+function bind(){
+  /* 底部标签的点击统一由上面的全局委托处理；这里只做标记与后备绑定 */
+  $$("nav.tabs button").forEach(function(b){
+    b.setAttribute("type", "button");
+    if (b.addEventListener){
+      /* 后备：只有全局委托没有处理这次点击时才生效，避免重复切换 */
+      b.addEventListener("click", function(ev){
+        if (ev && ev.__navHandled) return;
+        go(b.getAttribute("data-page"));
+      });
+    }
+  });
+  $("#q").addEventListener("input", function(){ runSearch(this.value); });
+  $("#btnClearQ").addEventListener("click", function(){ $("#q").value = ""; runSearch(""); $("#q").focus(); });
+  $("#qList").addEventListener("input", function(){ state.listQuery = this.value; renderList(); });
+  $("#btnSortName").addEventListener("click", function(){ state.sort = "name"; renderList(); });
+  $("#btnSortDate").addEventListener("click", function(){ state.sort = "date"; renderList(); });
+  $("#btnNewTop").addEventListener("click", function(){ resetForm(); go("add"); });
+  $("#btnAllDevices2").addEventListener("click", function(){ go("list"); });
+  $("#btnRecentFix").addEventListener("click", function(){
+    var items = state.devices.filter(function(d){ var n = daysAgo(d.lastFix); return n != null && n <= 30; })
+      .sort(function(a,b){ return String(b.lastFix).localeCompare(String(a.lastFix)); });
+    $("#quickCard").classList.add("hidden");
+    $("#searchBanner").innerHTML = '<div class="banner info"><span>🛠</span><div>最近 30 天内检修过的设备：<b>' + items.length + '</b> 条</div></div>';
+    $("#searchOut").innerHTML = items.length ? items.map(function(d){
+      return '<div class="result match" data-id="' + esc(d.id) + '"><div class="rhead"><div class="grow">' +
+        '<div class="rname">' + esc(d.name || "(未命名)") + '</div><div class="rmodel">' +
+        esc(d.lastFix) + " 检修（" + daysAgo(d.lastFix) + " 天前）" + (d.bearing ? " · 轴承 " + esc(d.bearing) : "") +
+        '</div></div><button class="btn-sm btn-ghost" data-act="detail">详情</button></div></div>';
+    }).join("") : '<div class="card"><div class="empty">最近 30 天没有检修记录</div></div>';
+  });
+  $("#btnSave").addEventListener("click", saveForm);
+  $("#btnResetForm").addEventListener("click", resetForm);
+  $("#btnCancelEdit").addEventListener("click", function(){ resetForm(); go("search"); });
+  /* 外观的「背景颜色 / 字号」按钮由上面的全局委托统一处理 */
+  $$("#segTheme [data-theme-val], #segSize [data-size-val]").forEach(function(b){
+    b.setAttribute("type", "button");
+  });
+  $("#mask").addEventListener("click", closeDetail);
+  $("#shClose").addEventListener("click", closeDetail);
+  $("#shEdit").addEventListener("click", function(){ var id = sheetId; closeDetail(); if (id) startEdit(id); });
+  $("#shDel").addEventListener("click", function(){
+    if (!sheetId) return;
+    var d = state.devices.filter(function(x){ return x.id === sheetId; })[0];
+    if (!d) return;
+    if (!confirm("确定删除「" + (d.name || "未命名设备") + "」？此操作不可撤销。\n（建议先导出备份）")) return;
+    state.devices = state.devices.filter(function(x){ return x.id !== sheetId; });
+    saveData(); closeDetail(); renderList();
+    if ($("#q").value.trim()) runSearch($("#q").value);
+    toast("已删除");
+  });
+  $("#shCopyExp").addEventListener("click", function(){
+    var d = state.devices.filter(function(x){ return x.id === sheetId; })[0];
+    if (!d) return;
+    if (!d.exp){ toast("这条记录还没有填写经验总结"); return; }
+    copyText(d.name + " 检修经验：\n" + d.exp, "经验总结已复制");
+  });
+  $("#shCopyAll").addEventListener("click", function(){
+    var d = state.devices.filter(function(x){ return x.id === sheetId; })[0];
+    if (!d) return;
+    var lines = [];
+    allFields().forEach(function(f){
+      var v = getVal(d, f);
+      if (v) lines.push(f.label + "：" + v);
+    });
+    Object.keys(d.cf || {}).forEach(function(k){
+      if (!fieldByKey(k) && d.cf[k]) lines.push(k + "：" + d.cf[k]);
+    });
+    copyText(lines.join("\n"), "全部信息已复制");
+  });
+  $("#btnExport").addEventListener("click", exportJson);
+  $("#btnBackupQuick").addEventListener("click", exportJson);
+  $("#btnExportCsv").addEventListener("click", exportCsv);
+  /* 手机端数据交换 */
+  $("#btnShare").addEventListener("click", shareBackup);
+  $("#btnCopyBackup").addEventListener("click", copyBackupText);
+  $("#btnPasteImport").addEventListener("click", importFromClipboard);
+  $("#btnCopyText").addEventListener("click", copyAllAsText);
+  $("#btnImport").addEventListener("click", function(){ $("#fileImport").click(); });
+  $("#fileImport").addEventListener("change", function(){
+    var f = this.files && this.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function(){ importJson(String(r.result)); $("#fileImport").value = ""; };
+    r.readAsText(f, "utf-8");
+  });
+  $("#btnAddField").addEventListener("click", addCf);
+  $("#cfList").addEventListener("click", function(ev){
+    var b = up(ev.target, "button[data-delcf]");
+    if (!b) return;
+    var i = parseInt(b.getAttribute("data-delcf"), 10);
+    var f = (state.meta.fields || [])[i];
+    if (!f) return;
+    if (!confirm("删除字段「" + f.label + "」？\n已录入的数据仍会保留，但不再显示在表单里。")) return;
+    state.meta.fields.splice(i,1); saveMeta(); renderCfList(); buildForm(); toast("已删除字段");
+  });
+  var thr = $("#thr");
+  thr.value = state.meta.threshold;
+  $("#thVal").textContent = Number(state.meta.threshold).toFixed(2);
+  thr.addEventListener("input", function(){
+    state.meta.threshold = parseFloat(this.value);
+    $("#thVal").textContent = state.meta.threshold.toFixed(2);
+    saveMeta();
+    if ($("#q").value.trim()) runSearch($("#q").value);
+  });
+  $("#btnLoadDemo").addEventListener("click", loadDemo);
+  $("#btnWipe").addEventListener("click", function(){
+    if (!confirm("确定清空全部 " + state.devices.length + " 条记录？\n建议先导出备份。")) return;
+    if (!confirm("再次确认：此操作不可恢复。")) return;
+    state.devices = []; saveData(); renderList(); runSearch($("#q").value); toast("已清空");
+  });
+  document.addEventListener("keydown", function(ev){
+    if (ev.key === "Escape") closeDetail();
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter" && !$("#page-add").classList.contains("hidden")) saveForm();
+    if (ev.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA"){
+      ev.preventDefault(); go("search"); $("#q").focus();
+    }
+  });
+}
+
+/* ---------------- 启动 ---------------- */
+/* 每个启动步骤单独 try，任何一步出问题都不再让整个界面变成「点不动」 */
+function step(name, fn){
+  try { fn(); return true; }
+  catch(e){
+    try { if (window.console && console.error) console.error("启动步骤失败：" + name, e); } catch(e2){}
+    return false;
+  }
+}
+step("读取数据", load);
+step("应用外观", applyAppearance);
+step("构建表单", buildForm);
+step("清空表单", resetForm);
+step("绑定事件", bind);
+step("最近搜索", renderRecent);
+step("字段快捷", renderFieldChips);
+step("存储信息", updateStorageInfo);
+step("顶部副标题", updateTopSub);
+step("运行状态", updateDiag);
+step("移除脚本提示", function(){
+  var n = document.getElementById("nojs");
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+});
+window.addEventListener("storage", function(ev){
+  if (ev.key === LS_DATA){ load(); renderList(); updateTopSub(); }
+  if (ev.key === LS_META){ load(); applyAppearance(); updateDiag(); }
+});
+</script>
+</body>
+</html>
