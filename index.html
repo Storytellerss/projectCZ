@@ -1,0 +1,4181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="工作管理">
+<title>工作管理 · 工作票登记与查询</title>
+
+<!-- 添加到手机桌面 -->
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- PWA manifest（内联，不额外建文件） -->
+<link rel="manifest" href='data:application/manifest+json,{
+  "name": "工作管理",
+  "short_name": "工作管理",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}'>
+<style>
+/* ===== 配色变量：底色（浅/深）+ 主题色（可调） ===== */
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#68727f; --line:#e3e8f0;
+  --soft:#f1f5f9; --faint:#98a2b3; --faint-line:#c3cbd6;
+  --ok:#0f9d58; --ok-bg:#e7f7ee; --ok-ink:#0b6b3d; --ok-line:#c6ead7;
+  --warn:#b45309; --warn-bg:#fdf3e3; --warn-ink:#7c4a03; --warn-line:#f5dfba;
+  --danger:#d92d20; --danger-bg:#fdeceb; --danger-line:#f4c9c6;
+  --header-bg:rgba(244,246,251,.92); --nav-bg:rgba(255,255,255,.96);
+  --toast-bg:#111827; --toast-ink:#ffffff;
+  --mark-bg:#fff3a3; --mark-ink:#1f2733; --grab:#e4e7ec;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --card:#18202b; --ink:#e8edf5; --muted:#97a3b4; --line:#2a3544;
+  --soft:#222c38; --faint:#7b8798; --faint-line:#3c4859;
+  --ok:#4ade80; --ok-bg:#14301f; --ok-ink:#86efac; --ok-line:#245c3a;
+  --warn:#fbbf24; --warn-bg:#3a2c10; --warn-ink:#fde68a; --warn-line:#5b431a;
+  --danger:#f87171; --danger-bg:#3b1a1a; --danger-line:#6b2626;
+  --header-bg:rgba(15,20,27,.92); --nav-bg:rgba(24,32,43,.96);
+  --toast-bg:#e8edf5; --toast-ink:#111827;
+  --mark-bg:#7a6414; --mark-ink:#ffe9a3; --grab:#333f4f;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px rgba(0,0,0,.32);
+  color-scheme:dark;
+}
+/* 主题色：由脚本根据设置覆盖，默认蓝 */
+:root{
+  --brand:#2563eb;
+  --brand-d:#1d4ed8;
+  --brand-l:#e8f0ff;
+  --brand-ink:#1e40af;
+  --brand-line:#cfe0ff;
+}
+:root[data-theme="dark"]{
+  --brand-l:#1b2c44;
+  --brand-ink:#bfdbfe;
+}
+/* ===== 字号：小（默认）/ 中 / 大 ===== */
+:root{ --fs:15px; --fs-s:13px; --fs-xs:12px; --fs-l:16px; }
+:root[data-size="small"] { --fs:15px;   --fs-s:13px;   --fs-xs:12px;   --fs-l:16px; }
+:root[data-size="medium"]{ --fs:16.5px; --fs-s:14.2px; --fs-xs:13px;   --fs-l:18px; }
+:root[data-size="large"] { --fs:18.5px; --fs-s:15.8px; --fs-xs:14.5px; --fs-l:20.5px; }
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink); font-size:var(--fs); line-height:1.55;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  transition:background-color .18s ease, color .18s ease;
+}
+a{color:var(--brand)}
+.wrap{max-width:960px;margin:0 auto;padding:14px}
+/* ---------- 顶栏 ---------- */
+header.top{
+  position:sticky; top:0; z-index:30; background:var(--header-bg);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  padding:10px 14px;
+}
+.topin{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.logo{
+  width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+  background:var(--brand);color:#fff;font-weight:700;font-size:17px;
+}
+:root[data-theme="dark"] .logo{color:#0b1220}
+.title{font-weight:700;font-size:var(--fs-l);line-height:1.2}
+.sub{color:var(--muted);font-size:var(--fs-xs)}
+.grow{flex:1 1 auto}
+/* ---------- 卡片 / 表单 ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:var(--fs-l);display:flex;align-items:center;gap:8px}
+.card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex:0 0 auto}
+.hint{color:var(--muted);font-size:var(--fs-xs);margin:6px 0 0}
+.field{margin-bottom:12px}
+label.f{display:block;font-size:var(--fs-xs);color:var(--muted);margin:0 0 5px}
+input[type=text],input[type=date],input[type=datetime-local],input[type=search],textarea,select{
+  width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:11px;padding:11px 12px;font-size:var(--fs-l);font-family:inherit;outline:none;
+}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+/* 时间输入框的即时校验提示 */
+.timehint{font-size:var(--fs-xs);color:var(--muted);margin:5px 0 0}
+.timehint.ok{color:var(--ok-ink);font-weight:600}
+.timehint.bad{color:var(--danger);font-weight:600}
+input.ok{border-color:var(--ok)}
+input.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(217,45,32,.12)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.rowg{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+@media(max-width:580px){.row{grid-template-columns:1fr}.row3{grid-template-columns:1fr 1fr 1fr;gap:8px}.rowg{grid-template-columns:1fr 1fr 1fr;gap:8px}}
+/* ---------- 按钮 ---------- */
+button{font-family:inherit;font-size:var(--fs-l);cursor:pointer;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px}
+button:active{transform:translateY(1px)}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+:root[data-theme="dark"] .btn-primary{color:#0b1220}
+.btn-danger{border-color:var(--danger-line);color:var(--danger)}
+.btn-sm{padding:7px 11px;font-size:var(--fs-s);border-radius:9px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions:empty{display:none}
+.mini{font-size:var(--fs-s);padding:6px 10px;border-radius:9px}
+/* ---------- 搜索 ---------- */
+.searchbar{display:flex;gap:8px}
+.searchbox{flex:1 1 auto;position:relative;display:flex;align-items:center}
+.searchbox .ico{position:absolute;left:12px;color:var(--faint);font-size:16px;pointer-events:none}
+input[type=search]{padding-left:36px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:var(--fs-xs);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l)}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+.chip.on:hover{color:#fff}
+.seg.compact button{min-width:62px;padding:7px 8px;gap:2px}
+/* ---------- 结果 ---------- */
+.ticket{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
+.ticket.hit{border-left:4px solid var(--ok)}
+.ticket.near{border-left:4px solid var(--warn)}
+.ticket.late{border-left:4px solid var(--danger)}
+.thead{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.tname{font-weight:700;font-size:var(--fs-l)}
+.tmeta{color:var(--muted);font-size:var(--fs-s)}
+.badge{font-size:var(--fs-xs);border-radius:999px;padding:3px 9px;background:var(--brand-l);color:var(--brand);font-weight:600;white-space:nowrap}
+.badge.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.badge.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.badge.bad{background:var(--danger-bg);color:var(--danger)}
+.badge.plain{background:var(--soft);color:var(--muted)}
+.badge.done{background:var(--ink);color:var(--card);border:1px solid var(--ink);font-weight:700;letter-spacing:.5px}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:5px 10px;margin-top:9px;font-size:var(--fs-s)}
+.kv .k{color:var(--muted);font-size:var(--fs-xs)}
+.kv .v{word-break:break-word;white-space:pre-wrap}
+mark{background:var(--mark-bg);color:var(--mark-ink);border-radius:3px;padding:0 1px}
+/* ---------- 提示条 ---------- */
+.banner{border-radius:12px;padding:11px 13px;font-size:var(--fs-s);display:flex;gap:9px;align-items:flex-start;margin-bottom:12px}
+.banner.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.banner.info{background:var(--brand-l);color:var(--brand-ink);border:1px solid var(--brand-line)}
+.banner.ok{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.banner .x{margin-left:auto;background:transparent;border:0;color:inherit;padding:0 4px;font-size:16px;line-height:1}
+.section-title{font-size:var(--fs-xs);color:var(--muted);font-weight:600;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.empty{text-align:center;padding:26px 14px;color:var(--muted)}
+.empty .big{font-size:34px;line-height:1;margin-bottom:8px}
+/* ---------- 列表 ---------- */
+.list-item{display:flex;gap:10px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.li-main{flex:1 1 auto;min-width:0}
+.li-name{font-weight:600;font-size:var(--fs-l);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-sub{color:var(--muted);font-size:var(--fs-xs);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- 底部标签 ---------- */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--nav-bg);
+  backdrop-filter:blur(8px);border-top:1px solid var(--line);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+}
+nav.tabs button{
+  flex:1;border:0;background:transparent;padding:6px 2px;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:var(--fs-xs)
+}
+nav.tabs button .ti{font-size:19px;line-height:1.1}
+nav.tabs button.active{color:var(--brand);background:var(--brand-l);font-weight:700}
+/* ---------- 抽屉 ---------- */
+.sheet-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;display:none}
+.sheet-mask.show{display:block}
+.sheet{
+  visibility:hidden; pointer-events:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--card);color:var(--ink);
+  border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;
+  max-height:88vh;overflow:auto;transform:translateY(102%);transition:transform .22s ease, visibility .22s;
+  padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.sheet.show{visibility:visible;pointer-events:auto;transform:translateY(0)}
+@media(min-width:780px){
+  .sheet{left:50%;right:auto;bottom:auto;top:50%;width:720px;max-height:86vh;border-radius:18px;
+    transform:translate(-50%,-46%) scale(.98);opacity:0;transition:all .2s ease}
+  .sheet.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.sheet-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.grab{width:44px;height:4px;border-radius:999px;background:var(--grab);margin:0 auto 10px}
+.icobtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
+.topuser{max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-xs);color:var(--muted);padding:0 6px;text-align:right}
+/* ---------- 设置：分段按钮 / 取色 ---------- */
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1 1 0;min-width:92px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;font-size:var(--fs-s);color:var(--muted)}
+.seg button .si{font-size:20px;line-height:1.1}
+.seg button.active{border-color:var(--brand);background:var(--brand-l);color:var(--brand);font-weight:700}
+.colorlist{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.swatch{
+  width:44px;height:44px;border-radius:12px;border:2px solid var(--line);cursor:pointer;padding:0;
+  display:grid;place-items:center;color:#fff;font-size:16px
+}
+.swatch.active{border-color:var(--ink);box-shadow:0 0 0 3px var(--brand-l)}
+.pickerline{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+input[type=color]{width:52px;height:38px;padding:2px;border:1px solid var(--line);background:var(--card);border-radius:10px;cursor:pointer}
+#appStatus{font-size:var(--fs-xs);line-height:1.9;color:var(--muted);word-break:break-all}
+#appStatus .ok{color:var(--ok-ink);font-weight:600}
+#appStatus .bad{color:var(--danger);font-weight:600}
+#appStatus code{background:var(--soft);border-radius:5px;padding:1px 5px}
+/* ---------- 杂项 ---------- */
+.hidden{display:none !important}
+.muted{color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace}
+.copy{cursor:pointer;border-bottom:1px dashed var(--faint-line)}
+footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:8px 0 20px}
+.toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(10px);z-index:90;
+  background:var(--toast-bg);color:var(--toast-ink);padding:9px 16px;border-radius:999px;
+  font-size:var(--fs-s);opacity:0;transition:all .2s ease;pointer-events:none;max-width:86vw;text-align:center
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#nojs{background:#b45309;color:#fff;font-size:14px;line-height:1.7;padding:12px 14px;text-align:center;position:relative;z-index:50}
+#nojs b{color:#fff3c4}
+/* 设备记录卡片：字体放大并加粗 */
+.dev-card .tname{
+  font-size:calc(var(--fs-l) + 4px);
+  font-weight:800;
+}
+.dev-card .tmeta{
+  font-size:calc(var(--fs-s) + 1.5px);
+  font-weight:600;
+}
+.dev-card .kv{
+  font-size:calc(var(--fs) + 1px);
+}
+.dev-card .kv .k{
+  font-size:calc(var(--fs-s) + 1px);
+  font-weight:600;
+  color:var(--ink);        /* 想让标签也更深一点可加这行 */
+}
+.dev-card .kv .v{
+  font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<div id="nojs">
+  页面脚本没有运行：如果界面能看、但按钮都点不动，多半是在<b>微信/QQ 内置预览窗口</b>里打开的（它会禁止本地存储）。
+  请点右上角「⋯」→ 用其他应用打开 → 选 <b>Chrome / 系统浏览器</b>；文件也可能在传输中被截断，建议重新拷一份。
+</div>
+
+<header class="top">
+  <div class="topin">
+    <div class="logo">票</div>
+    <div>
+      <div class="title">工作管理</div>
+      <div class="sub" id="topSub">批准开始 · 批准结束 · 负责人</div>
+    </div>
+    <div class="grow"></div>
+    <span class="topuser" id="topUser"></span>
+    <button class="icobtn" id="btnBackupQuick" title="导出备份">⬇</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ 工作票（父页面） ============ -->
+  <section id="page-wt">
+    <div class="card">
+      <h2><span class="dot"></span>工作票</h2>
+      <div class="hint">选择要做的操作：查询已有工作票，或登记新的工作票。</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn-primary btn-block" id="btnGoSearch" style="padding:18px 14px">🔍 查询工作票</button>
+        <button class="btn-block" id="btnGoAdd" style="padding:18px 14px">＋ 登记工作票</button>
+      </div>
+      <div class="hint" id="wtCount"></div>
+    </div>
+  </section>
+
+  <!-- ============ 查询（工作票子页面） ============ -->
+  <section id="page-search" class="hidden">
+    <div class="actions"><button class="btn-sm" id="btnBackWt">← 返回工作票</button></div>
+    <div class="card">
+      <div class="searchbar">
+        <div class="searchbox">
+          <span class="ico">🔍</span>
+          <input type="search" id="q" placeholder="搜名称 / 批准开始 / 批准结束 / 负责人 / 种类…" autocomplete="off">
+        </div>
+        <button class="btn-sm" id="btnClearQ">清空</button>
+      </div>
+      <div class="hint">支持模糊搜索：名字记不全、负责人只记得姓、时间只记得「1004」或「1415」都能搜到；点下面的快捷筛选可看即将到期的工作票。</div>
+      <div class="chips" id="recentChips"></div>
+      <div class="actions" id="recentActions">
+        <button class="btn-sm" id="btnClearRecent">🧹 清除搜索记录</button>
+      </div>
+    </div>
+
+    <div id="searchBanner"></div>
+    <div id="searchOut"></div>
+
+    <div class="card" id="quickCard">
+      <h2><span class="dot"></span>快捷查看</h2>
+      <div class="chips" id="quickChips"></div>
+      <div class="chips" id="projFilterChips"></div>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn-sm" id="btnNewTop">＋ 登记新票</button>
+        <button class="btn-sm" id="btnSortDeadline">按批准结束时间排序</button>
+        <button class="btn-sm" id="btnSortCreated">按登记时间排序</button>
+      </div>
+      <div class="hint">「即将到期」按批准工作结束时间算，4 小时内会标黄、超过会标红。</div>
+    </div>
+
+    <div class="card" id="helpCard">
+      <h2><span class="dot"></span>使用说明</h2>
+      <div class="hint" style="line-height:1.85">
+        1. <b>登记</b>：点底部「＋ 登记」，填工作票名称、<b>批准工作开始时间</b>、<b>批准工作结束时间</b>、工作负责人，再选<b>工作票种类</b>（电气一种票 / 电气二种票 / 其他）和<b>状态</b>（已许可 / 已押回 / 已终结）。只填名称也能先存下。<br>
+        2. <b>时间怎么写</b>：只填 <b>12 位数字</b>，顺序是年(4)月(2)日(2)时(2)分(2)。例如 <b>202610041415</b> 就是 2026年10月4日14时15分；页面会实时显示转换结果，写错了会红字提醒并拦住保存。<br>
+        3. <b>负责人变更</b>：登记时「工作负责人变更」默认留空。需要变更工作负责人把新负责人姓名填进这一栏——保存后它会变成新的工作负责人，原来的负责人会记为「变更前负责人」，在详细信息里能同时看到<b>原负责人和现负责人</b>（变更时间也会记下）。想撤销变更，把这一栏清空即可。<br>
+        4. <b>查询</b>：在「查询」页输入关键字即搜，名称、批准开始 / 结束时间、负责人（含变更前后）、种类都能搜到（时间只记得「1004」或「1415」也能搜）；输入框下面「最近」是搜索记录，点右边的「🧹 清除搜索记录」可一键清掉。<br>
+        5. <b>没搜到</b>：会明确提示「没有查到」，并把模糊相似的票列在下面供核对；也可以一键用该关键字登记新票。<br>
+        6. <b>到期提醒</b>：距离批准工作结束时间不足 4 小时的标黄、超时的标红；上方「快捷查看」可一键筛出，列表里点「← 返回首页」回到搜索主页。<br>
+        7. <b>手机使用</b>：不要用微信/QQ 预览窗口打开（会禁止本地存储并导致按钮失灵），用 Chrome / 系统浏览器打开。<br>
+        8. <b>备份</b>：设置页可导出备份文件或用系统分享发送；新设备上用「导入备份文件」，数据多时用 CSV 批量导入。
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 登记（工作票子页面） ============ -->
+  <section id="page-add" class="hidden">
+    <div class="actions"><button class="btn-sm" id="btnBackWt2">← 返回工作票</button></div>
+    <div class="card">
+      <h2><span class="dot"></span><span id="formTitle">登记新工作票</span></h2>
+      <div id="formBody"></div>
+      <div class="actions" style="margin-top:14px">
+        <button class="btn-primary" id="btnSave">💾 保存工作票</button>
+        <button class="btn-sm" id="btnResetForm">清空重填</button>
+        <button class="btn-sm hidden" id="btnCancelEdit">取消编辑</button>
+      </div>
+      <div class="hint">只有「工作票名称」必填；时间是 <b>12 位数字</b>（如 202610041415 = 2026年10月4日14时15分）；「工作负责人变更」留空表示负责人不变，填了就会替换工作负责人并保留原负责人；种类可选<b>电气一种票 / 电气二种票 / 其他</b>，状态可选<b>已许可 / 已押回 / 已终结</b>。</div>
+    </div>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section id="page-set" class="hidden">
+    <div class="card">
+      <h2><span class="dot"></span>底色</h2>
+      <div class="seg" id="segTheme">
+        <button type="button" data-theme-val="light"><span class="si">☀️</span>浅色</button>
+        <button type="button" data-theme-val="dark"><span class="si">🌙</span>深色</button>
+      </div>
+      <div class="hint">深色适合夜间值班或机房光线暗时查看，选择后立即生效并自动记住。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>主题颜色</h2>
+      <div class="colorlist" id="colorList"></div>
+      <div class="pickerline">
+        <label class="f" style="margin:0">自定义颜色：</label>
+        <input type="color" id="colorPick" value="#2563eb">
+        <span class="hint" id="colorNow" style="margin:0"></span>
+      </div>
+      <div class="hint">主题色用于按钮、选中的标签和高亮文字。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>字号大小</h2>
+      <div class="seg" id="segSize">
+        <button type="button" data-size-val="small">小<span class="si" style="font-size:14px">Aa</span></button>
+        <button type="button" data-size-val="medium">中<span class="si" style="font-size:18px">Aa</span></button>
+        <button type="button" data-size-val="large">大<span class="si" style="font-size:23px">Aa</span></button>
+      </div>
+      <div class="hint">默认「小」。字号变大后一屏能看的内容会相应减少。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>数据保存与交换（工作票）</h2>
+      <div class="hint" style="margin-bottom:10px">数据保存在本机浏览器里，默认上限约 5 MB（≈1 万条）。<b>换手机、清理浏览器前，先导出备份。</b></div>
+      <div class="actions">
+        <button class="btn-sm btn-primary" id="btnExport">⬇ 导出备份文件</button>
+        <button class="btn-sm" id="btnImport">⬆ 导入备份文件</button>
+        <button class="btn-sm" id="btnShare">↗ 用系统分享发送</button>
+        <button class="btn-sm" id="btnExportCsv">导出 CSV（Excel 可编辑）</button>
+        <input type="file" id="fileImport" accept=".json,.csv,.txt,application/json,text/csv,text/plain" class="hidden">
+      </div>
+      <div class="hint" id="storageInfo"></div>
+      <div class="hint" id="appStatus"></div>
+    </div>
+
+    <div class="card" id="cardAccount">
+      <h2><span class="dot"></span>账号与同步（云端）</h2>
+      <div class="hint" id="cloudHint"></div>
+
+      <div id="loginBox">
+        <div class="field">
+          <label class="f" for="accUser">账号</label>
+          <input type="text" id="accUser" placeholder="如：chenzheng" autocomplete="username" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="f" for="accPass">密码</label>
+          <input type="password" id="accPass" placeholder="至少 6 位" autocomplete="current-password">
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <button class="btn-sm btn-primary" id="btnLogin">登录</button>
+          <button class="btn-sm" id="btnRegister">注册</button>
+        </div>
+        <div class="hint">首次使用点「注册」即可，账号不用填邮箱。登录只影响同步，<b>不登录时本地功能完全可用</b>。</div>
+      </div>
+
+      <div id="userBox" class="hidden">
+        <div class="banner info"><span>👤</span><div>已登录：<b id="userName">—</b><br><span class="muted" id="userId"></span></div></div>
+        <div class="actions" style="margin-top:10px">
+          <button class="btn-sm" id="btnLogout">退出登录</button>
+        </div>
+      </div>
+
+      <div id="syncBox" class="hidden" style="margin-top:12px">
+        <div class="actions">
+          <button class="btn-sm btn-primary" id="btnSyncUp">⬆ 上传到云端</button>
+          <button class="btn-sm" id="btnSyncDown">⬇ 从云端下载</button>
+        </div>
+        <div class="hint" id="syncInfo"></div>
+      </div>
+
+      <div id="histBox" class="hidden" style="margin-top:14px">
+        <div class="hint" style="font-weight:700;color:var(--ink)">云端历史（最近 20 个版本）</div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn-sm" id="btnHistory">📜 查看云端历史</button>
+          <button class="btn-sm hidden" id="btnHistoryRefresh">↻ 刷新历史</button>
+        </div>
+        <div id="histList" class="hidden" style="margin-top:10px"></div>
+        <div class="hint" id="histInfo"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>批量录入 / 数据量大的时候</h2>
+      <div class="hint" style="margin-bottom:10px">
+        方法如下：<br>
+        <b>① Excel 批量录入</b>：先点「导出 CSV（Excel 可编辑）」拿到表头模板，在电脑 Excel 里把几十上百条填好，存成 CSV（UTF-8），再用下面的「导入 CSV」读进来。<br>
+        <b>② 分段粘贴</b>：实在只能靠粘贴时，点「分段导入」——把备份内容分几次粘进去，每次粘一段，粘完再确认，最后自动合并。（v2.0后此功能淘汰不再更新）
+      </div>
+      <div class="actions">
+        <button class="btn-sm" id="btnImportCsv">📄 导入 CSV（Excel 批量录入）</button>
+        <button class="btn-sm" id="btnCsvTemplate">🧩 下载导入模板（CSV）</button>
+        <button class="btn-sm" id="btnChunkImport">✂ 分段导入（长内容分几次粘）</button>
+        <button class="btn-sm" id="btnCopyBackup">⧉ 复制备份内容</button>
+        <button class="btn-sm" id="btnPasteImport">⇩ 一次性粘贴导入（数据少时）</button>
+        <input type="file" id="csvImport" accept=".csv,.txt,text/csv,text/plain" class="hidden">
+      </div>
+      <div id="chunkBox" class="hidden" style="margin-top:12px">
+        <label class="f" id="chunkTitle">第 1 段</label>
+        <textarea id="chunkArea" placeholder="把备份内容的一段粘贴到这里，然后点「追加这一段」…" style="min-height:110px"></textarea>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn-sm btn-primary" id="btnChunkAdd">追加这一段</button>
+          <button class="btn-sm" id="btnChunkDone">好了，导入</button>
+          <button class="btn-sm" id="btnChunkCancel">取消</button>
+        </div>
+        <div class="hint" id="chunkInfo"></div>
+      </div>
+    </div>
+
+    <div class="card" id="cardProjects">
+      <h2><span class="dot"></span>项目分类管理</h2>
+      <div class="hint">下面四段各选一个，自动拼成项目标签：<b>年 + 厂 + #机组号 + 机 + 检修类型 + 修</b>，例如 <b>2026嘉电#10机C修</b>。保存后的项目会出现在这里，新登记的工作票与设备记录默认归入当前选中的项目。</div>
+      <div id="projTabs"></div>
+      <div class="banner info" id="projPreview" style="margin-top:12px"><span>🏷</span><div>四个选项都选好后，这里会自动拼出项目标签</div></div>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn-sm btn-primary" id="btnProjSave" data-projsave="1">💾 保存为项目</button>
+      </div>
+      <div class="section-title">已保存项目（点一下选中，✕ 删除）</div>
+      <div class="chips" id="projList"></div>
+      <div class="hint" id="projInfo"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>关于 & 工作日志</h2>
+      <div class="hint" style="line-height:1.8">
+        工具作者：<b>Chenzheng</b><br>
+        当前版本：<b>v<span id="aboutVer">1.0</span></b><br>
+        修改内容：<span id="aboutCount">1</span> 条记录
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button class="btn-sm" id="btnToggleLog">📋 查看工作日志</button>
+      </div>
+      <div id="logBox" class="hidden" style="margin-top:10px">
+        <div class="hint" id="logList" style="line-height:1.9"></div>
+      </div>
+    </div>
+
+    <footer class="foot" id="footText">本应用为本地应用，云端功能需要联网</footer>
+  </section>
+
+  <!-- ============ 设备记录 ============ -->
+  <section id="page-dev" class="hidden">
+    <div class="actions"><button class="btn-sm" id="btnDevBack">← 返回设备记录</button></div>
+    <div class="card">
+      <div class="searchbar">
+        <div class="searchbox">
+          <span class="ico">🔍</span>
+          <input type="search" id="qDev" placeholder="搜设备名称 / 型号 / 编号 / 轴承型号 / 功率…" autocomplete="off">
+        </div>
+        <button class="btn-sm" id="btnClearQDev">清空</button>
+      </div>
+      <div class="hint">本页搜索只查设备记录：名称、型号、编号、轴承型号、功率、额定电流、直流电阻、空载试转电流都能搜，支持模糊搜索。</div>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn-sm btn-primary" id="btnDevNew">＋ 新增设备</button>
+        <button class="btn-sm" id="btnDevAll">📋 全部设备（<span id="devCount">0</span>）</button>
+        <button class="btn-sm" id="btnDevExport">📊 导出表格（Excel）</button>
+        <button class="btn-sm" id="btnDevExportJson">⬇ 导出设备备份</button>
+      </div>
+    </div>
+
+    <div id="devBanner"></div>
+    <div id="devOut"></div>
+
+    <div class="card hidden" id="devFormCard">
+      <h2><span class="dot"></span><span id="devFormTitle">新增设备</span></h2>
+      <div id="devFormBody"></div>
+      <div class="actions" style="margin-top:14px">
+        <button class="btn-primary" id="btnDevSave">💾 保存设备</button>
+        <button class="btn-sm" id="btnDevReset">清空重填</button>
+        <button class="btn-sm hidden" id="btnDevCancelEdit">取消编辑</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ 详情抽屉 ============ -->
+<div class="sheet-mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="tname" id="shName">—</div>
+      <div class="tmeta" id="shMeta"></div>
+    </div>
+    <button class="icobtn" id="shClose" title="关闭">✕</button>
+  </div>
+  <div id="shBody"></div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-primary btn-sm" id="shEdit">✎ 编辑</button>
+    <button class="btn-sm" id="shExtend">⏱ 延期</button>
+    <button class="btn-sm" id="shCopy">⧉ 复制工作票信息</button>
+    <button class="btn-sm btn-danger" id="shDel">🗑 删除</button>
+  </div>
+</div>
+
+<!-- ============ 同步：下载方式选择 ============ -->
+<div class="sheet-mask" id="syncMask"></div>
+<div class="sheet" id="syncSheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="tname">从云端下载</div>
+      <div class="tmeta" id="syncPickInfo"></div>
+    </div>
+    <button class="icobtn" id="syncPickClose" title="关闭">✕</button>
+  </div>
+  <div class="hint" id="syncLocalInfo"></div>
+  <div class="hint" style="margin-top:8px">合并时按 id 去重，同一个 id 保留哪一份由下面选择（覆盖本地则直接用云端替换）。</div>
+  <div class="seg" id="segMerge" style="margin-top:10px">
+    <button type="button" data-merge-val="remote" class="active"><span class="si">☁</span>合并·云端优先</button>
+    <button type="button" data-merge-val="local"><span class="si">📱</span>合并·本机优先</button>
+  </div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-sm btn-primary" id="btnSyncOverwrite">覆盖本地（用云端数据替换）</button>
+    <button class="btn-sm" id="btnSyncMerge">合并</button>
+    <button class="btn-sm" id="btnSyncCancel">取消</button>
+  </div>
+</div>
+
+<!-- ============ 同步：版本冲突处理 ============ -->
+<div class="sheet-mask" id="conflictMask"></div>
+<div class="sheet" id="conflictSheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="tname">云端版本冲突</div>
+      <div class="tmeta" id="conflictInfo"></div>
+    </div>
+    <button class="icobtn" id="conflictClose" title="关闭">✕</button>
+  </div>
+  <div class="banner warn"><span>⚠</span><div>为免覆盖其他设备的修改，这次上传没有写入云端。可以先看差异，再决定是否强制覆盖。</div></div>
+  <div id="conflictDiff" class="hidden" style="margin-top:12px"></div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-sm" id="btnConflictDiff">🔍 查看差异</button>
+    <button class="btn-sm btn-danger" id="btnConflictForce">强制覆盖云端</button>
+    <button class="btn-sm" id="btnConflictCancel">取消</button>
+  </div>
+  <div class="hint">「强制覆盖」会以云端当前版本为基准重新上传，云端版本号会再加 1；覆盖前的旧快照仍可在「云端历史」里找回。</div>
+</div>
+
+<!-- ============ 导出：全部 / 分项目 ============ -->
+<div class="sheet-mask" id="expMask"></div>
+<div class="sheet" id="expSheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="tname" id="expTitle">导出表格</div>
+      <div class="tmeta" id="expInfo"></div>
+    </div>
+    <button class="icobtn" id="expClose" title="关闭">✕</button>
+  </div>
+  <div class="seg" id="expSeg">
+    <button type="button" data-exp-val="all" class="active"><span class="si">📋</span>全部导出</button>
+    <button type="button" data-exp-val="pick"><span class="si">🏷</span>分项目导出</button>
+  </div>
+  <div id="expPickBox" class="hidden" style="margin-top:12px">
+    <div class="hint">勾选要导出的项目（可多选）：</div>
+    <div class="chips" id="expChips"></div>
+  </div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-sm btn-primary" id="btnExpGo">⬇ 导出</button>
+    <button class="btn-sm" id="btnExpCancel">取消</button>
+  </div>
+  <div class="hint">导出的 CSV 里带「项目」列，可用 Excel 直接编辑后再导回来。</div>
+</div>
+
+<nav class="tabs">
+  <button data-page="wt" class="active"><span class="ti">📄</span>工作票</button>
+  <button data-page="dev"><span class="ti">🛠</span>设备记录</button>
+  <button data-page="set"><span class="ti">⚙</span>设置</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* 能执行到这里，说明 JS 没被禁用、文件也没被截断，可以移除红色提示 */
+(function(){
+  var n = document.getElementById("nojs");
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+})();
+
+/* =======================================================================
+   工作票管理本 —— 单文件本地应用
+   数据：本机浏览器存储（不可用时自动降级为内存模式）
+   搜索：精确子串命中 + 字符二元组模糊相似度推荐
+   字段：工作票名称 / 批准工作开始时间 / 批准工作结束时间 / 工作负责人 等
+   ======================================================================= */
+
+/* ===== 工具信息与工作日志 =====
+   以后每次改动，把 VERSION 往上加一位，并在 CHANGELOG 最前面插一条（最新的写最上面）。 */
+var AUTHOR = "Chenzheng";
+var VERSION = "2.5";
+var CHANGELOG = [
+  "2.5｜支持添加到手机桌面：加了 PWA 所需的 meta 与 manifest，桌面显示发电厂风格图标（冷却塔 + 闪电），打开为全屏无地址栏；HTML 本身逻辑与数据结构无变化，本地功能与 v2.4 完全一致",
+  "2.4｜修复 CSV 导入报「没有找到有效行」：导入表头改为宽松匹配（去 BOM/引号/首尾空格，剥离 ()（） 里的后缀），时间列接受「12 位纯数字」「2026年10月4日14时15分」「2026.10.04.13.00」等写法且可留空，数字列 / 普通列 / 显示列按优先级取值，名称列匹配不到时用第一列兜底，完全识别不出来时提示实际识别到的表头并建议另存为 UTF-8 CSV；导出 CSV 的时间字段由「纯数字 + 显示」两列精简为 1 列，表头就是「批准工作开始时间」这种简洁写法、值为可读格式；设置页「批量录入」新增「下载导入模板（CSV）」，表头与导出完全一致并附一行示例",
+  "2.3｜新增项目分类体系：设置页「项目分类管理」用年 / 厂 / 机组号 / 检修类型四段选项卡拼出项目标签（如 2026嘉电#10机C修），四段选项可增删，可「保存为项目」并选中当前项目；工作票与设备记录新增可选字段 project（未填＝未分类，老数据不受影响），登记时默认填入当前项目、也可直接手改字符串（新字符串保存后自动成为项目选项），两处搜索都支持项目模糊匹配；删除项目只把相关记录变为未分类，不删记录；「导出 CSV / 导出设备表格」改为先弹面板选「全部导出」或「分项目导出」（可多选），CSV 新增「项目」列，导入带该列的 CSV 会自动归类并补进项目列表；项目分类存入新的 work_projects_v1，随备份导入导出与云端同步一起搬运（合并下载时项目取并集、当前项目以本机为准）；工作票表单的「项目」栏支持从已保存项目里直接选（datalist），仍可手输新字符串",
+  "2.2｜已终结的工作票不再显示到期倒计时（列表去掉时间徽章与黄/红边框，详情改显示终结时间）；「已终结」状态标签改用新样式 .badge.done（深色底高对比，浅色/深色都醒目）；新增「终结时间」字段 finishedAt：状态改为「已终结」时自动写入保存那一刻的系统时间，保持已终结不变则保留原值，改回其他状态则清空；终结时间在详情抽屉、复制票据信息、CSV 导出（新增一列）中均可见，老数据无此字段时详情显示「终结时间未记录（旧数据）」",
+  "2.1｜同步增加版本乐观锁与历史回溯：上传改走云端函数 upload_snapshot（带 base_version 比对），云端被其他设备改过时不静默覆盖，弹窗可选「查看差异 / 强制覆盖 / 取消」；每次覆盖前旧快照自动存入 snapshot_history，设置页可查看最近 20 个版本并一键恢复到本机（只改本机、不动云端）；下载合并改为同 id 按 updatedAt 新的胜出；work_auth_v1 增加 syncVersion，界面提示本机与云端版本",
+  "2.0｜接入 Supabase 云端账号（用户名注册 / 登录 / 退出，会话仅存本机 work_auth_v1，刷新自动恢复）与「手动同步」：可把工作票、设备记录、外观设置上传到云端快照，或从云端下载并选择「覆盖本地 / 合并（云端优先或本机优先） / 取消」；用 fetch 直连 Supabase Auth 与 REST 接口，不引任何外部 SDK，未配置云端或不联网时登录与同步自动隐藏提示，其余本地功能完全照常",
+  "1.9｜增加设备记录增加返回按钮",
+  "1.8｜整体手动调试，新增设备记录卡中的设备重量以及设备生产厂家，更改一部分默认提示值，修复一些输出bug,增加了设备标签的视觉优化",
+  "1.7｜空载试转电流可自选单位（mA / A，默认 A）；振动可自选单位（mm / mm/s，默认 mm），并去掉标题上的固定单位备注；导出的表格相应增加单位列",
+  "1.6｜设备记录页新增导出：可导出为表格 CSV（Excel 直接打开，含各分相与振动的分列）以及设备记录专用备份 JSON（便于只搬设备数据）",
+  "1.5｜设备记录新增：直流电阻可自选单位（mΩ / Ω / MΩ，默认 Ω）；新增「振动」栏，分驱动端与非驱动端，各含垂直 / 轴向 / 水平，默认单位 mm；老数据自动补默认单位",
+  "1.4｜设备记录的「直流电阻」拆成 U-V / U-W / V-W 三个输入框，「空载试转电流」拆成 A相 / B相 / C相 三个输入框；三个分相都能参与搜索，老数据自动迁到第一项",
+  "1.3｜把查询与登记收进新的父页面「工作票」：底部标签改为 工作票 / 设备记录 / 设置，进入工作票后可选择「查询工作票」或「登记工作票」，子页面左上角可「← 返回工作票」",
+  "1.2｜新增「设备记录」标签页：可登记设备名称、型号、编号、轴承型号、功率、额定电流、直流电阻、空载试转电流，并在该页独立搜索（含模糊匹配），设备记录随备份一起导出导入",
+  "1.1｜新增工作负责人变更（默认留空，填入后替换负责人并保留原负责人，详情里同时显示原/现负责人与变更时间，清空可撤销）；「许可时间 / 最晚终结时间」改称「批准工作开始时间 / 批准工作结束时间」；查询页新增清除搜索记录；设置页新增关于与工作日志（作者 Chenzheng）；文件名由「工作票管理本」改为「工作管理」",
+  "1.0｜首版：工作票登记与模糊搜索、批准工作开始/结束时间、负责人变更、到期提醒、底色与主题色、字号三档、备份与 CSV 批量导入、分段导入、清除搜索记录"
+];
+
+var LS_DATA = "work_db_v1";
+var LS_META = "work_meta_v1";
+var LS_RECENT = "work_recent_v1";
+/* 改名前的旧键名，只用于一次性迁移老数据 */
+var LS_DATA_OLD = "workticket_db_v1";
+var LS_META_OLD = "workticket_meta_v1";
+var LS_RECENT_OLD = "workticket_recent_v1";
+/* 设备记录独立存储 */
+var LS_DEV = "work_dev_v1";
+/* 云端会话与上次同步状态（只存本机，不上传） */
+var LS_AUTH = "work_auth_v1";
+/* 项目分类：四段选项、已保存项目、当前选中项目 */
+var LS_PROJECTS = "work_projects_v1";
+
+/* ---------------- 云端配置（Supabase） ----------------
+   ⚠️ 换成你自己的项目地址和 anon key：
+   Supabase 后台 → Project Settings → API
+     · Project URL        → 填到 url（结尾不要带 /）
+     · anon public key    → 填到 anonKey
+   两项留空 = 未配置云端：登录与同步区域只显示「未配置云端，仅本地使用」，不会报错，
+   离线优先不变。本应用没有引入 Supabase SDK，全部走官方 REST 接口（auth + postgrest），
+   所以仍然是零外部依赖的单文件应用。 */
+var SUPABASE_CONFIG = {
+  url: "https://mksgbeqelsqupyjnnbaa.supabase.co",
+  anonKey: "sb_publishable_g3f-GiuBLV9oy_rOCLiEhQ_rt70qGy7",
+  /* 用户只填「用户名」，前端自动拼成 用户名@emailDomain 交给 Supabase Auth；
+     域名不必真实存在，但要在 Supabase 后台把 Confirm email 关掉才能注册后立即登录。 */
+  emailDomain: "workmanage.app"
+};
+var SYNC_TABLE = "user_snapshots";   /* 云端快照表，见 supabase_setup.sql */
+
+/* 设备记录字段 */
+var DEV_FIELDS = [
+  { key:"name",    label:"设备名称",       ph:"如：5号机前置泵", weight:150 },
+  { key:"model",   label:"型号",           ph:"如：IS100-65-200",  weight:130 },
+  { key:"code",    label:"编号",           ph:"如：SB-102",        weight:130 },
+  { key:"bearing", label:"轴承型号",       ph:"如：6308-2RS",      weight:120 },
+  { key:"power",   label:"功率",           ph:"如：30kW",          weight:110 },
+  { key:"current", label:"额定电流",       ph:"如：56.8A",         weight:110 },
+  { key:"weight", label:"重量",       ph:"如：100KG",         weight:110 },
+  { key:"Manufacturer", label:"生产厂家",       ph:"如：皖南电机厂",         weight:150 },
+  { key:"resistance", label:"直流电阻", unitKey:"resUnit", units:["mΩ","Ω","MΩ"], unitDefault:"Ω", group:true, subs:[
+      { key:"resistanceUV", label:"U-V", ph:"如：0.58" },
+      { key:"resistanceUW", label:"U-W", ph:"如：0.60" },
+      { key:"resistanceVW", label:"V-W", ph:"如：0.59" }
+    ], weight:110 },
+  { key:"noLoad",  label:"空载试转电流", unitKey:"noLoadUnit", units:["mA","A"], unitDefault:"A", group:true, subs:[
+      { key:"noLoadA", label:"A相", ph:"如：12.5" },
+      { key:"noLoadB", label:"B相", ph:"如：12.8" },
+      { key:"noLoadC", label:"C相", ph:"如：12.6" }
+    ], weight:110 },
+  { key:"vib", label:"振动", unitKey:"vibUnit", units:["mm","mm/s"], unitDefault:"mm", paras:[
+      { label:"驱动端", subs:[
+        { key:"vibDv", label:"垂直", ph:"如：1.2" },
+        { key:"vibDa", label:"轴向", ph:"如：0.8" },
+        { key:"vibDh", label:"水平", ph:"如：1.5" }
+      ]},
+      { label:"非驱动端", subs:[
+        { key:"vibNv", label:"垂直", ph:"如：1.1" },
+        { key:"vibNa", label:"轴向", ph:"如：0.9" },
+        { key:"vibNh", label:"水平", ph:"如：1.4" }
+      ]}
+    ], weight:110 },
+  { key:"project", label:"项目", ph:"如：2026嘉电#10机C修（留空＝未分类）", weight:80 }
+];
+/* 子项索引：resistanceUV → {group, sub} */
+var DEV_SUBS = {};
+DEV_FIELDS.forEach(function(f){
+  if (f.paras){
+    f.paras.forEach(function(p){
+      p.subs.forEach(function(s){ DEV_SUBS[s.key] = { group:f, para:p, sub:s }; });
+    });
+    return;
+  }
+  if (f.group) f.subs.forEach(function(s){ DEV_SUBS[s.key] = { group:f, para:null, sub:s }; });
+});
+/* 某组的所有叶子字段 */
+function devSubs(f){
+  if (f.paras){ var out = []; f.paras.forEach(function(p){ out = out.concat(p.subs); }); return out; }
+  return f.subs || [];
+}
+
+/* 票面字段定义（名称 / 批准开始 / 批准结束 / 负责人 / 负责人变更 / 种类 / 状态） */
+var FIELDS = [
+  { key:"name",      label:"工作票名称",         ph:"如：2# 锅炉给水泵检修工作票", core:true, weight:150 },
+  { key:"permitAt",  label:"批准工作开始时间",   type:"time", ph:"例如 202610041415", hint:"12 位数字：年(4) 月(2) 日(2) 时(2) 分(2)", core:true, weight:120 },
+  { key:"deadline",  label:"批准工作结束时间",   type:"time", ph:"例如 202610042115", hint:"12 位数字：年(4) 月(2) 日(2) 时(2) 分(2)", core:true, weight:130 },
+  { key:"leader",    label:"工作负责人",         ph:"如：张国强", core:true, weight:130 },
+  { key:"leaderNew", label:"工作负责人变更",     ph:"新负责人姓名（不变就留空）", core:true, weight:120 },
+  { key:"type",      label:"工作票种类",         type:"select", options:["电气一种票","电气二种票","其他"], core:true, weight:90 },
+  { key:"status",    label:"状态",               type:"select", options:["已许可","已押回","已终结"], core:true, weight:70 },
+  { key:"project",   label:"项目",               ph:"如：2026嘉电#10机C修（留空＝未分类）", weight:60 }
+];
+
+/* 只显示、不参与搜索的内部字段 */
+var EXTRA_SHOW = [
+  { key:"leaderPrev",   label:"变更前负责人" },
+  { key:"leaderChangeAt", label:"负责人变更时间" }
+];
+
+/* 旧版本里存在过、现已从票面去掉的字段：只用于兼容老数据展示 */
+var LEGACY_FIELDS = [
+  { key:"no",      label:"工作票编号" },
+  { key:"members", label:"工作班成员" },
+  { key:"place",   label:"工作地点 / 设备" },
+  { key:"issuer",  label:"签发人 / 许可人" },
+  { key:"safety",  label:"安全措施 / 备注" }
+];
+
+/* 主题色预设 */
+var COLORS = [
+  { v:"#2563eb", n:"蓝" },
+  { v:"#0f766e", n:"青" },
+  { v:"#15803d", n:"绿" },
+  { v:"#b45309", n:"橙" },
+  { v:"#9333ea", n:"紫" },
+  { v:"#be123c", n:"红" }
+];
+var THEMES = { light:"浅色", dark:"深色" };
+var SIZES = { small:"小", medium:"中", large:"大" };
+var THEME_COLORS = { light:"#f4f6fb", dark:"#0f141b" };
+var NEAR_MS = 4 * 3600 * 1000;   /* 4 小时内视为即将到期 */
+
+var state = {
+  tickets: [],
+  meta: { theme:"light", size:"small", brand:"#2563eb" },
+  editingId: null,
+  sort: "deadline",
+  inView: false,
+  devices: [],
+  devEditingId: null,
+  devQuery: "",
+  /* 项目分类：选项列表、已保存项目、当前选中项目（存 work_projects_v1） */
+  projects: { years:[], plants:[], units:[], types:[], saved:[], current:"", sel:{} },
+  /* 查询页的项目筛选：null = 不筛选；"" = 只看未分类；其他 = 只看该项目 */
+  projFilter: null,
+  viewKind: "all",
+  /* 云端：当前登录用户（未登录为 null）、同步状态、下载时待处理的云端快照与合并偏好 */
+  user: null,
+  syncStatus: { busy:false, which:"", at:"", text:"" },
+  syncRemote: null,
+  mergePref: "remote",
+  /* 云端版本号（乐观锁基准，随 work_auth_v1 一起存） */
+  syncVersion: 0,
+  /* 版本冲突弹窗上下文：{ open, current, base } */
+  syncConflict: null,
+  /* 云端历史区块：展开状态、历史列表、错误提示 */
+  histOpen: false,
+  histRows: null,
+  histErr: ""
+};
+
+/* ---------------- 安全存储层（微信/QQ 内置浏览器会禁止存储） ---------------- */
+var store = { mode:"local", ok:true, reason:"", data:{} };
+(function(){
+  try {
+    var k = "__wttest__";
+    window.localStorage.setItem(k, "1");
+    window.localStorage.removeItem(k);
+  } catch(e){
+    store.mode = "memory";
+    store.ok = false;
+    store.reason = (e && e.name) ? e.name : "不可用";
+  }
+})();
+function storeGet(key){
+  if (store.mode === "local"){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+  return Object.prototype.hasOwnProperty.call(store.data, key) ? store.data[key] : null;
+}
+function storeSet(key, val){
+  if (store.mode === "local"){
+    try { localStorage.setItem(key, val); return true; } catch(e){ return false; }
+  }
+  store.data[key] = String(val);
+  return true;
+}
+
+/* ---------------- 工具 ---------------- */
+function $(s){ return document.querySelector(s); }
+function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+function up(el, sel){ return (el && el.closest) ? el.closest(sel) : null; }
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function uid(){ return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+/* 复制到剪贴板：优先用 clipboard API，失败时退回 execCommand */
+function copyText(text, tip){
+  var done = function(){ toast(tip || "已复制"); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+  } else { fallback(); }
+  function fallback(){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      done();
+    } catch(e){ toast("复制失败，请手动选择文字"); }
+  }
+}
+function toast(msg){
+  var t = $("#toast"); if (!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove("show"); }, 1900);
+}
+function pad(n){ return (n < 10 ? "0" : "") + n; }
+function fmtNow(){
+  var d = new Date();
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+function nowLocalInput(){
+  return toDotDT(Date.now());
+}
+function fieldByKey(k){
+  for (var i=0;i<FIELDS.length;i++) if (FIELDS[i].key === k) return FIELDS[i];
+  return null;
+}
+/* ---------------- 时间：纯数字格式 202610041415 ----------------
+   输入、内部存储都用 12 位数字（年月日时分），展示时转成「2026年10月4日14时15分」。
+   同时兼容老写法：2026.10.04.13.00 / 2025-11-20T14:30 / 2026年10月4日13时00分 等。 */
+var TIME_PH = "例：202610041415（2026年10月4日14时15分）";
+function parseDT(v){
+  if (v == null) return null;
+  var s = String(v).trim();
+  if (!s) return null;
+  /* 纯数字：必须是 12 位 */
+  if (/^\d+$/.test(s)){
+    if (s.length !== 12) return null;
+    return buildTs(+s.slice(0,4), +s.slice(4,6), +s.slice(6,8), +s.slice(8,10), +s.slice(10,12));
+  }
+  var m = s.match(/^(\d{4})[.\-\/年](\d{1,2})[.\-\/月](\d{1,2})日?(?:[T\s.时:：]+(\d{1,2})[时:：.]?(\d{1,2})?分?)?/);
+  if (m){
+    return buildTs(+m[1], +m[2], +m[3], (m[4] == null ? 0 : +m[4]), (m[5] == null ? 0 : +m[5]));
+  }
+  var t = Date.parse(s.replace(/\./g, "-").replace(" ", "T"));
+  if (isNaN(t)) t = Date.parse(s.replace(/-/g, "/"));
+  return isNaN(t) ? null : t;
+}
+/* 校验并生成时间戳，非法（13 月、2 月 30、25 时…）返回 null */
+function buildTs(Y, M, D, h, mi){
+  if (!Y || Y < 1970 || Y > 2200) return null;
+  if (M < 1 || M > 12 || D < 1 || D > 31) return null;
+  if (h < 0 || h > 23 || mi < 0 || mi > 59) return null;
+  var d = new Date(Y, M - 1, D, h, mi, 0, 0);
+  if (d.getFullYear() !== Y || d.getMonth() !== M - 1 || d.getDate() !== D) return null;
+  return d.getTime();
+}
+/* 时间戳 → 202610041415（标准输入/存储写法） */
+function toDotDT(ts){
+  if (ts == null) return "";
+  var d = new Date(ts);
+  return String(d.getFullYear()) + pad(d.getMonth()+1) + pad(d.getDate()) + pad(d.getHours()) + pad(d.getMinutes());
+}
+/* 时间戳 → 2026年10月4日14时15分（给人看） */
+function fmtCN(ts){
+  if (ts == null) return "";
+  var d = new Date(ts);
+  return d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日" +
+         pad(d.getHours()) + "时" + pad(d.getMinutes()) + "分";
+}
+/* 任意写法 → 统一成 12 位数字；解析不出来返回 "" */
+function normTime(v){
+  var ts = parseDT(v);
+  return ts == null ? "" : toDotDT(ts);
+}
+/* 只允许数字，最多 12 位（老写法里的点/横线会被自动去掉） */
+function maskTime(raw){
+  return String(raw == null ? "" : raw).replace(/\D/g, "").slice(0, 12);
+}
+/* 宽松转换：优先按 12 位数字；否则尝试按老写法解析再转成 12 位 */
+function looseNorm(s){
+  s = String(s == null ? "" : s).trim();
+  if (!s) return "";
+  if (/^\d{12}$/.test(s)) return s;
+  var ts = parseDT(s);
+  return ts == null ? s : toDotDT(ts);
+}
+/* 检查输入是否可用，返回提示文字与是否为错误 */
+function timeHint(raw){
+  var s = String(raw == null ? "" : raw).trim();
+  if (!s) return { msg:"留空也可以；填写请用 12 位数字，例如 202610041415", cls:"" };
+  if (!/^\d+$/.test(s)) return { msg:"✘ 只能填数字，格式：" + TIME_PH, cls:"bad" };
+  if (s.length !== 12) return { msg:"✘ 要填满 12 位数字（已填 " + s.length + " 位）：" + TIME_PH, cls:"bad" };
+  var ts = parseDT(s);
+  if (ts == null) return { msg:"✘ 这个时间不存在，请检查月/日/时/分（" + TIME_PH + "）", cls:"bad" };
+  return { msg:"✔ " + fmtCN(ts), cls:"ok" };
+}
+/* 时间戳 → 便于阅读的写法（老函数，保留给内部提示用） */
+function fmtDT(ts){
+  if (ts == null) return "";
+  return fmtCN(ts);
+}
+/* 剩余时间的人类化描述 */
+function humanLeft(ms){
+  var neg = ms < 0, a = Math.abs(ms);
+  var h = Math.floor(a / 3600000), m = Math.floor((a % 3600000) / 60000);
+  var s;
+  if (h >= 24){ var d = Math.floor(h/24); s = d + " 天" + (h % 24 ? " " + (h % 24) + " 小时" : ""); }
+  else if (h >= 1){ s = h + " 小时" + (m ? " " + m + " 分" : ""); }
+  else { s = m + " 分钟"; }
+  return neg ? ("已超时 " + s) : ("还剩 " + s);
+}
+/* 单据状态：ok / near / late（依据批准工作结束时间） */
+function timeState(t){
+  var ts = parseDT(t.deadline);
+  if (ts == null) return { key:"none", cls:"plain", text:"无终结时间" };
+  var left = ts - Date.now();
+  if (left < 0) return { key:"late", cls:"bad", text:humanLeft(left), left:left };
+  if (left <= NEAR_MS) return { key:"near", cls:"warn", text:humanLeft(left), left:left };
+  return { key:"ok", cls:"ok", text:humanLeft(left), left:left };
+}
+function statusBadge(t){
+  var s = t.status || "已许可";
+  var cls = (s === "已押回") ? "warn" : (s === "已终结" ? "done" : "ok");
+  return '<span class="badge ' + cls + '">' + esc(s) + '</span>';
+}
+
+/* ---------------- 存储读写 ---------------- */
+function load(){
+  state.tickets = [];
+  /* 从旧版本（文件名还叫「工作票管理本」时）的数据里迁移一次 */
+  try {
+    if (!storeGet(LS_DATA)){
+      var oldData = storeGet(LS_DATA_OLD);
+      if (oldData){ storeSet(LS_DATA, oldData); }
+    }
+    if (!storeGet(LS_META)){
+      var oldMeta = storeGet(LS_META_OLD);
+      if (oldMeta){ storeSet(LS_META, oldMeta); }
+    }
+    if (!storeGet(LS_RECENT)){
+      var oldRec = storeGet(LS_RECENT_OLD);
+      if (oldRec){ storeSet(LS_RECENT, oldRec); }
+    }
+  } catch(e){}
+  try {
+    var raw = storeGet(LS_DATA);
+    var arr = raw ? JSON.parse(raw) : [];
+    state.tickets = Array.isArray(arr) ? arr : [];
+  } catch(e){ state.tickets = []; }
+  try {
+    var m = storeGet(LS_META);
+    if (m){
+      var o = JSON.parse(m);
+      if (o && typeof o === "object"){
+        if (o.theme && THEMES[o.theme]) state.meta.theme = o.theme;
+        if (o.size && SIZES[o.size]) state.meta.size = o.size;
+        if (o.brand && /^#[0-9a-fA-F]{6}$/.test(o.brand)) state.meta.brand = o.brand;
+      }
+    }
+  } catch(e){}
+}
+function saveData(){
+  var a = storeSet(LS_DATA, JSON.stringify(state.tickets));
+  var b = storeSet(LS_META, JSON.stringify(state.meta));
+  if (!a || !b) toast("保存失败：本机浏览器不允许存储，请先导出备份");
+  updateStorageInfo();
+  updateTopSub();
+  updateDiag();
+}
+function saveMeta(){
+  storeSet(LS_META, JSON.stringify(state.meta));
+  updateStorageInfo();
+  updateDiag();
+}
+/* ---------------- 项目分类（年 / 厂 / 机组号 / 检修类型） ----------------
+   标签拼接规则固定为：年 + 厂 + "#" + 机组号 + "机" + 检修类型 + "修"，例如 2026嘉电#10机C修。
+   #、机、修 是固定字符，不参与选项；机组号只存数字，展示时才补 #。 */
+function defaultProjects(){
+  return {
+    years:["2026","2027","2028","2029","2030"],
+    plants:["嘉电","长电","镇电","温电"],
+    units:["1","2","3","4","5","6","7","8","9","10"],
+    types:["A","C","零星"],
+    saved:[],
+    current:"",
+    sel:{ year:"2026", plant:"嘉电", unit:"10", type:"C" }
+  };
+}
+function projListKey(k){
+  return (k === "year") ? "years" : (k === "plant") ? "plants" : (k === "unit") ? "units" : "types";
+}
+/* 把任意数组清洗成去重、去空的字符串数组；空则退回默认值 */
+function normProjList(v, fallback){
+  var out = [];
+  if (Array.isArray(v)){
+    v.forEach(function(x){
+      var s = String(x == null ? "" : x).trim();
+      if (s && out.indexOf(s) < 0) out.push(s);
+    });
+  }
+  return out.length ? out : (fallback || []).slice();
+}
+function loadProjects(){
+  var d = defaultProjects();
+  try {
+    var raw = storeGet(LS_PROJECTS);
+    var o = raw ? JSON.parse(raw) : null;
+    if (o && typeof o === "object"){
+      d.years  = normProjList(o.years,  d.years);
+      d.plants = normProjList(o.plants, d.plants);
+      d.units  = normProjList(o.units,  d.units);
+      d.types  = normProjList(o.types,  d.types);
+      d.saved  = normProjList(o.saved,  []);
+      d.current = String(o.current || "").trim();
+      if (d.saved.indexOf(d.current) < 0) d.current = "";
+      if (o.sel && typeof o.sel === "object"){
+        ["year","plant","unit","type"].forEach(function(k){
+          var v = String(o.sel[k] == null ? "" : o.sel[k]).trim();
+          if (v) d.sel[k] = v;
+        });
+      }
+    }
+  } catch(e){}
+  state.projects = d;
+  renderProjectCard();
+}
+function saveProjects(){
+  var p = state.projects;
+  var ok = storeSet(LS_PROJECTS, JSON.stringify({
+    years:p.years, plants:p.plants, units:p.units, types:p.types,
+    saved:p.saved, current:p.current, sel:p.sel
+  }));
+  if (!ok) toast("项目设置保存失败：浏览器不允许存储，请先导出备份");
+  renderProjectCard();
+}
+/* 四段拼标签；缺任何一段返回 "" */
+function buildProjectLabel(sel){
+  var s = sel || state.projects.sel || {};
+  var y = String(s.year || "").trim(), pl = String(s.plant || "").trim();
+  var u = String(s.unit || "").trim(), ty = String(s.type || "").trim();
+  if (!y || !pl || !u || !ty) return "";
+  return y + pl + "#" + u + "机" + ty + "修";
+}
+/* 把一个项目名记入可复用选项；makeCurrent=true 时同时设为当前项目 */
+function addProjectOption(name, makeCurrent){
+  var s = String(name == null ? "" : name).trim();
+  if (!s) return false;
+  var p = state.projects;
+  var isNew = p.saved.indexOf(s) < 0;
+  if (isNew) p.saved.push(s);
+  if (makeCurrent) p.current = s;
+  if (isNew || makeCurrent) saveProjects();
+  return isNew;
+}
+function rememberProject(name){ return addProjectOption(name, true); }
+function projectOf(rec){ return String((rec && rec.project) || "").trim(); }
+function projectText(rec){ return projectOf(rec) || "未分类"; }
+/* 项目清单：已保存的项目 + 数据里实际用到的项目 */
+function allProjects(){
+  var out = state.projects.saved.slice();
+  var add = function(v){
+    var s = String(v == null ? "" : v).trim();
+    if (s && out.indexOf(s) < 0) out.push(s);
+  };
+  state.tickets.forEach(function(t){ add(t.project); });
+  state.devices.forEach(function(d){ add(d.project); });
+  return out;
+}
+/* 导出 / 筛选用的项目清单，末尾按需补上「未分类」（空字符串） */
+function exportOptions(kind){
+  var src = (kind === "dev") ? state.devices : state.tickets;
+  var opts = allProjects();
+  var hasBlank = false;
+  src.forEach(function(r){ if (!projectOf(r)) hasBlank = true; });
+  if (hasBlank) opts.push("");
+  return opts;
+}
+function projectCount(kind, name){
+  var src = (kind === "dev") ? state.devices : state.tickets;
+  return src.filter(function(r){ return projectOf(r) === name; }).length;
+}
+function applyProjFilter(list){
+  if (state.projFilter === null) return list;
+  return list.filter(function(r){ return projectOf(r) === state.projFilter; });
+}
+function renderProjectFilter(){
+  var el = $("#projFilterChips"); if (!el) return;
+  var opts = exportOptions("ticket");
+  if (!opts.length){ el.innerHTML = ""; return; }
+  var cur = state.projFilter;
+  var h = '<span class="muted" style="font-size:var(--fs-xs);align-self:center">项目：</span>' +
+    '<span class="chip' + (cur === null ? " on" : "") + '" data-pf="all">全部</span>';
+  opts.forEach(function(p){
+    h += '<span class="chip' + (cur !== null && cur === p ? " on" : "") + '" data-pf="' +
+      (p === "" ? "none" : "one") + '" data-pfval="' + esc(p) + '">' + esc(p || "未分类") + '</span>';
+  });
+  el.innerHTML = h;
+}
+/* 设置页：四段选项卡 + 预览 + 已保存项目列表 */
+function projGroupHTML(title, key, list, prefix, suffix){
+  return '<div class="section-title" style="margin:12px 0 6px">' + esc(title) + '</div>' +
+    '<div class="seg compact">' +
+    list.map(function(v){
+      return '<button type="button" data-projopt="' + esc(key) + '" data-projval="' + esc(v) + '"' +
+        (state.projects.sel[key] === v ? ' class="active"' : '') + '>' + esc(prefix + v + suffix) + '</button>';
+    }).join("") +
+    '<button type="button" data-projadd="' + esc(key) + '">＋ 增加</button>' +
+    '<button type="button" data-projdel="' + esc(key) + '">🗑 删除选中</button>' +
+    '</div>';
+}
+function renderProjectCard(){
+  var tabs = $("#projTabs"); if (!tabs) return;
+  var p = state.projects;
+  tabs.innerHTML =
+    projGroupHTML("年", "year", p.years, "", "") +
+    projGroupHTML("厂", "plant", p.plants, "", "") +
+    projGroupHTML("机组号", "unit", p.units, "#", "") +
+    projGroupHTML("检修类型", "type", p.types, "", "修");
+  var pv = $("#projPreview");
+  var label = buildProjectLabel();
+  if (pv){
+    pv.innerHTML = label
+      ? '<span>🏷</span><div>项目标签：<b>' + esc(label) + '</b></div>'
+      : '<span>🏷</span><div>四个选项都选好后，这里会自动拼出项目标签</div>';
+  }
+  var list = $("#projList");
+  if (list){
+    list.innerHTML = p.saved.length ? p.saved.map(function(x){
+      return '<span class="chip' + (p.current === x ? " on" : "") + '" data-projpick="' + esc(x) + '">' +
+        esc(x) + (p.current === x ? " ✓" : "") + '</span>' +
+        '<button type="button" class="btn-sm" data-projremove="' + esc(x) + '" title="删除项目">✕</button>';
+    }).join("") : '<span class="muted" style="font-size:var(--fs-xs)">还没有保存过项目：选好四段后点「💾 保存为项目」。</span>';
+  }
+  var info = $("#projInfo");
+  if (info){
+    info.textContent = p.current
+      ? ("当前项目：" + p.current + "。新登记的工作票与设备记录会默认归入该项目；在表单里直接改「项目」一栏即可换成别的项目。")
+      : "当前没有选中项目：表单里的「项目」一栏会留空（未分类），也可以直接在那一栏填写项目名。";
+  }
+  renderProjectFilter();
+}
+function projAddOption(key){
+  var ask = { year:"年份（4 位数字，如 2031）", plant:"厂名（如 嘉电）", unit:"机组号（数字，如 11）", type:"检修类型（如 B）" }[key] || "新选项";
+  var v = prompt("请输入要增加的" + ask + "：", "");
+  if (v == null) return;
+  v = String(v).trim();
+  if (!v){ toast("没有输入内容"); return; }
+  if (key === "year" && !/^\d{4}$/.test(v)){ toast("年份请填 4 位数字，例如 2031"); return; }
+  if (key === "unit" && !/^\d{1,3}$/.test(v)){ toast("机组号请填数字，例如 11"); return; }
+  if (/[#机修]/.test(v)){ toast("选项里不要带 # / 机 / 修，这几个是固定的拼接字符"); return; }
+  var k = projListKey(key), list = state.projects[k];
+  if (list.indexOf(v) >= 0){ state.projects.sel[key] = v; saveProjects(); toast("选项里已经有「" + v + "」了"); return; }
+  list.push(v);
+  state.projects.sel[key] = v;
+  saveProjects();
+  toast("已增加「" + v + "」");
+}
+function projDelOption(key){
+  var k = projListKey(key), list = state.projects[k];
+  var cur = state.projects.sel[key];
+  if (list.length <= 1){ toast("至少要保留一个选项"); return; }
+  if (!confirm("从选项卡里删除「" + cur + "」？\n（只删这个选项，已保存的项目不受影响）")) return;
+  state.projects[k] = list.filter(function(x){ return x !== cur; });
+  state.projects.sel[key] = state.projects[k][0];
+  saveProjects();
+  toast("已从选项卡里删除「" + cur + "」");
+}
+/* 删除项目：项目本身从列表移除，原先归入它的记录变成「未分类」，记录不删 */
+function deleteProject(name){
+  var n = projectCount("ticket", name) + projectCount("dev", name);
+  if (!confirm("确定删除项目「" + name + "」？\n\n原先归入该项目的 " + n + " 条记录会变成「未分类」（记录本身不会删除）。")) return;
+  var p = state.projects;
+  p.saved = p.saved.filter(function(x){ return x !== name; });
+  if (p.current === name) p.current = "";
+  if (state.projFilter === name) state.projFilter = null;
+  var now = fmtNow();
+  state.tickets.forEach(function(t){ if (projectOf(t) === name){ t.project = ""; t.updatedAt = now; } });
+  state.devices.forEach(function(d){ if (projectOf(d) === name){ d.project = ""; d.updatedAt = now; } });
+  saveProjects(); saveData(); saveDev();
+  renderQuickChips();
+  var q = $("#q") ? $("#q").value.trim() : "";
+  if (q) runSearch(q); else if (state.inView) showView(state.viewKind, state.sort);
+  if ($("#page-dev") && !$("#page-dev").classList.contains("hidden")) showDevAll();
+  toast("已删除项目「" + name + "」，相关记录已变为未分类");
+}
+/* 文件名里不能出现的字符统一去掉 */
+function safeName(s){
+  var v = String(s == null ? "" : s).replace(/[\\\/:*?"<>|\r\n\t]/g, "").trim().slice(0,40);
+  return v || "导出";
+}
+
+function updateTopSub(){
+  var el = $("#topSub"); if (!el) return;
+  var near = state.tickets.filter(function(t){ return timeState(t).key === "near" && (t.status || "已许可") === "已许可"; }).length;
+  el.textContent = state.tickets.length
+    ? ("共 " + state.tickets.length + " 张票" + (near ? " · " + near + " 张即将到期" : ""))
+    : "批准开始 · 批准结束 · 负责人";
+}
+function updateStorageInfo(){
+  var n = state.tickets.length;
+  var bytes = 0;
+  try { bytes = String(storeGet(LS_DATA) || "").length; } catch(e){}
+  var kb = (bytes/1024).toFixed(1);
+  var avg = n ? Math.round(bytes / n) : 0;
+  var room = avg ? Math.floor((4.5 * 1024 * 1024) / avg) : 20000;   /* 5 MiB 配额，留点余量 */
+  var el = $("#storageInfo"); if (!el) return;
+  el.textContent = "当前 " + n + " 张工作票，占用约 " + kb + " KB；每张约 " + avg + " 字节，" +
+    (store.mode === "local" ? ("本浏览器大约还能再存 " + room.toLocaleString() + " 张。") : "（内存模式，未落盘）。");
+}
+function updateDiag(){
+  /* 只在设置页留一行简短状态：能存 / 不能存 */
+  var el = $("#appStatus"); if (!el) return;
+  el.innerHTML = (store.mode === "local")
+    ? '<span class="ok">✔</span> 数据可正常保存在本机浏览器。'
+    : '<span class="bad">✘ 本机浏览器不允许存储</span>：已自动切换为内存模式，'
+      + '功能可用但<b>刷新后会丢数据</b>，请尽快导出备份。'
+      + '原因：微信/QQ 内置浏览器打开、无痕模式、或浏览器禁止了站点保存数据。';
+}
+
+/* ---------------- 外观：底色 / 主题色 / 字号 ---------------- */
+/* 把 "#2563eb" 变成 "rgba(37,99,235,alpha)"，用于生成浅色底 */
+function hexToRgba(hex, a){
+  var h = String(hex || "").replace("#","");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var n = parseInt(h, 16);
+  if (isNaN(n)) return "rgba(37,99,235," + a + ")";
+  return "rgba(" + ((n>>16)&255) + "," + ((n>>8)&255) + "," + (n&255) + "," + a + ")";
+}
+function lighten(hex, ratio){
+  var h = String(hex||"").replace("#","");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var n = parseInt(h,16);
+  if (isNaN(n)) return hex;
+  var r = (n>>16)&255, g = (n>>8)&255, b = n&255;
+  r = Math.round(r + (255-r)*ratio);
+  g = Math.round(g + (255-g)*ratio);
+  b = Math.round(b + (255-b)*ratio);
+  return "#" + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+}
+function darken(hex, ratio){
+  var h = String(hex||"").replace("#","");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var n = parseInt(h,16);
+  if (isNaN(n)) return hex;
+  var r = (n>>16)&255, g = (n>>8)&255, b = n&255;
+  return "#" + ((1<<24) + (Math.round(r*(1-ratio))<<16) + (Math.round(g*(1-ratio))<<8) + Math.round(b*(1-ratio))).toString(16).slice(1);
+}
+/* ---------------- 关于 / 工作日志 ---------------- */
+function renderAbout(){
+  var v = $("#aboutVer"); if (v) v.textContent = VERSION;
+  var c = $("#aboutCount"); if (c) c.textContent = CHANGELOG.length;
+  var f = $("#footText");
+  if (f) f.textContent = "工作管理 v" + VERSION + " · 作者 " + AUTHOR + " · 本地功能无需联网，云端功能需要网络";
+  var list = $("#logList");
+  if (list){
+    list.innerHTML = CHANGELOG.map(function(s){
+      var i = s.indexOf("｜");
+      var ver = i > 0 ? s.slice(0, i) : "";
+      var txt = i > 0 ? s.slice(i + 1) : s;
+      return '<div style="margin-bottom:6px"><b>v' + esc(ver) + '</b>　' + esc(txt) + '</div>';
+    }).join("");
+  }
+}
+function applyAppearance(){
+  var t = THEMES[state.meta.theme] ? state.meta.theme : "light";
+  var s = SIZES[state.meta.size] ? state.meta.size : "small";
+  var c = /^#[0-9a-fA-F]{6}$/.test(state.meta.brand || "") ? state.meta.brand : "#2563eb";
+  state.meta.theme = t; state.meta.size = s; state.meta.brand = c;
+
+  var root = document.documentElement;
+  root.setAttribute("data-theme", t);
+  root.setAttribute("data-size", s);
+  root.style.setProperty("--brand", c);
+  root.style.setProperty("--brand-d", t === "dark" ? lighten(c, .3) : darken(c, .18));
+  root.style.setProperty("--brand-l", t === "dark" ? hexToRgba(c, .22) : hexToRgba(c, .12));
+  root.style.setProperty("--brand-ink", t === "dark" ? lighten(c, .55) : darken(c, .25));
+  root.style.setProperty("--brand-line", t === "dark" ? hexToRgba(c, .45) : hexToRgba(c, .35));
+
+  var mc = document.querySelector('meta[name="theme-color"]');
+  if (mc) mc.setAttribute("content", t === "dark" ? THEME_COLORS.dark : THEME_COLORS.light);
+
+  $$("#segTheme [data-theme-val]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-theme-val") === t);
+  });
+  $$("#segSize [data-size-val]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-size-val") === s);
+  });
+  $$("#colorList .swatch").forEach(function(b){
+    b.classList.toggle("active", String(b.getAttribute("data-color")).toLowerCase() === c.toLowerCase());
+  });
+  var cp = $("#colorPick"); if (cp) cp.value = c;
+  var cn = $("#colorNow"); if (cn) cn.textContent = "当前：" + c;
+}
+function setAppearance(patch, quiet){
+  if (patch.theme && THEMES[patch.theme]) state.meta.theme = patch.theme;
+  if (patch.size && SIZES[patch.size]) state.meta.size = patch.size;
+  if (patch.brand && /^#[0-9a-fA-F]{6}$/.test(patch.brand)) state.meta.brand = patch.brand;
+  applyAppearance();
+  saveMeta();
+  if (!quiet){
+    var msg = [];
+    if (patch.theme) msg.push("底色：" + THEMES[state.meta.theme]);
+    if (patch.size) msg.push("字号：" + SIZES[state.meta.size]);
+    if (patch.brand) msg.push("主题色：" + state.meta.brand);
+    toast(msg.join("　"));
+  }
+}
+function renderColorList(){
+  var el = $("#colorList"); if (!el) return;
+  el.innerHTML = COLORS.map(function(c){
+    return '<button type="button" class="swatch" data-color="' + c.v + '" title="' + esc(c.n) + '" ' +
+      'style="background:' + c.v + '">' + esc(c.n) + '</button>';
+  }).join("");
+}
+
+/* ---------------- 模糊搜索核心 ---------------- */
+function norm(s){
+  return String(s == null ? "" : s).toLowerCase()
+    .replace(/[\s\u3000]+/g,"")
+    .replace(/[，,。.、;；:：\/\\|()（）\[\]【】"'`~!！?？*#\-_+=<>@$%^&]/g,"");
+}
+function bigrams(s){
+  var out = [], n = s.length;
+  if (n === 0) return out;
+  if (n === 1) return [s];
+  for (var i=0;i<n-1;i++) out.push(s.substr(i,2));
+  return out;
+}
+function dice(a, b){
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  if (a.length < 2 && b.length < 2) return 0;
+  var A = bigrams(a), B = bigrams(b);
+  if (!A.length || !B.length) return 0;
+  var pool = B.slice(), hit = 0;
+  for (var i=0;i<A.length;i++){
+    var idx = pool.indexOf(A[i]);
+    if (idx >= 0){ hit++; pool.splice(idx,1); }
+  }
+  return (2*hit) / (A.length + B.length);
+}
+/* 显示值：时间字段转成便于阅读的写法 */
+/* 内部统一存 12 位数字，界面上显示成 2026年10月4日13时00分 */
+function fieldValue(t, f){
+  var v = t[f.key];
+  if (v == null || v === "") return "";
+  if (f && f.type === "time"){
+    var ts = parseDT(v);
+    return ts == null ? String(v) : fmtCN(ts);
+  }
+  return String(v);
+}
+function simField(q, qn, val){
+  if (!val) return 0;
+  var v = String(val).toLowerCase();
+  var vn = norm(v);
+  if (!vn) return 0;
+  if (vn === qn) return 1;
+  if (vn.indexOf(qn) >= 0 || qn.indexOf(vn) >= 0) return 0.92;
+  var parts = v.split(/[\s\/,，、;；\|]+/).filter(Boolean);
+  for (var i=0;i<parts.length;i++){
+    var p = norm(parts[i]);
+    if (p && (p === qn || p.indexOf(qn) >= 0)) return 0.9;
+  }
+  return dice(qn, vn);
+}
+function highlight(text, q){
+  var s = String(text == null ? "" : text);
+  var kw = String(q || "").trim();
+  if (!kw) return esc(s);
+  var out = esc(s);
+  if (!norm(kw)) return out;
+  try {
+    var re = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    if (re.test(s)) return out.replace(re, function(m){ return "<mark>" + m + "</mark>"; });
+  } catch(e){}
+  return out;
+}
+function hasExact(text, q){
+  var kw = String(q || "").trim();
+  if (!kw) return false;
+  try { return new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(String(text == null ? "" : text)); }
+  catch(e){ return false; }
+}
+var MAIN_KEYS = { name:1, leader:1, type:1, permitAt:1, deadline:1 };
+
+function scoreTicket(t, rawQ){
+  var q = String(rawQ || "").trim();
+  var qn = norm(q);
+  if (!qn) return { score:0, hits:[], keyHit:false };
+  var fuzzyOK = qn.length >= 2;
+  var best = 0, hits = [], keyHit = false;
+
+  FIELDS.forEach(function(f){
+    /* 时间字段同时用「易读写法」和「原始写法」参与匹配，方便按 11-20 这种片段搜 */
+    var raw = t[f.key];
+    if (!raw) return;
+    var shown = fieldValue(t, f);
+    var s = Math.max(simField(q, qn, shown), simField(q, qn, raw));
+    if (!fuzzyOK && s < 0.9) return;
+    if (s <= 0.28) return;
+    var total = s * (f.weight || 60);
+    if (s > 0.995) total += 60;
+    else if (s >= 0.9) total += 25;
+    if (f.key === "name") total *= 1.35;
+    if (total > best) best = total;
+    if (s >= 0.9 && MAIN_KEYS[f.key]) keyHit = true;
+    hits.push({ field:f.label, val:shown, s:s, total:total });
+  });
+
+  hits.sort(function(a,b){ return b.total - a.total; });
+  return { score:best, hits:hits.slice(0,6), keyHit:keyHit };
+}
+/* 按批准工作结束时间从早到晚排（没填时间的排最后） */
+function sortByDeadline(a, b){
+  var x = parseDT(a.deadline), y = parseDT(b.deadline);
+  if (x == null && y == null) return 0;
+  if (x == null) return 1;
+  if (y == null) return -1;
+  return x - y;
+}
+/* 按登记时间从新到旧排 */
+function sortByCreated(a, b){
+  return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+}
+
+/* ---------------- 查询页 ---------------- */
+function runSearch(rawQ){
+  var q = String(rawQ || "").trim();
+  var banner = $("#searchBanner"), out = $("#searchOut");
+  if (!banner || !out) return;
+  if (!q){
+    banner.innerHTML = "";
+    if (!state.tickets.length){
+      out.innerHTML = '<div class="card"><div class="empty"><div class="big">📝</div>' +
+        '还没有工作票记录。<br>点下面的按钮开始登记，或先载入示例看看效果。' +
+        '<div class="actions" style="justify-content:center;margin-top:14px">' +
+        '<button class="btn-primary btn-sm" data-goto="add">＋ 登记第一张票</button>' +
+        '<button class="btn-sm" data-demo="1">载入 3 条示例</button></div></div></div>';
+    } else if (out.innerHTML) {
+      /* 刚才在看某个列表（全部/即将到期），给一个返回的出口 */
+      out.innerHTML = '<div class="actions" style="margin-top:12px">' +
+        '<button class="btn-sm" data-view="all">📋 查看全部工作票</button>' +
+        '<button class="btn-sm" data-wipe="1">🗑 清空全部数据</button></div>';
+    } else {
+      out.innerHTML = "";
+    }
+    $("#quickCard").classList.remove("hidden");
+    return;
+  }
+  state.inView = false;
+  $("#quickCard").classList.add("hidden");
+
+  var scored = applyProjFilter(state.tickets).map(function(t){
+    var r = scoreTicket(t, q);
+    return { t:t, score:r.score, hits:r.hits, keyHit:r.keyHit };
+  }).filter(function(x){ return x.score > 0; })
+    .sort(function(a,b){ return b.score - a.score; });
+
+  if (scored.length) pushRecent(q);
+
+  var matched = scored.filter(function(x){ return x.keyHit; });
+  var sugg = scored.filter(function(x){ return !x.keyHit && (x.score / 150) >= 0.34; });
+
+  var html = "";
+  if (!matched.length){
+    banner.innerHTML = '<div class="banner warn"><span>⚠</span><div>' +
+      '<b>没有查到与「' + esc(q) + '」直接匹配的工作票。</b>' +
+      (sugg.length ? '下面列出的是模糊匹配到的相近票据，可供核对参考。' : '') +
+      '</div><button class="x" data-dismiss="1" title="关闭">✕</button></div>';
+  } else {
+    banner.innerHTML = '<div class="banner ok"><span>✔</span><div>找到 <b>' + matched.length +
+      '</b> 张与「' + esc(q) + '」匹配的工作票' +
+      (sugg.length ? '，另有 ' + sugg.length + ' 张相近票据可供参考。' : '。') + '</div></div>';
+    html += '<div class="section-title">匹配结果（' + matched.length + '）</div>';
+    html += matched.map(function(x){ return renderTicket(x, true, q); }).join("");
+  }
+
+  if (sugg.length){
+    html += '<div class="section-title">' + (matched.length ? "相近票据 · 可参考" : "相关票据 · 供参考") +
+            '（' + Math.min(sugg.length,8) + '）</div>';
+    html += sugg.slice(0,8).map(function(x){ return renderTicket(x, false, q); }).join("");
+    if (!matched.length){
+      html += '<div class="hint" style="margin:2px 0 12px">以上为模糊匹配结果，仅供参考；若确实没有，可直接登记新票。</div>' +
+        '<div class="actions" style="margin-bottom:14px">' +
+        '<button class="btn-sm btn-primary" data-newfrom="' + esc(q) + '">＋ 用「' + esc(short(q,18)) + '」登记新票</button>' +
+        '<button class="btn-sm" data-copyq="' + esc(q) + '">⧉ 复制关键字</button></div>';
+    }
+  } else if (!matched.length){
+    html += '<div class="card"><div class="empty"><div class="big">🗂</div>' +
+      '没有更多可参考的相近票据了。<br>可以换个关键字（例如只输入时间里的「1004」或负责人的姓），或到「登记」页新增一张。</div></div>';
+  }
+  out.innerHTML = html;
+}
+function short(s, n){
+  s = String(s == null ? "" : s).replace(/\s+/g," ").trim();
+  return s.length > n ? s.slice(0,n) + "…" : s;
+}
+function renderTicket(x, isMatch, q){
+  var t = x.t;
+  var done = (t.status || "已许可") === "已终结";
+  var st = timeState(t);
+  var cls = isMatch ? "hit" : (done ? "" : ((st.key === "late") ? "late" : (st.key === "near" ? "near" : "")));
+  var h = '<div class="ticket ' + cls + '" data-id="' + esc(t.id) + '">';
+  h += '<div class="thead"><div class="grow">' +
+       '<div class="tname">' + highlight(t.name || "(未命名工作票)", q) + '</div>' +
+       '<div class="tmeta">' + (t.type ? highlight(t.type, q) + " · " : "") +
+       (t.leader ? "负责人 " + highlight(t.leader, q) + (t.leaderPrev ? '（原 ' + esc(t.leaderPrev) + '）' : "") : "未填负责人") + '</div>' +
+       '</div>' +
+       (isMatch ? '<span class="badge ok">匹配</span>' : '<span class="badge plain">相近参考</span>') +
+       statusBadge(t) +
+       (done ? '' : '<span class="badge ' + st.cls + '">' + esc(st.text) + '</span>') +
+       '</div>';
+  if (t.leaderPrev){
+    h += '<div class="hint" style="margin-top:6px">👤 负责人已变更：<b>' + esc(t.leaderPrev) + '</b> → <b>' +
+         esc(t.leader || "未填") + '</b>' + (t.leaderChangeAt ? '（' + esc(t.leaderChangeAt) + '）' : '') + '</div>';
+  }
+
+  if (x.hits && x.hits.length){
+    h += '<div class="chips" style="margin-top:8px">';
+    x.hits.slice(0,3).forEach(function(g){
+      h += '<span class="chip" style="cursor:default">' + esc(g.field) + '：' + highlight(short(g.val,32), q) + '</span>';
+    });
+    h += '</div>';
+  }
+
+  var rows = [];
+  if (t.permitAt) rows.push(["批准开始", fieldValue(t, fieldByKey("permitAt"))]);
+  if (t.deadline) rows.push(["批准结束", fieldValue(t, fieldByKey("deadline"))]);
+  if (t.place)    rows.push(["地点设备", short(t.place, 60)]);
+  if (t.safety)   rows.push(["安措备注", short(t.safety, 100)]);
+  if (rows.length){
+    h += '<div class="kv">';
+    rows.forEach(function(r){
+      h += '<div class="k">' + esc(r[0]) + '</div><div class="v">' + highlight(r[1], q) + '</div>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="actions" style="margin-top:10px">' +
+       '<button class="btn-sm" data-act="detail">查看详情</button>' +
+       '<button class="btn-sm" data-act="edit">编辑</button>' +
+       '</div>';
+  var hitArr = x.hits || [];
+  var exactAny = hitArr.some(function(g){ return hasExact(g.val, q); }) || hasExact(t.name, q);
+  if (!exactAny && hitArr.length){
+    h += '<div class="hint">与「' + esc(short(q,16)) + '」的相似度约 ' + Math.round(hitArr[0].s * 100) + '%（票面里没有完全一致的关键字）</div>';
+  }
+  return h + '</div>';
+}
+
+/* 最近搜索 */
+function readRecent(){
+  var list = [];
+  try { list = JSON.parse(storeGet(LS_RECENT) || "[]"); } catch(e){}
+  return Array.isArray(list) ? list : [];
+}
+function pushRecent(q){
+  var list = readRecent().filter(function(x){ return x !== q; });
+  list.unshift(q);
+  storeSet(LS_RECENT, JSON.stringify(list.slice(0,10)));
+  renderRecent();
+}
+function renderRecent(){
+  var list = readRecent(), el = $("#recentChips"), act = $("#recentActions");
+  if (!el) return;
+  el.innerHTML = list.length
+    ? '<span class="muted" style="font-size:var(--fs-xs);align-self:center">最近：</span>' +
+      list.map(function(q){ return '<span class="chip" data-q="' + esc(q) + '">' + esc(short(q,16)) + '</span>'; }).join("")
+    : "";
+  /* 没有搜索记录时把「清除搜索记录」按钮收起来 */
+  if (act) act.classList.toggle("hidden", !list.length);
+}
+
+/* 快捷筛选 */
+function quickViews(){
+  var list = state.tickets.filter(function(t){ return (t.status || "已许可") === "已许可"; });
+  var late = list.filter(function(t){ return timeState(t).key === "late"; });
+  var near = list.filter(function(t){ return timeState(t).key === "near"; });
+  return { active:list, late:late, near:near };
+}
+function renderQuickChips(){
+  var el = $("#quickChips"); if (!el) return;
+  var v = quickViews();
+  el.innerHTML =
+    '<span class="chip" data-view="near">⏱ 即将到期（' + v.near.length + '）</span>' +
+    '<span class="chip" data-view="late">⚠ 已超时未终结（' + v.late.length + '）</span>' +
+    '<span class="chip" data-view="today">📅 今天许可的（' + state.tickets.filter(function(t){
+      var ts = parseDT(t.permitAt);
+      return ts != null && new Date(ts).toDateString() === new Date().toDateString();
+    }).length + '）</span>' +
+    '<span class="chip" data-view="all">📋 全部（' + state.tickets.length + '）</span>';
+}
+/* 回到查询主页：清掉列表、恢复快捷查看 */
+function goHome(){
+  state.inView = false;
+  var banner = $("#searchBanner"), out = $("#searchOut");
+  if (banner) banner.innerHTML = "";
+  if (out) out.innerHTML = "";
+  var q = $("#q");
+  if (q && q.value) q.value = "";
+  var qc = $("#quickCard");
+  if (qc) qc.classList.remove("hidden");
+  renderQuickChips();
+  renderProjectFilter();
+  renderRecent();
+  try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
+}
+function showView(kind, sort){
+  var out = $("#searchOut"), banner = $("#searchBanner");
+  if (!out || !banner) return;
+  state.inView = true;
+  var qc = $("#quickCard");
+  if (qc) qc.classList.add("hidden");
+  var q = $("#q");
+  /* 从列表点进来时先把搜索框清掉，免得下次渲染又跳回搜索结果 */
+  if (q && q.value){ q.value = ""; }
+  var title = "", list = [];
+  var v = quickViews();
+  if (kind === "near"){ title = "即将到期（4 小时内）"; list = v.near; }
+  else if (kind === "late"){ title = "已超过批准工作结束时间"; list = v.late; }
+  else if (kind === "today"){ title = "今天许可的工作票"; list = state.tickets.filter(function(t){
+      var ts = parseDT(t.permitAt);
+      return ts != null && new Date(ts).toDateString() === new Date().toDateString();
+    }); }
+  else {
+    title = (sort === "created") ? "全部工作票（按登记时间，新的在前）" : "全部工作票（按批准工作结束时间，早的在前）";
+    list = state.tickets.slice().sort(sort === "created" ? sortByCreated : sortByDeadline);
+  }
+  state.viewKind = kind;
+  if (sort) state.sort = sort;
+  list = applyProjFilter(list);
+
+  banner.innerHTML = '<div class="banner ' + (kind === "late" ? "warn" : "info") + '">' +
+    '<span>📌</span><div>' + esc(title) + '：<b>' + list.length + '</b> 张</div>' +
+    '<button class="btn-sm" data-home="1" style="margin-left:auto">← 返回首页</button></div>';
+
+  if (!list.length){
+    out.innerHTML = '<div class="card"><div class="empty"><div class="big">✅</div>「' + esc(title) + '」里没有工作票' +
+      '<div class="actions" style="justify-content:center;margin-top:14px">' +
+      '<button class="btn-primary btn-sm" data-home="1">← 返回首页</button></div></div></div>';
+    return;
+  }
+  out.innerHTML = '<div class="section-title">' + esc(title) + '（' + list.length + '）</div>' +
+    list.map(function(t){ return renderTicket({ t:t, hits:[] }, true, ""); }).join("") +
+    '<div class="actions" style="margin:14px 0 4px">' +
+    '<button class="btn-sm" data-home="1">← 返回首页</button>' +
+    '<button class="btn-sm" data-wipe="1">🗑 清空全部数据</button></div>';
+}
+
+/* ---------------- 结果区交互（全局委托） ---------------- */
+document.addEventListener("click", function(ev){
+  var t = ev.target;
+
+  var tab = up(t, "nav.tabs button[data-page]");
+  if (tab){ ev.__navHandled = 1; go(tab.getAttribute("data-page")); return; }
+
+  var th = up(t, "#segTheme [data-theme-val]");
+  if (th){
+    var tv = th.getAttribute("data-theme-val");
+    if (tv !== state.meta.theme) setAppearance({ theme:tv });
+    return;
+  }
+  var sz = up(t, "#segSize [data-size-val]");
+  if (sz){
+    var sv = sz.getAttribute("data-size-val");
+    if (sv !== state.meta.size) setAppearance({ size:sv });
+    return;
+  }
+  var sw = up(t, ".swatch[data-color]");
+  if (sw){ setAppearance({ brand: sw.getAttribute("data-color") }); return; }
+
+  var nf = up(t, "button[data-newfrom]");
+  if (nf){
+    var kw = nf.getAttribute("data-newfrom");
+    resetForm(); go("add");
+    var elName = $("#fld_name"); if (elName) elName.value = kw;
+    toast("已把关键字填入工作票名称，请补充其他信息");
+    return;
+  }
+  var cq = up(t, "button[data-copyq]");
+  if (cq){ copyText(cq.getAttribute("data-copyq"), "关键字已复制"); return; }
+
+  var dis = up(t, "[data-dismiss]");
+  if (dis){ var bn = up(dis, ".banner"); if (bn && bn.parentNode) bn.parentNode.removeChild(bn); return; }
+
+  var view = up(t, ".chip[data-view]");
+  if (view){ showView(view.getAttribute("data-view")); return; }
+
+  /* 查询页的「项目」筛选 chip */
+  var pfc = up(t, ".chip[data-pf]");
+  if (pfc){
+    var pfk = pfc.getAttribute("data-pf");
+    var pfv = pfc.getAttribute("data-pfval");
+    state.projFilter = (pfk === "all") ? null : String(pfv == null ? "" : pfv);
+    renderProjectFilter();
+    var pvq = $("#q") ? $("#q").value.trim() : "";
+    if (pvq) runSearch(pvq);
+    else if (state.inView) showView(state.viewKind, state.sort);
+    else goHome();
+    return;
+  }
+
+  var home = up(t, "[data-home]");
+  if (home){ goHome(); return; }
+
+  var gt = up(t, "button[data-goto]");
+  if (gt){
+    if (gt.getAttribute("data-goto") === "add"){ resetForm(); go("add"); }
+    return;
+  }
+
+  var chip = up(t, ".chip[data-q]");
+  if (chip){ $("#q").value = chip.getAttribute("data-q"); runSearch(chip.getAttribute("data-q")); return; }
+
+  var act = up(t, "button[data-act]");
+  if (act){
+    var host = up(act, ".ticket");
+    var id = host ? host.getAttribute("data-id") : null;
+    if (!id) return;
+    if (act.getAttribute("data-act") === "edit") startEdit(id); else openDetail(id);
+    return;
+  }
+  var res = up(t, ".ticket");
+  if (res && res.getAttribute("data-id") && !up(t, "button")) openDetail(res.getAttribute("data-id"));
+});
+/* 点一下可复制的内容 */
+document.addEventListener("click", function(ev){
+  var c = up(ev.target, ".copy[data-copy]");
+  if (c) copyText(c.getAttribute("data-copy"), "已复制");
+});
+
+/* ---------------- 表单 ---------------- */
+function buildForm(){
+  var body = $("#formBody"); if (!body) return;
+  var h = "";
+  h += fieldHTML(fieldByKey("name"));
+  h += '<div class="row">' + fieldHTML(fieldByKey("permitAt")) + '</div>';
+  h += fieldHTML(fieldByKey("deadline"));
+  h += '<div class="actions" style="margin-bottom:14px">' +
+       '<button type="button" class="mini" id="btnFillPermitNow">批准开始＝现在</button>' +
+       '<button type="button" class="mini" id="btnDeadline8">批准结束＝批准开始 + 8 小时</button>' +
+       '<button type="button" class="mini" id="btnDeadline12">＋12 小时</button>' +
+       '</div>';
+  h += '<div class="row">' + fieldHTML(fieldByKey("leader")) + fieldHTML(fieldByKey("type")) + '</div>';
+  /* 负责人变更：默认留空，填了才会替换工作负责人 */
+  h += fieldHTML(fieldByKey("leaderNew"));
+  h += fieldHTML(fieldByKey("status"));
+  h += fieldHTML(fieldByKey("project"));
+  h += '<datalist id="projOptions">' + allProjects().map(function(p){ return '<option value="' + esc(p) + '"></option>'; }).join("") + '</datalist>';
+  body.innerHTML = h;
+  validateTimeFields();
+}
+function fieldHTML(f){
+  if (!f) return "";
+  var id = "fld_" + f.key;
+  var label = esc(f.label) + (f.key === "name" ? ' <span style="color:#d92d20">*</span>' : "");
+  var h = '<div class="field"><label class="f" for="' + id + '">' + label + '</label>';
+  if (f.type === "textarea"){
+    h += '<textarea id="' + id + '" data-key="' + esc(f.key) + '" placeholder="' + esc(f.ph||"") + '"></textarea>';
+  } else if (f.type === "select"){
+    h += '<select id="' + id + '" data-key="' + esc(f.key) + '">' +
+         (f.options || []).map(function(o){ return '<option value="' + esc(o) + '">' + esc(o) + '</option>'; }).join("") +
+         '</select>';
+  } else if (f.type === "time"){
+    /* 时间：手输 12 位数字，例如 202610041415 */
+    h += '<input type="tel" id="' + id + '" data-key="' + esc(f.key) + '" data-time="1" ' +
+         'placeholder="' + esc(f.ph || TIME_PH) + '" autocomplete="off" inputmode="numeric" maxlength="20">' +
+         (f.hint ? '<div class="hint" style="margin-top:5px">' + esc(f.hint) + '</div>' : "");
+  } else {
+    h += '<input type="text" id="' + id + '" data-key="' + esc(f.key) + '"' + (f.key === "project" ? ' list="projOptions"' : "") + ' placeholder="' + esc(f.ph||"") + '" autocomplete="off">';
+  }
+  if (f.type === "time"){
+    h += '<div class="timehint" id="hint_' + esc(f.key) + '"></div>';
+  }
+  return h + '</div>';
+}
+/* 实时检查两个时间框，给出「格式对不对 / 转成了什么」 */
+function validateTimeFields(){
+  $$('#formBody [data-time]').forEach(function(el){
+    var key = el.getAttribute("data-key");
+    var box = document.getElementById("hint_" + key);
+    var r = timeHint(el.value);
+    el.classList.toggle("bad", r.cls === "bad");
+    el.classList.toggle("ok", r.cls === "ok");
+    if (box){
+      box.textContent = r.msg;
+      box.className = "timehint" + (r.cls ? " " + r.cls : "");
+    }
+  });
+}
+/* 只保留「年.月.日.时.分」，其余一律清掉 */
+function cleanTimeInput(s){
+  return String(s == null ? "" : s).replace(/[^\d.\-\/:：年月日时分\s]/g, "").trim();
+}
+function readForm(){
+  var t = {};
+  $$("#formBody [data-key]").forEach(function(el){
+    var k = el.getAttribute("data-key");
+    var v = String(el.value || "").trim();
+    if (el.getAttribute("data-time")) v = looseNorm(v);
+    t[k] = v;
+  });
+  if (!t.status) t.status = "已许可";
+  return t;
+}
+function fillForm(t){
+  $$("#formBody [data-key]").forEach(function(el){
+    var k = el.getAttribute("data-key");
+    var raw = (t && t[k] != null) ? String(t[k]) : (k === "status" ? "已许可" : "");
+    if (el.getAttribute("data-time")) raw = looseNorm(raw);
+    el.value = raw;
+  });
+  /* 种类默认选第一个，省一次点击 */
+  var ty = document.getElementById("fld_type");
+  if (ty && !ty.value && ty.options && ty.options.length) ty.value = ty.options[0].value;
+  validateTimeFields();
+}
+function resetForm(){
+  state.editingId = null;
+  var ft = $("#formTitle"); if (ft) ft.textContent = "登记新工作票";
+  var ce = $("#btnCancelEdit"); if (ce) ce.classList.add("hidden");
+  fillForm({ status:"已许可", permitAt: nowLocalInput(), project: state.projects.current || "" });
+}
+function startEdit(id){
+  var t = null;
+  state.tickets.forEach(function(x){ if (x.id === id) t = x; });
+  if (!t) return;
+  state.editingId = id;
+  go("add");
+  var ft = $("#formTitle"); if (ft) ft.textContent = "编辑：" + (t.name || "未命名工作票");
+  var ce = $("#btnCancelEdit"); if (ce) ce.classList.remove("hidden");
+  buildForm();
+  fillForm(t);
+  try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
+  toast("已进入编辑模式");
+}
+function saveForm(){
+  var data = readForm();
+  if (!data.name){ toast("请至少填写「工作票名称」"); var el = $("#fld_name"); if (el) el.focus(); return; }
+  /* 时间格式先检查：写错了不让保存，避免存进去算不出倒计时 */
+  var bad = null;
+  ["permitAt","deadline"].forEach(function(k){
+    if (bad) return;
+    var v = String(data[k] || "").trim();
+    if (!v) return;
+    if (parseDT(v) == null) bad = k;
+    else data[k] = normTime(v);
+  });
+  if (bad){
+    toast("「" + fieldByKey(bad).label + "」格式不对，请照 " + TIME_PH + " 填写");
+    var inp = $("#fld_" + bad);
+    if (inp){ inp.focus(); if (inp.select) inp.select(); }
+    validateTimeFields();
+    return;
+  }
+  /* 项目：留空＝未分类；填了别的名字，保存后自动成为新的项目选项 */
+  data.project = String(data.project || "").trim();
+  if (state.editingId){
+    var idx = -1;
+    state.tickets.forEach(function(x,i){ if (x.id === state.editingId) idx = i; });
+    if (idx >= 0){
+      var old = state.tickets[idx];
+      data.id = state.editingId;
+      data.createdAt = old.createdAt || fmtNow();
+      data.updatedAt = fmtNow();
+      data = applyLeaderChange(data, old);
+      data = applyFinishedAt(data, old);
+      state.tickets[idx] = data;
+      toast("已更新「" + data.name + "」" + (data.leaderNew ? "" : ""));
+    }
+  } else {
+    /* 新登记时如果直接填了「负责人变更」，就把它当负责人，并在变更前留空 */
+    data = applyLeaderChange(data, null);
+    data.id = uid();
+    data.createdAt = fmtNow();
+    data.updatedAt = data.createdAt;
+    data = applyFinishedAt(data, null);
+    state.tickets.push(data);
+    toast("已登记「" + data.name + "」");
+  }
+  saveData();
+  if (data.project) rememberProject(data.project);
+  resetForm();
+  renderQuickChips();
+  if ($("#q").value.trim()) runSearch($("#q").value);
+}
+/* 处理「终结时间」：改为已终结时写入当下时间；一直已终结则保留原值；改回其他状态则清空。
+   与 updatedAt 相互独立，顺延结束时间不影响它。 */
+function applyFinishedAt(data, old){
+  var nowDone = (data.status || "已许可") === "已终结";
+  var wasDone = old ? ((old.status || "已许可") === "已终结") : false;
+  if (!nowDone) data.finishedAt = "";
+  else if (wasDone) data.finishedAt = (old && old.finishedAt) ? old.finishedAt : fmtNow();
+  else data.finishedAt = fmtNow();
+  return data;
+}
+/* 处理「工作负责人变更」：
+   留空 = 负责人不变；填了名字 = 用它替换工作负责人，原负责人记入 leaderPrev（同时记下变更时间）。
+   清空这一栏 = 撤销变更，恢复成原负责人。 */
+function applyLeaderChange(data, old){
+  var curOld = (old && old.leader) ? String(old.leader) : String(data.leader || "");
+  var prev = (old && old.leaderPrev) ? String(old.leaderPrev) : "";
+  var newName = String(data.leaderNew || "").trim();
+  if (newName){
+    if (newName !== curOld){
+      /* 换人：原来那个人成为「变更前负责人」（若之前已换过，则保留最早的那位） */
+      data.leaderPrev = prev || curOld;
+      data.leaderChangeAt = fmtNow();
+    } else {
+      /* 填的还是同一个人：不算变更 */
+      data.leaderPrev = prev;
+      data.leaderChangeAt = (old && old.leaderChangeAt) || "";
+    }
+    data.leader = newName;
+    data.leaderNew = "";                       /* 变更栏用完清空，下次要改再填 */
+  } else {
+    /* 留空：如果之前换过人，视为撤销变更，恢复原负责人 */
+    if (prev){
+      data.leader = prev;
+      data.leaderPrev = "";
+      data.leaderChangeAt = "";
+    } else {
+      data.leader = curOld;
+      data.leaderPrev = "";
+      data.leaderChangeAt = (old && old.leaderChangeAt) || "";
+    }
+    data.leaderNew = "";
+  }
+  if (!data.leaderPrev) data.leaderPrev = "";
+  return data;
+}
+
+/* ---------------- 详情抽屉 ---------------- */
+var sheetId = null;
+function openDetail(id){
+  var t = null;
+  state.tickets.forEach(function(x){ if (x.id === id) t = x; });
+  if (!t) return;
+  sheetId = id;
+  var st = timeState(t);
+  var html = "";
+  /* 负责人变更：把原负责人和现负责人放在最显眼的位置 */
+  if (t.leaderPrev){
+    html += '<div class="banner warn" style="margin-bottom:12px"><span>👤</span><div>' +
+      '工作负责人已变更：原负责人 <b>' + esc(t.leaderPrev) + '</b>' +
+      ' → 现负责人 <b>' + esc(t.leader || "未填") + '</b>' +
+      (t.leaderChangeAt ? '<br><span class="muted">变更时间：' + esc(t.leaderChangeAt) + '</span>' : "") +
+      '</div></div>';
+  }
+  html += '<div class="kv">';
+  FIELDS.forEach(function(f){
+    if (f.key === "name" || f.key === "leaderNew") return;
+    var v = fieldValue(t, f);
+    if (!v) return;
+    var isKey = (f.key === "leader");
+    html += '<div class="k">' + esc(f.label) + '</div><div class="v">' +
+      (isKey ? '<span class="copy" data-copy="' + esc(v) + '">' + esc(v) + ' ⧉</span>'
+             : esc(v).replace(/\n/g, "<br>")) + '</div>';
+    /* 现负责人下面紧跟着显示原负责人 */
+    if (f.key === "leader" && t.leaderPrev){
+      html += '<div class="k">原工作负责人</div><div class="v">' + esc(t.leaderPrev) + '</div>' +
+              '<div class="k">现工作负责人</div><div class="v">' + esc(t.leader || "") + '</div>';
+    }
+  });
+  /* 其他只显示字段（如变更时间） */
+  EXTRA_SHOW.forEach(function(f){
+    if (f.key === "leaderPrev") return;                 /* 上面已经显示过 */
+    var v = t[f.key];
+    if (!v) return;
+    html += '<div class="k">' + esc(f.label) + '</div><div class="v">' + esc(String(v)) + '</div>';
+  });
+  /* 老数据里还留着的旧字段，一并显示，避免看不到 */
+  LEGACY_FIELDS.forEach(function(f){
+    var v = t[f.key];
+    if (!v) return;
+    html += '<div class="k">' + esc(f.label) + '</div><div class="v">' +
+      esc(String(v)).replace(/\n/g, "<br>") + '</div>';
+  });
+  html += '</div>';
+  if ((t.status || "已许可") === "已终结"){
+    html += '<div class="banner ok" style="margin-top:14px"><span>✅</span><div>' +
+      (t.finishedAt ? '终结时间：<b>' + esc(t.finishedAt) + '</b>' : '终结时间未记录（旧数据）') +
+      '</div></div>';
+  } else {
+    html += '<div class="banner ' + (st.key === "late" ? "warn" : "info") + '" style="margin-top:14px"><span>⏱</span><div>' +
+      '批准工作结束时间：<b>' + esc(fieldValue(t, fieldByKey("deadline")) || "未填写") + '</b>' +
+      (st.key !== "none" ? '　→　<b>' + esc(st.text) + '</b>' : "") + '</div></div>';
+  }
+  html += '<div class="hint">登记：' + esc(t.createdAt || "-") + '　最后修改：' + esc(t.updatedAt || "-") + '</div>';
+
+  var nm = $("#shName"), mt = $("#shMeta");
+  if (nm) nm.textContent = t.name || "(未命名工作票)";
+  if (mt) mt.textContent = (t.type ? t.type + " · " : "") +
+    (t.leader ? "负责人 " + t.leader + (t.leaderPrev ? "（原 " + t.leaderPrev + "）" : "") : "未填负责人") +
+    (t.status ? " · " + t.status : "");
+  var sb = $("#shBody"); if (sb) sb.innerHTML = html;
+  $("#mask").classList.add("show");
+  $("#sheet").classList.add("show");
+}
+function closeDetail(){
+  $("#mask").classList.remove("show");
+  $("#sheet").classList.remove("show");
+  sheetId = null;
+}
+
+/* ---------------- 设备记录（独立页面与独立数据） ---------------- */
+function devFieldByKey(k){
+  for (var i=0;i<DEV_FIELDS.length;i++) if (DEV_FIELDS[i].key === k) return DEV_FIELDS[i];
+  return null;
+}
+function loadDev(){
+  state.devices = [];
+  try {
+    var raw = storeGet(LS_DEV);
+    var arr = raw ? JSON.parse(raw) : [];
+    state.devices = Array.isArray(arr) ? arr : [];
+  } catch(e){ state.devices = []; }
+  /* 老数据迁移：原来的单个「直流电阻 / 空载试转电流」搬到第一个分相框里，并补默认单位 */
+  state.devices.forEach(function(d){
+    if (d.resistance && !d.resistanceUV && !d.resistanceUW && !d.resistanceVW){
+      d.resistanceUV = d.resistance;
+    }
+    if (d.noLoad && !d.noLoadA && !d.noLoadB && !d.noLoadC){
+      d.noLoadA = d.noLoad;
+    }
+    if (!d.resUnit) d.resUnit = "Ω";
+    if (!d.noLoadUnit) d.noLoadUnit = "A";
+    if (!d.vibUnit) d.vibUnit = "mm";
+    delete d.resistance;
+    delete d.noLoad;
+  });
+}
+function saveDev(){
+  if (!storeSet(LS_DEV, JSON.stringify(state.devices))) toast("保存失败：浏览器不允许存储");
+  updateDevCount();
+}
+function updateDevCount(){
+  var el = $("#devCount");
+  if (el) el.textContent = state.devices.length;
+}
+function buildDevForm(){
+  var body = $("#devFormBody"); if (!body) return;
+  body.innerHTML = DEV_FIELDS.map(function(f){
+    /* 带单位选择的分组（如直流电阻：mΩ / Ω / MΩ） */
+    if (f.group){
+      var unitSel = f.unitKey
+        ? '<div style="min-width:104px"><label class="f">单位</label>' +
+          '<select id="devf_' + esc(f.unitKey) + '" data-devunit="' + esc(f.key) + '">' +
+          (f.units || [f.unitDefault]).map(function(u){ return '<option value="' + esc(u) + '"' + (u === f.unitDefault ? " selected" : "") + '>' + esc(u) + '</option>'; }).join("") +
+          '</select></div>'
+        : "";
+      return '<div class="field"><label class="f">' + esc(f.label) + '</label>' +
+        '<div class="rowg">' + f.subs.map(function(s){
+          return '<div><label class="f" for="devf_' + esc(s.key) + '">' + esc(s.label) + '</label>' +
+            '<input type="text" id="devf_' + esc(s.key) + '" data-devkey="' + esc(s.key) + '" ' +
+            'placeholder="' + esc(s.ph || "") + '" autocomplete="off"></div>';
+        }).join("") + unitSel + '</div></div>';
+    }
+    /* 带分部（驱动端 / 非驱动端）的分组，如振动 */
+    if (f.paras){
+      /* 带单位选择的分部表单（如振动：mm / mm/s） */
+      var unitSel2 = f.unitKey
+        ? '<div style="min-width:104px;margin-bottom:8px"><label class="f">单位</label>' +
+          '<select id="devf_' + esc(f.unitKey) + '" data-devunit="' + esc(f.key) + '">' +
+          (f.units || [f.unitDefault]).map(function(u){ return '<option value="' + esc(u) + '"' + (u === f.unitDefault ? " selected" : "") + '>' + esc(u) + '</option>'; }).join("") +
+          '</select></div>'
+        : "";
+      return '<div class="field"><label class="f">' + esc(f.label) + '</label>' + unitSel2 +
+        f.paras.map(function(p){
+          return '<div style="margin-bottom:8px"><div class="hint" style="margin:0 0 4px">' + esc(p.label) + '</div>' +
+            '<div class="row3">' + p.subs.map(function(s){
+              return '<div><label class="f" for="devf_' + esc(s.key) + '">' + esc(s.label) + '</label>' +
+                '<input type="text" id="devf_' + esc(s.key) + '" data-devkey="' + esc(s.key) + '" ' +
+                'placeholder="' + esc(s.ph || "") + '" autocomplete="off"></div>';
+            }).join("") + '</div></div>';
+        }).join("") + '</div>';
+    }
+    return '<div class="field"><label class="f" for="devf_' + esc(f.key) + '">' +
+      esc(f.label) + (f.key === "name" ? ' <span style="color:#d92d20">*</span>' : "") + '</label>' +
+      '<input type="text" id="devf_' + esc(f.key) + '" data-devkey="' + esc(f.key) + '" ' +
+      'placeholder="' + esc(f.ph || "") + '" autocomplete="off"></div>';
+  }).join("");
+}
+/* 组内各分项的显示文字（带单位） */
+function devGroupParts(d, f){
+  var unit = f.unitKey ? String(d[f.unitKey] || f.unitDefault || "") : "";
+  if (f.paras){
+    var vunit = f.unitKey ? String(d[f.unitKey] || f.unitDefault || "") : "";
+    return f.paras.map(function(p){
+      return p.label + "：" + p.subs.map(function(s){
+        var v = String(d[s.key] == null ? "" : d[s.key]).trim();
+        return s.label + " " + (v ? v + vunit : "—");
+      }).join("　");
+    });
+  }
+  return f.subs.map(function(s){
+    var v = String(d[s.key] == null ? "" : d[s.key]).trim();
+    return s.label + " " + (v ? v + unit : "—");
+  });
+}
+function readDevForm(){
+  var d = {};
+  $$("#devFormBody [data-devkey]").forEach(function(el){
+    d[el.getAttribute("data-devkey")] = String(el.value || "").trim();
+  });
+  $$("#devFormBody [data-devunit]").forEach(function(el){
+    var g = fieldByDevKey(el.getAttribute("data-devunit"));
+    if (g && g.unitKey) d[g.unitKey] = String(el.value || "");
+  });
+  return d;
+}
+function fillDevForm(d){
+  $$("#devFormBody [data-devkey]").forEach(function(el){
+    var k = el.getAttribute("data-devkey");
+    el.value = (d && d[k] != null) ? String(d[k]) : "";
+  });
+  $$("#devFormBody [data-devunit]").forEach(function(el){
+    var g = fieldByDevKey(el.getAttribute("data-devunit"));
+    if (!g || !g.unitKey) return;
+    var want = (d && d[g.unitKey]) ? String(d[g.unitKey]) : (g.unitDefault || "");
+    el.value = want;
+    if (el.value !== want) el.value = g.unitDefault || "";
+  });
+}
+function fieldByDevKey(k){
+  for (var i=0;i<DEV_FIELDS.length;i++) if (DEV_FIELDS[i].key === k) return DEV_FIELDS[i];
+  return null;
+}
+function resetDevForm(){
+  state.devEditingId = null;
+  var t = $("#devFormTitle"); if (t) t.textContent = "新增设备";
+  var c = $("#btnDevCancelEdit"); if (c) c.classList.add("hidden");
+  buildDevForm();
+  fillDevForm({ project: state.projects.current || "" });
+}
+function openDevForm(){
+  var card = $("#devFormCard");
+  if (card) card.classList.remove("hidden");
+  resetDevForm();
+  try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
+}
+function saveDevForm(){
+  var d = readDevForm();
+  if (!d.name){ toast("请至少填写「设备名称」"); var el = $("#devf_name"); if (el) el.focus(); return; }
+  d.project = String(d.project || "").trim();
+  if (state.devEditingId){
+    var idx = -1;
+    state.devices.forEach(function(x,i){ if (x.id === state.devEditingId) idx = i; });
+    if (idx >= 0){
+      d.id = state.devEditingId;
+      d.createdAt = state.devices[idx].createdAt || fmtNow();
+      d.updatedAt = fmtNow();
+      state.devices[idx] = d;
+      toast("已更新「" + d.name + "」");
+    }
+  } else {
+    d.id = "e" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    d.createdAt = fmtNow();
+    d.updatedAt = d.createdAt;
+    state.devices.push(d);
+    toast("已保存设备「" + d.name + "」");
+  }
+  saveDev();
+  if (d.project) rememberProject(d.project);
+  resetDevForm();
+  var card = $("#devFormCard");
+  if (card) card.classList.add("hidden");
+  if ($("#qDev").value.trim()) runDevSearch($("#qDev").value);
+}
+function devScore(d, rawQ){
+  var q = String(rawQ || "").trim(), qn = norm(q);
+  if (!qn) return { score:0, hits:[], keyHit:false };
+  var best = 0, hits = [], keyHit = false, seen = {};
+  DEV_FIELDS.forEach(function(f){
+    if (f.group || f.paras){
+      /* 整组接一起算一次，避免同一组重复命中 */
+      var leaves = devSubs(f);
+      var parts = leaves.map(function(s){ return String(d[s.key] == null ? "" : d[s.key]); }).filter(Boolean);
+      var unit = f.unitKey ? String(d[f.unitKey] || "") : "";
+      if (!parts.length) return;
+      var shown = devGroupParts(d, f).join(" ");
+      var pool = parts.join(" ") + " " + shown + " " + unit + " " + f.label;
+      var gs = simField(q, qn, pool);
+      if (gs <= 0.28) return;
+      var gtotal = gs * (f.weight || 100) + (gs > 0.995 ? 60 : (gs >= 0.9 ? 25 : 0));
+      if (gtotal > best) best = gtotal;
+      if (gs >= 0.9) keyHit = true;
+      hits.push({ field:f.label, val:shown, s:gs, total:gtotal });
+      return;
+    }
+    var v = d[f.key];
+    if (!v) return;
+    var s = simField(q, qn, v);
+    if (s <= 0.28) return;
+    var total = s * (f.weight || 100);
+    if (s > 0.995) total += 60; else if (s >= 0.9) total += 25;
+    if (f.key === "name") total *= 1.35;
+    if (total > best) best = total;
+    if (s >= 0.9) keyHit = true;
+    hits.push({ field:f.label, val:v, s:s, total:total });
+  });
+  hits.sort(function(a,b){ return b.total - a.total; });
+  return { score:best, hits:hits.slice(0,6), keyHit:keyHit };
+}
+function renderDevCard(d, q, isMatch){
+  var h = '<div class="ticket dev-card ' + (isMatch ? "hit" : "") + '" data-devid="' + esc(d.id) + '">';
+  h += '<div class="thead"><div class="grow"><div class="tname">' + highlight(d.name || "(未命名设备)", q) + '</div>' +
+    '<div class="tmeta">' + (d.model ? "型号 " + highlight(d.model, q) : "") +
+    (d.code ? (d.model ? " · " : "") + "编号 " + highlight(d.code, q) : "") + '</div></div>' +
+    (isMatch ? '<span class="badge ok">匹配</span>' : '<span class="badge plain">相近参考</span>') + '</div>';
+  var rows = [];
+  DEV_FIELDS.forEach(function(f){
+    if (f.key === "name" || f.key === "model" || f.key === "code") return;
+    if (f.group || f.paras){
+      var leaves = devSubs(f);
+      var any = leaves.some(function(s){ return String(d[s.key] == null ? "" : d[s.key]).trim(); });
+      if (!any) return;
+      rows.push([f.label, devGroupParts(d, f).join("　")]);
+      return;
+    }
+    if (d[f.key]) rows.push([f.label, d[f.key]]);
+  });
+  if (rows.length){
+    h += '<div class="kv">';
+    rows.forEach(function(r){
+      h += '<div class="k">' + esc(r[0]) + '</div><div class="v">' + highlight(r[1], q) + '</div>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="actions" style="margin-top:10px">' +
+    '<button class="btn-sm" data-devact="edit">编辑</button>' +
+    '<button class="btn-sm" data-devact="del">删除</button></div></div>';
+  return h;
+}
+function runDevSearch(rawQ){
+  var q = String(rawQ || "").trim();
+  state.devQuery = q;
+  var banner = $("#devBanner"), out = $("#devOut");
+  if (!banner || !out) return;
+  if (!q){
+    banner.innerHTML = "";
+    out.innerHTML = state.devices.length
+      ? '<div class="hint" style="margin:2px 0 12px">输入关键字开始搜索，或点「全部设备」浏览。</div>'
+      : '<div class="card"><div class="empty"><div class="big">🛠</div>还没有设备记录，点「＋ 新增设备」开始录入</div></div>';
+    updateDevCount();
+    return;
+  }
+  var scored = state.devices.map(function(d){
+    var r = devScore(d, q);
+    return { d:d, score:r.score, hits:r.hits, keyHit:r.keyHit };
+  }).filter(function(x){ return x.score > 0; }).sort(function(a,b){ return b.score - a.score; });
+  var matched = scored.filter(function(x){ return x.keyHit; });
+  var sugg = scored.filter(function(x){ return !x.keyHit && (x.score / 150) >= 0.34; });
+  var html = "";
+  if (!matched.length){
+    banner.innerHTML = '<div class="banner warn"><span>⚠</span><div><b>没有查到与「' + esc(q) + '」匹配的设备记录。</b>' +
+      (sugg.length ? '下面是模糊匹配到的相近设备，可核对参考。' : '') + '</div></div>';
+  } else {
+    banner.innerHTML = '<div class="banner ok"><span>✔</span><div>找到 <b>' + matched.length + '</b> 台与「' + esc(q) + '」匹配的设备' +
+      (sugg.length ? '，另有 ' + sugg.length + ' 台相近设备。' : '。') + '</div></div>';
+    html += '<div class="section-title">匹配结果（' + matched.length + '）</div>' +
+      matched.map(function(x){ return renderDevCard(x.d, q, true); }).join("");
+  }
+  if (sugg.length){
+    html += '<div class="section-title">相近设备 · 供参考（' + Math.min(sugg.length,8) + '）</div>' +
+      sugg.slice(0,8).map(function(x){ return renderDevCard(x.d, q, false); }).join("");
+  }
+  out.innerHTML = html;
+  updateDevCount();
+}
+function showDevAll(){
+  var out = $("#devOut"), banner = $("#devBanner");
+  if (!out) return;
+  state.devQuery = "";
+  var q = $("#qDev"); if (q) q.value = "";
+  banner.innerHTML = '<div class="banner info"><span>📋</span><div>全部设备：<b>' + state.devices.length + '</b> 台</div></div>';
+  out.innerHTML = state.devices.length
+    ? state.devices.slice().sort(function(a,b){ return String(a.name||"").localeCompare(String(b.name||""), "zh"); })
+        .map(function(d){ return renderDevCard(d, "", true); }).join("")
+    : '<div class="card"><div class="empty"><div class="big">🛠</div>还没有设备记录</div></div>';
+  updateDevCount();
+}
+function startDevEdit(id){
+  var d = null;
+  state.devices.forEach(function(x){ if (x.id === id) d = x; });
+  if (!d) return;
+  var card = $("#devFormCard");
+  if (card) card.classList.remove("hidden");
+  buildDevForm();
+  state.devEditingId = id;
+  fillDevForm(d);
+  var t = $("#devFormTitle"); if (t) t.textContent = "编辑：" + (d.name || "未命名设备");
+  var c = $("#btnDevCancelEdit"); if (c) c.classList.remove("hidden");
+  try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
+  toast("已进入编辑模式");
+}
+function delDev(id){
+  var d = null;
+  state.devices.forEach(function(x){ if (x.id === id) d = x; });
+  if (!d) return;
+  if (!confirm("确定删除设备「" + (d.name || "未命名") + "」？不可撤销。")) return;
+  state.devices = state.devices.filter(function(x){ return x.id !== id; });
+  saveDev();
+  if ($("#qDev").value.trim()) runDevSearch($("#qDev").value); else showDevAll();
+  toast("已删除");
+}
+
+/* ---------------- 导入导出 ---------------- */
+/* 轻量文本压缩：把 JSON 里反复出现的片段（字段名、值）换成单个 ASCII 字符，
+   备份体积通常缩到 1/3 左右，粘贴和发文件都更省事。
+   结果只含可打印 ASCII 字符，微信/QQ 之间粘贴不会被“乱码”吃掉。 */
+var PACK_ESC = "\u00a7";
+var PACK_TOKENS = (function(){
+  var out = "", c;
+  for (c = 33; c <= 126; c++){ if (c === 34 || c === 92 || c === 127) continue; out += String.fromCharCode(c); }
+  for (c = 161; c <= 255; c++){ out += String.fromCharCode(c); }
+  for (c = 256; c <= 383; c++){ out += String.fromCharCode(c); }
+  return out;
+})();
+function canPack(s){
+  for (var i = 0; i < s.length; i++){
+    var cc = s.charCodeAt(i);
+    if (cc < 32 || cc === 127) return false;      /* 换行、制表符等会让分段错位 */
+  }
+  return true;
+}
+function packText(text){
+  /* 传对象就自动转 JSON，传字符串就按原样压缩 */
+  var s = (typeof text === "string") ? text : JSON.stringify(text);
+  if (!canPack(s)) return null;
+  var counts = {}, len = s.length, L, i, sub;
+  for (var l = 2; l <= 4; l++){
+    L = l;
+    for (i = 0; i + L <= len; i++){
+      sub = s.substr(i, L);
+      counts[sub] = (counts[sub] || 0) + 1;
+    }
+  }
+  var cands = [];
+  Object.keys(counts).forEach(function(k){
+    var n = counts[k];
+    if (n < 3) return;
+    var save = (k.length - 1) * n - (k.length + 1);
+    if (save <= 0) return;
+    cands.push({ k:k, save:save });
+  });
+  cands.sort(function(a,b){ return (b.save - a.save) || (b.k.length - a.k.length); });
+  var dict = [], used = {}, capped = cands.slice(0, PACK_TOKENS.length);
+  capped.forEach(function(cd){
+    if (cd.k.indexOf(PACK_ESC) >= 0) return;
+    var k = cd.k;
+    for (var j = 0; j < k.length; j++) if (used[k[j]]) return;   /* 单字符不参与替换，避免二次替换 */
+    dict.push(k);
+    for (var j2 = 0; j2 < k.length; j2++) used[k[j2]] = 1;
+  });
+  var out = s;
+  for (i = 0; i < dict.length; i++){
+    out = out.split(dict[i]).join(PACK_ESC + PACK_TOKENS.charAt(i));
+  }
+  return { flag:"p1", modes:{ "1":"num" }, data: JSON.stringify(dict) + out };
+}
+function unpackText(flag, data){
+  if (flag !== "p1") return "";
+  var s = String(data || "");
+  var i = s.indexOf("]");
+  if (s.charAt(0) !== "[" || i < 0) return "";
+  var dict;
+  try { dict = JSON.parse(s.slice(0, i + 1)); } catch(e){ return ""; }
+  var body = s.slice(i + 1);
+  var parts = body.split(PACK_ESC);
+  for (var j = 1; j < parts.length; j++){
+    var tok = parts[j].charAt(0);
+    var idx = PACK_TOKENS.indexOf(tok);
+    parts[j] = (idx >= 0 && dict[idx] != null) ? dict[idx] + parts[j].slice(1) : parts[j];
+  }
+  return parts.join("");
+}
+/* 备份文本 → 可粘贴的字符串（紧凑单行） */
+function backupText(){
+  var json = JSON.stringify(backupPayload());
+  var packed = null;
+  try { packed = packText(json); } catch(e){ packed = null; }
+  if (!packed) return json;
+  return JSON.stringify({ app:"工作管理", packed:packed });
+}
+function downloadFile(name, text, mime){
+  try {
+    var blob = new Blob([text], { type: (mime || "application/json") + ";charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){
+      if (a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 800);
+  } catch(e){ toast("此浏览器不支持下载，请用「复制备份内容」"); }
+}
+function backupPayload(){
+  /* 紧凑格式（v2）：体积小、重复导入不会产生重复记录；同时带上设备记录与项目分类 */
+  var p = packV2();
+  p.devices = state.devices || [];
+  p.projects = state.projects.saved.slice();
+  p.currentProject = state.projects.current;
+  p.projOptions = {
+    years: state.projects.years, plants: state.projects.plants,
+    units: state.projects.units, types: state.projects.types, sel: state.projects.sel
+  };
+  return p;
+}
+function backupName(){ return "工作票备份_" + (new Date().toISOString().slice(0,10).replace(/-/g,"")) + ".json"; }
+function exportJson(){
+  if (!state.tickets.length){ toast("暂无数据可导出"); return; }
+  var payload = backupPayload();
+  /* 导出两种等价格式，体积更小，方便传输和粘贴 */
+  downloadFile(backupName(), JSON.stringify({
+    app: "工作管理", author: AUTHOR, version: VERSION, exportedAt: fmtNow(),
+    meta: state.meta,
+    packed: (function(){ try { return packText(payload); } catch(e){ return null; } })()
+  }, null, 1));
+}
+function copyBackupText(){
+  if (!state.tickets.length){ toast("暂无数据可导出"); return; }
+  var txt = backupText();
+  copyText(txt, "已复制备份（" + state.tickets.length + " 张票，约 " + Math.round(txt.length/1024) + " KB）");
+}
+function shareBackup(){
+  if (!state.tickets.length){ toast("暂无数据可导出"); return; }
+  var text = backupText();
+  var name = backupName();
+  try {
+    if (window.File && navigator.canShare && navigator.share){
+      var file = new File([text], name, { type:"application/json" });
+      if (navigator.canShare({ files:[file] })){
+        navigator.share({ files:[file], title:"工作票备份", text:"工作票备份（" + state.tickets.length + " 张）" })
+          .then(function(){ toast("已打开系统分享"); }, function(){});
+        return;
+      }
+    }
+    if (navigator.share){
+      /* 文本分享体积有限，太长就只走文件 */
+      navigator.share({ title:"工作票备份", text: text.length > 60000 ? "备份文件见附件" : text })
+        .then(function(){ toast("已打开系统分享"); }, function(){});
+      return;
+    }
+    copyText(text, "此浏览器不支持系统分享，已改为复制备份内容");
+  } catch(e){
+    copyText(text, "此浏览器不支持系统分享，已改为复制备份内容");
+  }
+}
+/* 紧凑备份格式 v2：票据数组 + 字段表，并把 id 变成由内容算出的固定值。
+   好处：① 体积约缩一半；② 同样的票重复导入不会变成两份，只会更新覆盖。 */
+var BACKUP_KEYS = FIELDS.map(function(f){ return f.key; });
+function stableHash(s){
+  var h1 = 0x811c9dc5, h2 = 0x1000193;
+  s = String(s);
+  for (var i = 0; i < s.length; i++){
+    var c = s.charCodeAt(i);
+    h1 = (h1 ^ c) >>> 0; h1 = Math.imul(h1, 16777619) >>> 0;
+    h2 = (h2 + c * (i + 1)) >>> 0;
+  }
+  return (h1.toString(36) + h2.toString(36));
+}
+function detId(t){
+  return "k" + stableHash(BACKUP_KEYS.map(function(k){ return String(t[k] == null ? "" : t[k]); }).join("\u0001"));
+}
+function packV2(){
+  var rows = state.tickets.map(function(t){
+    return BACKUP_KEYS.map(function(k){ return t[k] == null ? "" : String(t[k]); });
+  });
+  return { app:"工作管理", version:2, keys:BACKUP_KEYS, rows:rows,
+           meta: state.meta, exportedAt: fmtNow() };
+}
+function unpackV2(obj){
+  var keys = Array.isArray(obj.keys) && obj.keys.length ? obj.keys : BACKUP_KEYS;
+  var rows = Array.isArray(obj.rows) ? obj.rows : [];
+  return rows.map(function(r, i){
+    var t = {};
+    FIELDS.forEach(function(f){ t[f.key] = ""; });
+    keys.forEach(function(k, j){
+      var v = Array.isArray(r) ? r[j] : (r ? r[k] : "");
+      if (v != null) t[k] = String(v);
+    });
+    if (!t.status) t.status = "已许可";
+    t.id = obj.ids && obj.ids[i] ? String(obj.ids[i]) : detId(t);
+    return t;
+  });
+}
+
+/* 从可能被截断的 JSON 里尽可能抠出完整的票据对象 */
+function salvageTickets(text){
+  var out = [], re = /"id"\s*:/g, m;
+  while ((m = re.exec(text))){
+    var start = text.lastIndexOf("{", m.index);
+    if (start < 0) continue;
+    var depth = 0, end = -1, inStr = false, esc = false;
+    for (var i = start; i < text.length; i++){
+      var ch = text[i];
+      if (inStr){
+        if (esc) esc = false;
+        else if (ch === "\\") esc = true;
+        else if (ch === '"') inStr = false;
+        continue;
+      }
+      if (ch === '"'){ inStr = true; continue; }
+      if (ch === "{") depth++;
+      else if (ch === "}"){
+        depth--;
+        if (depth === 0){ end = i; break; }
+      }
+    }
+    if (end < 0) break;                      /* 后面都被截断了，停 */
+    var piece = text.slice(start, end + 1);
+    try { out.push(JSON.parse(piece)); } catch(e){}
+    re.lastIndex = end + 1;
+  }
+  return out;
+}
+/* ---------------- 分段导入（内容太长、只能靠粘贴时用） ---------------- */
+var chunk = { on:false, target:"", acc:"", n:0 };
+function openChunk(){
+  chunk = { on:true, target:"", acc:"", n:0 };
+  var box = $("#chunkBox");
+  if (box) box.classList.remove("hidden");
+  updateChunkUI();
+}
+function closeChunk(){
+  chunk.on = false;
+  var box = $("#chunkBox");
+  if (box) box.classList.add("hidden");
+  var ta = $("#chunkArea"); if (ta) ta.value = "";
+}
+function updateChunkUI(){
+  var t = $("#chunkTitle"), info = $("#chunkInfo"), ta = $("#chunkArea");
+  var keys = FIELDS.map(function(f){ return '"' + f.key + '"'; });
+  function countIn(str, k){ return str.split(k).length - 1; }
+  var cnt = 0, unit = "个字段值";
+  if (chunk.acc){
+    if (chunk.acc.indexOf('"rows"') >= 0){
+      var m = chunk.acc.match(/\[\[/g);
+      cnt = m ? m.length : 0;
+      unit = "条记录（估算）";
+    } else {
+      keys.forEach(function(k){ cnt += countIn(chunk.acc, k); });
+    }
+  }
+  if (t) t.textContent = "第 " + (chunk.n + 1) + " 段（已粘 " + chunk.n + " 段，累计 " + Math.round(chunk.acc.length/1024) + " KB）";
+  if (info) info.textContent = (chunk.acc
+    ? "已累计 " + chunk.acc.length + " 个字符，大致包含 " + cnt + " " + unit + "。"
+    : "把备份内容分成几段，依次粘贴。") +
+    " 建议每段 2～5 万字符；如果有原始文件，直接「导入备份文件」或「导入 CSV」最省事、最不容易出错。";
+  if (ta) ta.placeholder = "把第 " + (chunk.n + 1) + " 段粘贴到这里…";
+}
+function chunkAdd(){
+  var ta = $("#chunkArea");
+  if (!ta || !ta.value.trim()){ toast("先把这一段粘贴到上面的框里"); return; }
+  if (!chunk.on) openChunk();
+  chunk.acc += ta.value;
+  chunk.n++;
+  ta.value = "";
+  updateChunkUI();
+  /* 已经能解析出完整内容就直接收工 */
+  try {
+    JSON.parse(chunk.acc);
+    toast("内容看起来已经完整，自动导入");
+    chunkFinish();
+    return;
+  } catch(e){}
+  var salv = salvageTickets(chunk.acc);
+  toast("已收到第 " + chunk.n + " 段（累计 " + Math.round(chunk.acc.length/1024) + " KB）");
+  updateChunkUI();
+}
+/* 从被截断的紧凑备份（v2）里尽量抠出完整的行数组 */
+function salvageRows(text){
+  var out = [], i = String(text).indexOf('"rows"');
+  if (i < 0) return out;
+  var start = text.indexOf("[", i);
+  if (start < 0) return out;
+  var depth = 0, rowStart = -1, inStr = false, esc = false;
+  for (var p = start; p < text.length; p++){
+    var ch = text[p];
+    if (inStr){
+      if (esc) esc = false;
+      else if (ch === "\\") esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"'){ inStr = true; continue; }
+    if (ch === "["){
+      depth++;
+      if (depth === 2) rowStart = p;               /* 一条记录开始 */
+      continue;
+    }
+    if (ch === "]"){
+      if (depth === 2 && rowStart >= 0){
+        try { out.push(JSON.parse(text.slice(rowStart, p + 1))); } catch(e){}
+        rowStart = -1;
+      }
+      depth--;
+      if (depth <= 0) break;                       /* 外层数组结束 */
+    }
+  }
+  return out;
+}
+function chunkFinish(){
+  if (!chunk.acc){ toast("还没有粘贴任何内容"); return; }
+  var ok = false;
+  try { JSON.parse(chunk.acc); ok = true; } catch(e){}
+  if (ok){
+    var acc = chunk.acc;
+    closeChunk();
+    importJson(acc);
+    return;
+  }
+  /* 不完整：先试对象式备份，再试紧凑备份的行数组 */
+  var salv = salvageTickets(chunk.acc);
+  if (salv.length){
+    closeChunk();
+    importJson(JSON.stringify({ tickets: salv }));
+    return;
+  }
+  var rows = salvageRows(chunk.acc);
+  if (rows.length){
+    closeChunk();
+    var objs = unpackV2({ keys: BACKUP_KEYS, rows: rows });
+    importJson(JSON.stringify({ tickets: objs }));
+    toast("内容不完整，已导入能读出来的 " + rows.length + " 条");
+    return;
+  }
+  toast("还拼不出完整内容，请继续粘贴下一段");
+}
+function importFromClipboard(){
+  var apply = function(txt){
+    if (!txt || !String(txt).trim()){ toast("剪贴板里没有内容"); return; }
+    var s = String(txt);
+    if (s.length > 80000){
+      /* 太长：直接转入分段导入，避免一次性粘崩 */
+      openChunk();
+      chunk.acc = s;
+      chunk.n = 1;
+      updateChunkUI();
+      toast("内容较长（" + Math.round(s.length/1024) + " KB），已放进分段导入，请检查后点「好了，导入」");
+      return;
+    }
+    importJson(s);
+  };
+  if (navigator.clipboard && navigator.clipboard.readText){
+    navigator.clipboard.readText().then(apply, function(){
+      var t = prompt("无法直接读取剪贴板，请把备份内容粘贴到下面：");
+      if (t) apply(t);
+    });
+  } else {
+    var t = prompt("请把备份内容粘贴到下面：");
+    if (t) apply(t);
+  }
+}
+/* 导出设备记录为表格（Excel 可直接打开的 CSV） */
+function devHeads(){
+  var h = [];
+  var u = function(f){ return (f.unitDefault && !f.unitKey) ? "(" + f.unitDefault + ")" : ""; };
+  DEV_FIELDS.forEach(function(f){
+    if (f.paras){
+      f.paras.forEach(function(p){
+        p.subs.forEach(function(s){ h.push(f.label + "-" + p.label + "-" + s.label + u(f)); });
+      });
+      return;
+    }
+    if (f.group){
+      f.subs.forEach(function(s){ h.push(f.label + "-" + s.label + u(f)); });
+      return;
+    }
+    h.push(f.label);
+  });
+  h.push("直流电阻单位", "空载电流单位", "振动单位", "登记时间", "最后修改");
+  return h;
+}
+function devRow(d){
+  var row = [];
+  DEV_FIELDS.forEach(function(f){
+    if (f.paras){
+      f.paras.forEach(function(p){
+        p.subs.forEach(function(s){ row.push(d[s.key] == null ? "" : String(d[s.key])); });
+      });
+      return;
+    }
+    if (f.group){
+      f.subs.forEach(function(s){ row.push(d[s.key] == null ? "" : String(d[s.key])); });
+      return;
+    }
+    row.push(d[f.key] == null ? "" : String(d[f.key]));
+  });
+  row.push(d.resUnit || "Ω", d.noLoadUnit || "A", d.vibUnit || "mm", d.createdAt || "", d.updatedAt || "");
+  return row;
+}
+function exportDevCsv(list, suffix){
+  if (!state.devices.length){ toast("暂无设备记录可导出"); return; }
+  var arr = Array.isArray(list) ? list : state.devices;
+  if (!arr.length){ toast("所选项目下没有设备记录"); return; }
+  var lines = [devHeads().map(csvCell).join(",")];
+  arr.slice().sort(function(a,b){ return String(a.name||"").localeCompare(String(b.name||""), "zh"); })
+    .forEach(function(d){ lines.push(devRow(d).map(csvCell).join(",")); });
+  var tail = suffix ? (safeName(suffix) + "_") : "";
+  var name = "设备记录_" + tail + (new Date().toISOString().slice(0,10)) + ".csv";
+  downloadFile(name, "\ufeff" + lines.join("\r\n"), "text/csv");
+  toast("已导出 " + arr.length + " 台设备的表格，可用 Excel 打开");
+}
+function exportDevBackup(){
+  if (!state.devices.length){ toast("暂无设备记录可导出"); return; }
+  var payload = { app:"工作管理", version:VERSION, exportedAt: fmtNow(), devices: state.devices };
+  downloadFile("设备记录备份_" + (new Date().toISOString().slice(0,10)) + ".json", JSON.stringify(payload, null, 1));
+  toast("已导出设备记录备份（含所有分项数据）");
+}
+function csvCell(v){
+  var s = String(v == null ? "" : v);
+  return '"' + s.replace(/"/g,'""').replace(/\r?\n/g," ") + '"';
+}
+/* 导出 CSV：时间列只给 1 列，表头用字段名、值是给人看的可读格式。
+   list 省略时导出全部；分项目导出时由 suffix 在文件名里带上项目标识。 */
+function exportCsv(list, suffix){
+  if (!state.tickets.length){ toast("暂无数据可导出"); return; }
+  var arr = Array.isArray(list) ? list : state.tickets;
+  if (!arr.length){ toast("所选项目下没有工作票"); return; }
+  var heads = ["工作票名称"];
+  FIELDS.forEach(function(f){
+    if (f.key === "name" || f.key === "project") return;
+    heads.push(f.label);
+  });
+  heads.push("项目");
+  heads.push("终结时间");
+  var lines = [heads.map(csvCell).join(",")];
+  arr.forEach(function(t){
+    var row = [csvCell(t.name || "")];
+    FIELDS.forEach(function(f){
+      if (f.key === "name" || f.key === "project") return;
+      if (f.type === "time"){
+        var ts = parseDT(t[f.key]);
+        row.push(csvCell(ts == null ? "" : fmtCN(ts)));
+      } else {
+        row.push(csvCell(t[f.key] || ""));
+      }
+    });
+    row.push(csvCell(projectOf(t)));
+    row.push(csvCell(t.finishedAt || ""));
+    lines.push(row.join(","));
+  });
+  var tail = suffix ? (safeName(suffix) + "_") : "";
+  downloadFile("工作票台账_" + tail + (new Date().toISOString().slice(0,10)) + ".csv", "\ufeff" + lines.join("\r\n"), "text/csv");
+  toast("已导出 " + arr.length + " 张工作票的表格，可直接在 Excel 里编辑");
+}
+/* 导入模板：与 exportCsv 表头完全一致，附一行示例，用户填好另存为 UTF-8 CSV 再导入。
+   时间列填「2026年10月4日14时15分」或 12 位数字 202610041415 都可以。 */
+function exportCsvTemplate(){
+  var heads = ["工作票名称"];
+  FIELDS.forEach(function(f){
+    if (f.key === "name" || f.key === "project") return;
+    heads.push(f.label);
+  });
+  heads.push("项目");
+  heads.push("终结时间");
+  var demo = {
+    name: "示例：2# 锅炉给水泵检修工作票（这行请删掉）",
+    permitAt: "202610041415", deadline: "202610042115",
+    leader: "张国强", leaderNew: "", type: "电气一种票", status: "已许可",
+    project: state.projects.current || "2026嘉电#10机C修"
+  };
+  var row = [csvCell(demo.name)];
+  FIELDS.forEach(function(f){
+    if (f.key === "name" || f.key === "project") return;
+    if (f.type === "time"){
+      var ts = parseDT(demo[f.key]);
+      row.push(csvCell(ts == null ? "" : fmtCN(ts)));
+    } else {
+      row.push(csvCell(demo[f.key] || ""));
+    }
+  });
+  row.push(csvCell(projectOf(demo)));
+  row.push(csvCell(""));
+  var lines = [heads.map(csvCell).join(","), row.join(",")];
+  downloadFile("工作票导入模板_" + (new Date().toISOString().slice(0,10)) + ".csv", "\ufeff" + lines.join("\r\n"), "text/csv");
+  toast("已导出 CSV 导入模板：按示例填好，另存为 UTF-8 CSV 再导入");
+}
+/* ---------- 导出面板：全部 / 分项目 ---------- */
+var expState = { kind:"ticket", mode:"all", picked:{} };
+function openExport(kind){
+  expState.kind = (kind === "dev") ? "dev" : "ticket";
+  expState.mode = "all";
+  expState.picked = {};
+  if (!$("#expSheet")){ doExport(); return; }
+  renderExportSheet();
+  $("#expMask").classList.add("show");
+  $("#expSheet").classList.add("show");
+}
+function closeExport(){
+  var m = $("#expMask"), s = $("#expSheet");
+  if (m) m.classList.remove("show");
+  if (s) s.classList.remove("show");
+}
+function renderExportSheet(){
+  var kind = expState.kind;
+  var src = (kind === "dev") ? state.devices : state.tickets;
+  var title = $("#expTitle"), info = $("#expInfo");
+  if (title) title.textContent = (kind === "dev") ? "导出设备表格（Excel 可编辑）" : "导出工作票 CSV（Excel 可编辑）";
+  if (info) info.textContent = "本机现有 " + src.length + (kind === "dev" ? " 台设备" : " 张工作票") +
+    "；分项目导出时只导出勾选项目下的记录，未勾选就不导出。";
+  $$("#expSeg [data-exp-val]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-exp-val") === expState.mode);
+  });
+  var box = $("#expPickBox");
+  if (box) box.classList.toggle("hidden", expState.mode !== "pick");
+  var chips = $("#expChips");
+  if (!chips) return;
+  if (expState.mode !== "pick"){ chips.innerHTML = ""; return; }
+  var opts = exportOptions(kind);
+  chips.innerHTML = opts.length ? opts.map(function(p){
+    return '<span class="chip' + (expState.picked[p] ? " on" : "") + '" data-expproj="' + esc(p) + '">' +
+      esc(p || "未分类") + '（' + projectCount(kind, p) + '）</span>';
+  }).join("") : '<span class="muted" style="font-size:var(--fs-xs)">还没有项目：先把记录归入项目，或到设置页新建项目。</span>';
+}
+function doExport(){
+  var kind = expState.kind;
+  var src = (kind === "dev") ? state.devices : state.tickets;
+  var list = src, suffix = "";
+  if (expState.mode === "pick"){
+    var picks = [];
+    for (var k in expState.picked) if (expState.picked[k]) picks.push(k);
+    if (!picks.length){ toast("请至少勾选一个项目"); return; }
+    list = src.filter(function(r){ return picks.indexOf(projectOf(r)) >= 0; });
+    if (!list.length){ toast("所选项目下没有记录"); return; }
+    suffix = (picks.length <= 2) ? picks.map(function(p){ return p || "未分类"; }).join("-") : "多项目";
+  }
+  closeExport();
+  if (kind === "dev") exportDevCsv(list, suffix); else exportCsv(list, suffix);
+}
+/* ---------- CSV 导入（Excel 批量录入） ---------- */
+function parseCsv(text){
+  var s = String(text || "").replace(/^\ufeff/, "");
+  var rows = [], row = [], field = "", inQ = false;
+  for (var i = 0; i < s.length; i++){
+    var ch = s[i];
+    if (inQ){
+      if (ch === '"'){
+        if (s[i+1] === '"'){ field += '"'; i++; } else inQ = false;
+      } else field += ch;
+    } else if (ch === '"'){ inQ = true; }
+    else if (ch === ","){ row.push(field); field = ""; }
+    else if (ch === "\n"){ row.push(field); field = ""; rows.push(row); row = []; }
+    else if (ch !== "\r") field += ch;
+  }
+  row.push(field);
+  if (row.length > 1 || String(row[0]).trim() !== "") rows.push(row);
+  return rows;
+}
+/* 从一段文本里抠出 12 位时间数字，容忍 Excel 自动格式化 */
+function toTime12(v){
+  var s = String(v == null ? "" : v).trim();
+  if (!s) return "";
+  if (/^\d{12}$/.test(s)) return s;
+  var digits = s.replace(/\D/g, "");
+  if (digits.length === 12) return digits;
+  var ts = parseDT(s);
+  if (ts != null) return toDotDT(ts);   /* 可读写法 / Excel 日期 → 12 位数字 */
+  return "";
+}
+function importCsv(text){
+  var rows = parseCsv(text).filter(function(r){
+    return r.some(function(c){ return String(c).trim() !== ""; });
+  });
+  if (rows.length < 2){ toast("CSV 里没有数据行（只要表头？）"); return; }
+  var heads = rows[0].map(function(h){
+    return String(h == null ? "" : h).replace(/^\ufeff/, "").trim().replace(/^"|"$/g, "").trim();
+  });
+  /* 表头宽松匹配：剥离 () / （） 里的后缀（如「(纯数字12位)」「(显示)」），
+     按「数字列 > 普通列 > 显示列」的优先级记录列号 */
+  var idx = {}, numIdx = {}, dispIdx = {};
+  heads.forEach(function(h, i){
+    var base = h.replace(/[(（][^)）]*[)）]/g, "").trim();
+    if (!base) return;
+    if (/显示/.test(h)){ if (dispIdx[base] == null) dispIdx[base] = i; return; }
+    if (/纯数字/.test(h)){ if (numIdx[base] == null) numIdx[base] = i; return; }
+    if (idx[base] == null) idx[base] = i;
+  });
+  /* 一个字段都没认出来：直接把表头报给用户，而不是笼统说「没有有效行」 */
+  var known = 0;
+  for (var kk in idx) known++;
+  for (var kn in numIdx) known++;
+  if (!known){
+    toast("没有识别到有效数据行\n识别到的表头：" + heads.slice(0,6).join(" / ") +
+      "\n请用 Excel 另存为 UTF-8 CSV 再导入");
+    return;
+  }
+  var cellAt = function(cells, i){ return (i != null && cells && cells[i] != null) ? String(cells[i]).trim() : ""; };
+  var arr = [];
+  for (var r = 1; r < rows.length; r++){
+    var cells = rows[r];
+    var t = {};
+    FIELDS.forEach(function(f){
+      var i;
+      if (f.type === "time"){
+        i = (numIdx[f.label] != null) ? numIdx[f.label]
+          : (idx[f.label] != null) ? idx[f.label] : dispIdx[f.label];
+        t[f.key] = toTime12(cellAt(cells, i));
+        return;
+      }
+      i = (idx[f.label] != null) ? idx[f.label] : numIdx[f.label];
+      t[f.key] = cellAt(cells, i);
+    });
+    var iName = (idx["工作票名称"] != null) ? idx["工作票名称"] : 0;   /* 名称列缺失时用第一列兜底 */
+    t.name = cellAt(cells, iName);
+    if (!t.name) continue;                                   /* 没名字的行跳过 */
+    if (!t.status) t.status = "已许可";
+    arr.push(t);
+  }
+  if (!arr.length){
+    toast("没有识别到有效数据行\n识别到的表头：" + heads.slice(0,6).join(" / ") +
+      "\n请用 Excel 另存为 UTF-8 CSV 再导入");
+    return;
+  }
+  importJson(JSON.stringify({ tickets: arr }));
+}
+/* 合并备份里的设备记录（按编号+名称去重，重复则覆盖） */
+function importDevices(list){
+  if (!Array.isArray(list) || !list.length) return 0;
+  var added = 0, updated = 0;
+  list.forEach(function(raw){
+    if (!raw || typeof raw !== "object") return;
+    var d = {};
+    DEV_FIELDS.forEach(function(f){ d[f.key] = raw[f.key] != null ? String(raw[f.key]) : ""; });
+    if (!d.name) return;
+    d.id = raw.id || ("e" + Date.now().toString(36) + Math.random().toString(36).slice(2,7));
+    d.createdAt = raw.createdAt || fmtNow();
+    d.updatedAt = raw.updatedAt || fmtNow();
+    var existing = null;
+    state.devices.forEach(function(x){ if (x.id === d.id) existing = x; });
+    if (existing){ for (var k in d) existing[k] = d[k]; updated++; }
+    else { state.devices.push(d); added++; }
+  });
+  if (added || updated) saveDev();
+  return added + updated;
+}
+/* 导入备份时合并项目分类：项目取并集，当前项目本机为空才用备份值 */
+function mergeBackupProjects(obj){
+  var p = state.projects, o = obj.projOptions || {};
+  p.years  = normProjList(p.years.concat(o.years  || []), p.years);
+  p.plants = normProjList(p.plants.concat(o.plants || []), p.plants);
+  p.units  = normProjList(p.units.concat(o.units  || []), p.units);
+  p.types  = normProjList(p.types.concat(o.types  || []), p.types);
+  (Array.isArray(obj.projects) ? obj.projects : []).forEach(function(x){
+    var s = String(x == null ? "" : x).trim();
+    if (s && p.saved.indexOf(s) < 0) p.saved.push(s);
+  });
+  var cur = String(obj.currentProject || "").trim();
+  if (!p.current && cur) p.current = cur;
+  saveProjects();
+}
+function importJson(text){
+  var obj = null;
+  try { obj = JSON.parse(text); } catch(e){
+    /* 可能是分段粘贴到一半的内容，试试能不能抠出完整的票据 */
+    var salv = salvageTickets(String(text || ""));
+    if (salv.length){ importJson(JSON.stringify({ tickets: salv })); return; }
+    toast("导入失败：内容不完整或不是有效的备份内容");
+    return;
+  }
+  /* 压缩备份：解包后再走一遍 */
+  if (obj && obj.packed && obj.packed.flag){
+    var inner = "";
+    try { inner = unpackText(obj.packed.flag, obj.packed.data); } catch(e){ inner = ""; }
+    if (!inner){ toast("导入失败：备份内容解包失败，可能被截断了"); return; }
+    importJson(inner);
+    return;
+  }
+  /* 备份里带的设备记录：先合并设备，再合并工作票 */
+  if (obj && Array.isArray(obj.devices)) importDevices(obj.devices);
+  /* 备份里带的项目分类：项目取并集，当前项目本机为空时才用备份值 */
+  if (obj && (Array.isArray(obj.projects) || obj.projOptions)) mergeBackupProjects(obj);
+  var arr = null;
+  if (Array.isArray(obj)) arr = obj;
+  else if (obj && Array.isArray(obj.rows)) arr = unpackV2(obj);        /* 紧凑格式 v2 */
+  else if (obj && Array.isArray(obj.tickets)) arr = obj.tickets;
+  else if (obj && Array.isArray(obj.data)) arr = obj.data;
+  if (!arr){ toast("导入失败：内容里没有找到工作票列表"); return; }
+
+  var added = 0, updated = 0, pj = [];
+  arr.forEach(function(raw){
+    if (!raw || typeof raw !== "object") return;
+    var t = {};
+    FIELDS.forEach(function(f){ t[f.key] = raw[f.key] != null ? String(raw[f.key]) : ""; });
+    t.id = raw.id || uid();
+    t.createdAt = raw.createdAt || fmtNow();
+    t.updatedAt = raw.updatedAt || fmtNow();
+    t.project = String(t.project || "").trim();
+    if (t.project && pj.indexOf(t.project) < 0) pj.push(t.project);
+    if (!t.name && raw.deviceName) t.name = String(raw.deviceName);
+    var existing = null;
+    state.tickets.forEach(function(x){ if (x.id === t.id) existing = x; });
+    if (existing){
+      if (confirm("发现相同 ID 的票据「" + (existing.name || "未命名") + "」，是否覆盖？\n\n确定 = 覆盖；取消 = 作为新记录导入")){
+        for (var k in t) existing[k] = t[k];
+        updated++;
+      } else { t.id = uid(); state.tickets.push(t); added++; }
+    } else { state.tickets.push(t); added++; }
+  });
+  pj.forEach(function(n){ addProjectOption(n, false); });
+  saveData(); renderQuickChips();
+  if ($("#q").value.trim()) runSearch($("#q").value);
+  toast("导入完成：新增 " + added + " 张，覆盖 " + updated + " 张");
+}
+
+/* ---------------- 云端账号（Supabase Auth + REST，不引 SDK） ----------------
+   设计：所有网络请求集中在 authPost / syncApi 里，方便以后换后端；
+   未登录、未配置、断网都只影响同步，不影响本地任何功能。 */
+function cloudReady(){
+  return !!(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) && /^https?:\/\//.test(String(SUPABASE_CONFIG.url));
+}
+function cloudBase(){ return String(SUPABASE_CONFIG.url || "").replace(/\/+$/, ""); }
+function cloudHeaders(token, prefer){
+  var h = {
+    "apikey": SUPABASE_CONFIG.anonKey,
+    "Authorization": "Bearer " + (token || SUPABASE_CONFIG.anonKey),
+    "Content-Type": "application/json"
+  };
+  if (prefer) h["Prefer"] = prefer;
+  return h;
+}
+/* 统一的 JSON 请求：把网络异常与 HTTP 错误都收敛成可读中文 */
+function httpJson(url, method, headers, body){
+  var opt = { method: method || "GET", headers: headers, cache: "no-store" };
+  if (body != null) opt.body = JSON.stringify(body);
+  return fetch(url, opt).then(function(res){
+    return res.text().then(function(txt){
+      var data = null;
+      if (txt){ try { data = JSON.parse(txt); } catch(e){ data = null; } }
+      return { ok: res.ok, status: res.status, data: data, raw: txt };
+    });
+  });
+}
+function cloudFail(msg){ var e = new Error(msg); e.friendly = true; return e; }
+var CLOUD_MSG = [
+  ["Invalid login credentials", "账号或密码不正确"],
+  ["User already registered", "这个账号已经被注册过了，直接点「登录」试试"],
+  ["duplicate key", "这个账号已经被注册过了，直接点「登录」试试"],
+  ["Password should be at least", "密码太短：云端要求至少 6 位"],
+  ["Email not confirmed", "云端还要求邮箱验证：请到 Supabase 后台 Auth 设置里关掉 Confirm email"],
+  ["Unable to validate email", "账号只能用字母、数字、下划线、点和短横线，请换一个"],
+  ["rate limit", "操作太频繁，请稍后再试"],
+  ["not authenticated", "登录状态已失效，请重新登录"],
+  ["could not find the function", "云端还没建 upload_snapshot 函数，请先执行 supabase_sync_v2.sql"],
+  ["function public.upload_snapshot", "云端还没建 upload_snapshot 函数，请先执行 supabase_sync_v2.sql"],
+  ["permission denied for function", "云端函数权限不足，请检查 SQL 里的函数授权（grant execute）"],
+  ["does not exist", "云端还没有建表：请先在 Supabase 里执行 supabase_setup.sql / supabase_sync_v2.sql"],
+  ["permission denied", "云端拒绝了这次读写：请检查 supabase_setup.sql 里的 RLS 策略是否已执行"]
+];
+function cloudError(r, fallback){
+  var d = (r && r.data) || {};
+  var s = String(d.msg || d.message || d.error_description || d.error || d.hint || (r && r.raw) || "");
+  var low = s.toLowerCase();
+  for (var i = 0; i < CLOUD_MSG.length; i++){
+    if (low.indexOf(CLOUD_MSG[i][0].toLowerCase()) >= 0) return CLOUD_MSG[i][1];
+  }
+  if (r && r.status === 401) return "登录状态已过期，请重新登录";
+  if (r && r.status === 404) return "云端接口不存在：请检查 SUPABASE_CONFIG 里的项目地址";
+  if (r && r.status === 409) return "云端数据冲突，请稍后重试";
+  return fallback + (s ? "：" + s.slice(0, 120) : "（HTTP " + ((r && r.status) || "?") + "）");
+}
+/* 把异常变成一句中文提示 */
+function syncErrMsg(e, fallback){
+  if (e && e.friendly) return e.message;
+  var m = String((e && e.message) || "");
+  if (/failed to fetch|networkerror|load failed|network/i.test(m)) return "连不上云端（可能断网或项目地址填错），本次同步没有执行";
+  return m ? (fallback + "：" + m.slice(0, 140)) : fallback;
+}
+function userEmail(u){ return String(u || "").trim().toLowerCase() + "@" + SUPABASE_CONFIG.emailDomain; }
+function authPost(path, body, fallbackMsg, token){
+  return httpJson(cloudBase() + path, "POST", cloudHeaders(token), body).then(function(r){
+    if (!r.ok) throw cloudFail(cloudError(r, fallbackMsg));
+    return r.data || {};
+  });
+}
+function restGet(path, token){
+  return httpJson(cloudBase() + "/rest/v1/" + path, "GET", cloudHeaders(token), null).then(function(r){
+    if (!r.ok) throw cloudFail(cloudError(r, "云端读取失败"));
+    return r.data;
+  });
+}
+/* 调用云端函数（PostgREST 的 /rpc 入口），如 upload_snapshot / trim_snapshot_history */
+function restRpc(name, token, body){
+  return httpJson(cloudBase() + "/rest/v1/rpc/" + name, "POST", cloudHeaders(token), body || {}).then(function(r){
+    if (!r.ok) throw cloudFail(cloudError(r, "云端函数调用失败"));
+    return r.data;
+  });
+}
+/* ---------------- 会话：保存 / 恢复 / 续期 ---------------- */
+function saveAuth(){
+  var o = { token:"", refresh:"", uid:"", name:"", exp:0, ver: state.syncVersion || 0,
+            syncAt: state.syncStatus.at || "", syncText: state.syncStatus.text || "" };
+  if (state.user){
+    o.token = state.user.token; o.refresh = state.user.refresh;
+    o.uid = state.user.id; o.name = state.user.name; o.exp = state.user.exp || 0;
+  }
+  storeSet(LS_AUTH, JSON.stringify(o));
+}
+function readAuth(){
+  try { var o = JSON.parse(storeGet(LS_AUTH) || "null"); return (o && typeof o === "object") ? o : null; }
+  catch(e){ return null; }
+}
+function applySession(d){
+  var u = (d && d.user) || {};
+  var mail = String(u.email || "");
+  var at = mail.indexOf("@");
+  var name = at > 0 ? mail.slice(0, at) : ((state.user && state.user.name) || "");
+  state.user = {
+    id: u.id || ((state.user && state.user.id) || ""),
+    name: name || "已登录",
+    token: (d && d.access_token) || "",
+    refresh: (d && d.refresh_token) || ((state.user && state.user.refresh) || ""),
+    exp: Date.now() + (((d && d.expires_in) || 3600) * 1000)
+  };
+  saveAuth(); renderAccount();
+}
+function signOutLocal(){ state.user = null; saveAuth(); renderAccount(); }
+function restoreSession(){
+  if (!cloudReady()){ renderAccount(); return; }
+  var o = readAuth();
+  if (o){
+    state.syncVersion = Number(o.ver) || 0;   /* 乐观锁基准：上次已知的云端版本号 */
+    if (o.syncAt || o.syncText){ state.syncStatus.at = o.syncAt || ""; state.syncStatus.text = o.syncText || ""; }
+    if (o.refresh && o.uid){
+      state.user = { id:o.uid, name:o.name || "已登录", token:o.token || "", refresh:o.refresh, exp:o.exp || 0 };
+    }
+  }
+  renderAccount();
+  /* 静默续期：access token 只有 1 小时，过期就用 refresh token 换新的 */
+  if (state.user){ refreshSession(true)["catch"](function(){}); }
+}
+function refreshSession(silent){
+  if (!state.user || !state.user.refresh) return Promise.reject(cloudFail("登录状态已失效，请重新登录"));
+  return authPost("/auth/v1/token?grant_type=refresh_token", { refresh_token: state.user.refresh }, "登录状态续期失败")
+    .then(function(d){ applySession(d); return d; }, function(e){
+      signOutLocal();
+      if (!silent) toast("登录状态已过期，请重新登录");
+      throw e;
+    });
+}
+function ensureToken(){
+  if (!cloudReady()) return Promise.reject(cloudFail("未配置云端，仅本地使用"));
+  if (!state.user) return Promise.reject(cloudFail("请先登录再同步"));
+  if (state.user.token && state.user.exp && Date.now() < state.user.exp - 60000) return Promise.resolve(state.user.token);
+  return refreshSession().then(function(){ return state.user.token; });
+}
+/* ---------------- 登录 / 注册 / 退出 ---------------- */
+function doLogin(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (state.syncStatus.busy) return;
+  var u = $("#accUser") ? $("#accUser").value.trim() : "";
+  var p = $("#accPass") ? $("#accPass").value : "";
+  if (!u || !p){ toast("请先填写账号和密码"); return; }
+  accountBusy(true, "login");
+  authPost("/auth/v1/token?grant_type=password", { email: userEmail(u), password: p }, "登录失败")
+    .then(function(d){
+      applySession(d);
+      toast("登录成功：" + state.user.name);
+    }, function(e){ toast(syncErrMsg(e, "登录失败")); })
+    .then(function(){
+      accountBusy(false);
+      if ($("#accPass")) $("#accPass").value = "";
+    });
+}
+function upsertProfile(username){
+  if (!state.user) return Promise.resolve(false);
+  var row = { id: state.user.id, username: String(username || "").toLowerCase(), created_at: new Date().toISOString() };
+  return httpJson(cloudBase() + "/rest/v1/profiles?on_conflict=id", "POST",
+    cloudHeaders(state.user.token, "resolution=merge-duplicates,return=minimal"), row)
+    .then(function(r){
+      if (!r.ok) throw cloudFail(cloudError(r, "账号资料写入失败"));
+      return true;
+    });
+}
+function doRegister(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (state.syncStatus.busy) return;
+  var u = $("#accUser") ? $("#accUser").value.trim() : "";
+  var p = $("#accPass") ? $("#accPass").value : "";
+  if (!/^[A-Za-z0-9_.-]{2,32}$/.test(u)){ toast("账号请用 2~32 位字母、数字、下划线、点或短横线"); return; }
+  if (String(p).length < 6){ toast("密码至少 6 位"); return; }
+  accountBusy(true, "reg");
+  authPost("/auth/v1/signup", { email: userEmail(u), password: p }, "注册失败")
+    .then(function(d){
+      if (d && d.access_token){
+        applySession(d);
+        return upsertProfile(u).then(function(){
+          toast("注册成功，已自动登录：" + state.user.name);
+        }, function(e){
+          toast("注册成功（账号资料未写入云端，不影响同步）：" + syncErrMsg(e, "写入失败"));
+        });
+      }
+      toast("已提交注册，但云端还要求邮箱验证：请到 Supabase 后台关闭 Confirm email 后重新注册");
+    }, function(e){ toast(syncErrMsg(e, "注册失败")); })
+    .then(function(){
+      accountBusy(false);
+      if ($("#accPass")) $("#accPass").value = "";
+    });
+}
+function doLogout(){
+  var tok = (state.user && state.user.token) || "";
+  var finish = function(){ signOutLocal(); toast("已退出登录，本地数据仍在"); };
+  if (!cloudReady() || !tok){ finish(); return; }
+  accountBusy(true, "logout");
+  httpJson(cloudBase() + "/auth/v1/logout", "POST", cloudHeaders(tok), {}).then(finish, finish)
+    .then(function(){ accountBusy(false); });
+}
+/* ---------------- 云端：项目分类随快照一起搬运 ----------------
+   不新增 user_snapshots 列（表结构不变），统一放在快照的 meta 里一起上传下载。 */
+function syncMetaPayload(){
+  return {
+    theme: state.meta.theme, size: state.meta.size, brand: state.meta.brand,
+    projects: state.projects.saved.slice(),
+    currentProject: state.projects.current,
+    projOptions: {
+      years: state.projects.years, plants: state.projects.plants,
+      units: state.projects.units, types: state.projects.types, sel: state.projects.sel
+    }
+  };
+}
+function unionProjList(a, b){
+  var out = Array.isArray(a) ? a.slice() : [];
+  (Array.isArray(b) ? b : []).forEach(function(x){
+    var s = String(x == null ? "" : x).trim();
+    if (s && out.indexOf(s) < 0) out.push(s);
+  });
+  return out;
+}
+/* 把云端 meta 应用到本机：union=true 时项目取并集（合并下载），否则以云端为准（覆盖下载 / 恢复历史） */
+function applyCloudMeta(m, union){
+  if (!m || typeof m !== "object") return;
+  if (THEMES[m.theme]) state.meta.theme = m.theme;
+  if (SIZES[m.size]) state.meta.size = m.size;
+  if (/^#[0-9a-fA-F]{6}$/.test(m.brand || "")) state.meta.brand = m.brand;
+  var p = state.projects, o = m.projOptions || {};
+  if (union){
+    p.years  = unionProjList(p.years,  o.years);
+    p.plants = unionProjList(p.plants, o.plants);
+    p.units  = unionProjList(p.units,  o.units);
+    p.types  = unionProjList(p.types,  o.types);
+  } else {
+    p.years  = normProjList(o.years,  p.years);
+    p.plants = normProjList(o.plants, p.plants);
+    p.units  = normProjList(o.units,  p.units);
+    p.types  = normProjList(o.types,  p.types);
+  }
+  (Array.isArray(m.projects) ? m.projects : []).forEach(function(x){
+    var s = String(x == null ? "" : x).trim();
+    if (s && p.saved.indexOf(s) < 0) p.saved.push(s);
+  });
+  var cur = String(m.currentProject || "").trim();
+  if (!union) p.current = cur;
+  else if (!p.current && cur) p.current = cur;
+  saveProjects();
+}
+
+/* ---------------- 同步（所有网络请求集中在这里） ---------------- */
+var syncApi = {
+  /* 上传：调用云端函数 upload_snapshot 做「版本比对 + 备份旧快照 + 递增版本」，
+     返回 { ok, new_version, current_version }；ok=false 表示云端已被其他设备改过，不写数据。 */
+  upload: function(baseVersion){
+    return ensureToken().then(function(tok){
+      return restRpc("upload_snapshot", tok, {
+        p_tickets: state.tickets,
+        p_devices: state.devices,
+        p_meta: syncMetaPayload(),
+        p_base_version: Number(baseVersion) || 0,
+        p_device_label: deviceLabel()
+      });
+    }).then(function(d){
+      var row = Array.isArray(d) ? d[0] : d;
+      if (!row || typeof row !== "object"){
+        throw cloudFail("云端没有返回上传结果，请确认已执行 supabase_sync_v2.sql");
+      }
+      return {
+        ok: !!row.ok,
+        new_version: Number(row.new_version) || 0,
+        current_version: Number(row.current_version) || 0
+      };
+    });
+  },
+  /* 下载：读回该用户自己的那一行；keepVersion=true 时不改动本机版本基准（查看差异时用） */
+  download: function(keepVersion){
+    return ensureToken().then(function(tok){
+      var q = SYNC_TABLE + "?select=*&user_id=eq." + encodeURIComponent(state.user.id);
+      return restGet(q, tok).then(function(d){
+        var rows = Array.isArray(d) ? d : [];
+        var row = rows.length ? rows[0] : null;
+        if (row && !keepVersion){
+          state.syncVersion = Number(row.version) || 0;
+          saveAuth(); renderSyncInfo(); renderAccount();
+        }
+        return row;
+      });
+    });
+  },
+  /* 历史列表：最近 20 条（只取列表需要的字段，不带大 JSON） */
+  history: function(){
+    return ensureToken().then(function(tok){
+      var q = "snapshot_history?select=id,version,saved_at,device_label&user_id=eq." +
+        encodeURIComponent(state.user.id) + "&order=saved_at.desc&limit=20";
+      return restGet(q, tok).then(function(d){ return Array.isArray(d) ? d : []; });
+    });
+  },
+  /* 某一条历史的完整快照 */
+  historyDetail: function(id){
+    return ensureToken().then(function(tok){
+      var q = "snapshot_history?id=eq." + encodeURIComponent(id) + "&select=*";
+      return restGet(q, tok).then(function(d){
+        var rows = Array.isArray(d) ? d : [];
+        return rows.length ? rows[0] : null;
+      });
+    });
+  },
+  /* 历史清理：只保留最近 20 条；上传成功后静默调用，失败不影响主流程 */
+  trimHistory: function(){
+    if (!cloudReady() || !state.user || !state.user.token) return Promise.resolve(false);
+    return restRpc("trim_snapshot_history", state.user.token, {})
+      .then(function(){ return true; }, function(){ return false; });
+  }
+};
+function deviceLabel(){
+  var ua = navigator.userAgent || "";
+  var os = /Android/i.test(ua) ? "安卓" : (/iPhone|iPad|iPod/i.test(ua) ? "iOS"
+    : (/Windows/i.test(ua) ? "Windows" : (/Mac OS X/i.test(ua) ? "Mac" : "其他设备")));
+  var br = /Edg\//.test(ua) ? "Edge" : (/Chrome\//.test(ua) ? "Chrome"
+    : (/Safari\//.test(ua) ? "Safari" : (/Firefox\//.test(ua) ? "Firefox" : "浏览器")));
+  return os + " · " + br;
+}
+function syncInfoText(){
+  if (!state.user) return "";
+  var s = state.syncStatus;
+  return s.at ? ("上次同步：" + s.at + (s.text ? "（" + s.text + "）" : ""))
+              : "还没有同步过：上传会用本机数据覆盖云端那一行，下载前会让你选择如何处理本地数据。";
+}
+function renderSyncInfo(){ var el = $("#syncInfo"); if (el) el.textContent = syncInfoText(); }
+function markSync(text){ state.syncStatus.at = fmtNow(); state.syncStatus.text = text; saveAuth(); renderSyncInfo(); }
+/* 稳定的对象字符串化（键排序），用来判断「同 id 的两条内容是否真的不同」 */
+function stableStr(o){
+  if (o == null || typeof o !== "object") return JSON.stringify(o);
+  if (Array.isArray(o)) return "[" + o.map(stableStr).join(",") + "]";
+  return "{" + Object.keys(o).sort().map(function(k){ return JSON.stringify(k) + ":" + stableStr(o[k]); }).join(",") + "}";
+}
+function indexById(list){
+  var m = {};
+  (list || []).forEach(function(x){ if (x && x.id) m[x.id] = x; });
+  return m;
+}
+/* 差异统计：只算数量，不动数据 */
+function diffStat(local, remote){
+  var lm = indexById(local), rm = indexById(remote);
+  var onlyLocal = 0, onlyRemote = 0, changed = 0;
+  Object.keys(lm).forEach(function(id){
+    if (!rm[id]) onlyLocal++;
+    else if (stableStr(lm[id]) !== stableStr(rm[id])) changed++;
+  });
+  Object.keys(rm).forEach(function(id){ if (!lm[id]) onlyRemote++; });
+  return { onlyLocal:onlyLocal, onlyRemote:onlyRemote, changed:changed,
+           localTotal:Object.keys(lm).length, remoteTotal:Object.keys(rm).length };
+}
+/* 逐条比较更新时间：>0 表示 a 更新，<0 表示 b 更新，0 表示无法比较（缺 updatedAt） */
+function recTime(s){
+  if (!s) return null;
+  var t = Date.parse(String(s).replace(/-/g, "/"));   /* "2026-10-05 14:20" 在 Safari 下要换成斜杠 */
+  return isNaN(t) ? null : t;
+}
+function cmpRecord(a, b){
+  var ta = recTime(a && a.updatedAt), tb = recTime(b && b.updatedAt);
+  if (ta == null || tb == null) return 0;
+  return ta === tb ? 0 : (ta > tb ? 1 : -1);
+}
+/* 按 id 合并两组记录：同 id 时 updatedAt 新的胜出，无法比较时退回 priorRemote 规则 */
+function mergeRecords(local, remote, remoteFirst){
+  var out = [], pos = {}, stat = { add:0, upd:0, keep:0 };
+  (local || []).forEach(function(x){
+    if (!x || typeof x !== "object" || !x.id || pos[x.id] != null) return;
+    pos[x.id] = out.length; out.push(x);
+  });
+  (remote || []).forEach(function(r){
+    if (!r || typeof r !== "object" || !r.id) return;
+    var i = pos[r.id];
+    if (i == null){ pos[r.id] = out.length; out.push(r); stat.add++; return; }
+    var l = out[i];
+    var w = cmpRecord(l, r);
+    var takeRemote = (w === 0) ? !!remoteFirst : (w < 0);
+    if (takeRemote){
+      if (stableStr(l) !== stableStr(r)){ out[i] = r; stat.upd++; }
+      else { stat.keep++; }
+    } else {
+      stat.keep++;
+    }
+  });
+  return { list:out, add:stat.add, upd:stat.upd, keep:stat.keep };
+}
+/* 按钮统一的忙碌态：禁用 + 「同步中…/登录中…」 */
+function accountBusy(busy, which){
+  state.syncStatus.busy = !!busy;
+  state.syncStatus.which = busy ? (which || "") : "";
+  var up = $("#btnSyncUp"), dn = $("#btnSyncDown"), lg = $("#btnLogin"), rg = $("#btnRegister");
+  var hb = $("#btnHistory"), hr = $("#btnHistoryRefresh");
+  if (hb) hb.disabled = !!busy;
+  if (hr) hr.disabled = !!busy;
+  if (up){ up.disabled = !!busy; up.textContent = (busy && which === "up") ? "同步中…" : "⬆ 上传到云端"; }
+  if (dn){ dn.disabled = !!busy; dn.textContent = (busy && which === "down") ? "同步中…" : "⬇ 从云端下载"; }
+  if (lg){ lg.disabled = !!busy; lg.textContent = (busy && which === "login") ? "登录中…" : "登录"; }
+  if (rg){ rg.disabled = !!busy; rg.textContent = (busy && which === "reg") ? "注册中…" : "注册"; }
+}
+function updateTopUser(){
+  var el = $("#topUser"); if (!el) return;
+  el.textContent = state.user ? ("☁ " + state.user.name) : "";
+  el.title = state.user ? ("已登录：" + state.user.name) : "";
+}
+function renderAccount(){
+  var ready = cloudReady(), on = !!(ready && state.user);
+  var hint = $("#cloudHint");
+  if (hint) hint.innerHTML = ready ? "" :
+    '<span class="muted">未配置云端，仅本地使用</span>：登录与同步不可用，其余功能完全照常。' +
+    '（在脚本顶部 SUPABASE_CONFIG 里填入项目地址与 anon key 即可启用）';
+  var lb = $("#loginBox"); if (lb) lb.classList.toggle("hidden", !ready || on);
+  var ub = $("#userBox"); if (ub) ub.classList.toggle("hidden", !on);
+  var sb = $("#syncBox"); if (sb) sb.classList.toggle("hidden", !on);
+  var un = $("#userName"); if (un) un.textContent = on ? state.user.name : "—";
+  var ui = $("#userId");
+  if (ui) ui.textContent = on ? ((state.user.id || "") + "　本机版本基准 v" + (Number(state.syncVersion) || 0)) : "";
+  renderSyncInfo(); renderHistory(); updateTopUser();
+  accountBusy(state.syncStatus.busy, state.syncStatus.which);
+}
+function syncUpload(forceBase){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录再同步"); return; }
+  if (state.syncStatus.busy) return;
+  /* base = 本机认得的云端版本；「强制覆盖」时由冲突弹窗传入云端当前版本 */
+  var base = (forceBase == null) ? (Number(state.syncVersion) || 0) : (Number(forceBase) || 0);
+  accountBusy(true, "up");
+  syncApi.upload(base).then(function(res){
+    if (!res.ok){
+      /* 云端版本 ≠ 本机基准：绝不静默覆盖，交给用户决定 */
+      markSync("版本冲突");
+      state.syncConflict = { open:true, current: res.current_version, base: base };
+      openConflict();
+      return;
+    }
+    state.syncVersion = res.new_version;
+    saveAuth();
+    markSync("上传成功 v" + state.syncVersion);
+    toast("上传成功（云端 v" + state.syncVersion + "）：工作票 " + state.tickets.length +
+      " 张，设备 " + state.devices.length + " 台");
+    syncApi.trimHistory();                 /* 静默清理历史，失败不影响主流程 */
+    if (state.histOpen) loadHistory();
+  }, function(e){
+    markSync("上传失败");
+    toast(syncErrMsg(e, "上传失败"));
+  }).then(function(){
+    /* 冲突弹窗还开着时保持忙碌态，等用户选完再恢复按钮 */
+    if (!(state.syncConflict && state.syncConflict.open)) accountBusy(false);
+  });
+}
+/* ---------------- 版本冲突弹窗（复用 .sheet 样式） ---------------- */
+function openConflict(){
+  var c = state.syncConflict || {};
+  var info = $("#conflictInfo");
+  if (info) info.textContent = "云端版本 v" + c.current + "，本机基于 v" + c.base +
+    "：这期间云端已被其他设备改过，为避免覆盖别人的修改，本次上传已暂停。";
+  var d = $("#conflictDiff");
+  if (d){ d.classList.add("hidden"); d.innerHTML = ""; }
+  $("#conflictMask").classList.add("show");
+  $("#conflictSheet").classList.add("show");
+}
+function closeConflict(){
+  $("#conflictMask").classList.remove("show");
+  $("#conflictSheet").classList.remove("show");
+  state.syncConflict = null;
+  accountBusy(false);                      /* 关闭后按钮恢复可用 */
+}
+/* 查看差异：只读对比，本机与云端都不写 */
+function showConflictDiff(){
+  var d = $("#conflictDiff");
+  if (d){ d.classList.remove("hidden"); d.innerHTML = '<div class="hint">正在对比…</div>'; }
+  syncApi.download(true).then(function(row){
+    if (!d) return;
+    if (!row){ d.innerHTML = '<div class="banner warn"><span>⚠</span><div>云端快照读不到了。</div></div>'; return; }
+    var t = diffStat(state.tickets, row.tickets), v = diffStat(state.devices, row.devices);
+    d.innerHTML = '<div class="kv">' +
+      '<div class="k">工作票</div><div class="v">仅本机 ' + t.onlyLocal + ' 条 · 仅云端 ' + t.onlyRemote +
+        ' 条 · 两边都有但不同 ' + t.changed + ' 条（本机共 ' + t.localTotal + ' / 云端共 ' + t.remoteTotal + '）</div>' +
+      '<div class="k">设备记录</div><div class="v">仅本机 ' + v.onlyLocal + ' 条 · 仅云端 ' + v.onlyRemote +
+        ' 条 · 两边都有但不同 ' + v.changed + ' 条（本机共 ' + v.localTotal + ' / 云端共 ' + v.remoteTotal + '）</div>' +
+      '</div><div class="hint">以上只是对比结果，本机与云端的数据都没有被修改。</div>';
+  }, function(e){
+    if (d) d.innerHTML = '<div class="banner warn"><span>⚠</span><div>' + esc(syncErrMsg(e, "读取云端数据失败")) + '</div></div>';
+  });
+}
+/* 强制覆盖：以云端当前版本为基准重新上传，成功后版本 = 当前 + 1 */
+function forceOverwrite(){
+  var cur = state.syncConflict ? state.syncConflict.current : 0;
+  closeConflict();                         /* 先恢复按钮，紧接着 syncUpload 会重新置忙 */
+  syncUpload(cur);
+}
+function syncDownload(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录再同步"); return; }
+  if (state.syncStatus.busy) return;
+  accountBusy(true, "down");
+  syncApi.download().then(function(row){
+    if (!row){ markSync("云端暂无数据"); toast("云端还没有这个账号的数据，请先在本机点「上传到云端」"); return; }
+    markSync("已读取云端快照 v" + state.syncVersion);
+    openSyncPick(row);
+  }, function(e){
+    markSync("下载失败");
+    toast(syncErrMsg(e, "下载失败"));
+  }).then(function(){ accountBusy(false); });
+}
+function openSyncPick(row){
+  state.syncRemote = row;
+  var info = $("#syncPickInfo");
+  if (info){
+    info.textContent = "云端快照：工作票 " + ((row.tickets || []).length) + " 张 · 设备 " +
+      ((row.devices || []).length) + " 台" +
+      (row.updated_at ? " · 更新于 " + String(row.updated_at).replace("T", " ").slice(0, 16) : "") +
+      (row.device_label ? " · 来自 " + row.device_label : "");
+  }
+  var loc = $("#syncLocalInfo");
+  if (loc) loc.textContent = "本机现有：工作票 " + state.tickets.length + " 张 · 设备 " + state.devices.length + " 台";
+  $("#syncMask").classList.add("show");
+  $("#syncSheet").classList.add("show");
+}
+function closeSyncPick(){
+  $("#syncMask").classList.remove("show");
+  $("#syncSheet").classList.remove("show");
+  state.syncRemote = null;
+}
+function applyRemote(mode){
+  var row = state.syncRemote;
+  if (!row) return;
+  var tRemote = Array.isArray(row.tickets) ? row.tickets : [];
+  var dRemote = Array.isArray(row.devices) ? row.devices : [];
+  var pref = state.mergePref === "local" ? "本机优先" : "云端优先";
+  var stat = null;
+  if (mode === "overwrite"){
+    state.tickets = tRemote.slice();
+    state.devices = dRemote.slice();
+    applyCloudMeta(row.meta, false);
+  } else {
+    /* 合并：同 id 的记录按 updatedAt 新的胜出；没有 updatedAt 才退回「云端优先 / 本机优先」 */
+    var rf = (state.mergePref !== "local");
+    var t = mergeRecords(state.tickets, tRemote, rf);
+    var d = mergeRecords(state.devices, dRemote, rf);
+    state.tickets = t.list; state.devices = d.list;
+    applyCloudMeta(row.meta, true);
+    stat = { add: t.add + d.add, upd: t.upd + d.upd, keep: t.keep + d.keep };
+  }
+  closeSyncPick();
+  saveData(); saveDev(); saveMeta();
+  applyAppearance(); renderQuickChips(); updateTopSub(); updateWtCount(); updateStorageInfo();
+  var q = $("#q") ? $("#q").value.trim() : "";
+  if (q) runSearch(q); else goHome();
+  if ($("#page-dev") && !$("#page-dev").classList.contains("hidden")) showDevAll();
+  if (mode === "overwrite"){
+    markSync("已覆盖本地 v" + (Number(state.syncVersion) || 0));
+    toast("已用云端数据覆盖本地：工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
+    return;
+  }
+  markSync("已合并·" + pref);
+  toast("已合并（同 id 按最后修改时间取新的）：新增 " + stat.add + " 条、更新 " + stat.upd +
+    " 条、保留 " + stat.keep + " 条；现共工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
+}
+
+/* ---------------- 云端历史（最近 20 个版本，可恢复到本机） ---------------- */
+/* 云端 saved_at 是带微秒的 UTC 时间串，先去掉小数秒再按本机时区显示 */
+function fmtCloudTime(s){
+  if (!s) return "时间未知";
+  var d = new Date(String(s).replace(/\.\d+/, "").replace(" ", "T"));
+  if (isNaN(d.getTime())) return String(s).replace("T", " ").slice(0, 16);
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+function renderHistory(){
+  var box = $("#histBox"); if (!box) return;
+  var on = !!(cloudReady() && state.user);
+  box.classList.toggle("hidden", !on);
+  var btn = $("#btnHistory"), rf = $("#btnHistoryRefresh"), list = $("#histList"), info = $("#histInfo");
+  if (btn) btn.textContent = state.histOpen ? "📜 收起云端历史" : "📜 查看云端历史";
+  if (rf) rf.classList.toggle("hidden", !state.histOpen);
+  if (list) list.classList.toggle("hidden", !state.histOpen);
+  if (!on || !list) return;
+  if (!state.histOpen){ if (info) info.textContent = ""; return; }
+  if (state.histErr){
+    list.innerHTML = '<div class="banner warn"><span>⚠</span><div>' + esc(state.histErr) + '</div></div>';
+    if (info) info.textContent = "";
+    return;
+  }
+  if (state.histRows == null){
+    list.innerHTML = '<div class="hint">正在读取云端历史…</div>';
+    if (info) info.textContent = "";
+    return;
+  }
+  if (info) info.textContent = state.histRows.length
+    ? ("共 " + state.histRows.length + " 个历史版本（云端最多保留 20 个）。恢复到本机不会改动云端数据。")
+    : "";
+  list.innerHTML = state.histRows.length ? state.histRows.map(function(h){
+    var ver = (h.version == null ? "?" : h.version);
+    return '<div class="ticket" style="padding:10px 12px;margin-bottom:8px">' +
+      '<div class="tname">v' + esc(String(ver)) + '</div>' +
+      '<div class="tmeta">' + esc(fmtCloudTime(h.saved_at)) +
+        (h.device_label ? ' · 来自 ' + esc(h.device_label) : '') + '</div>' +
+      '<div class="actions" style="margin-top:8px">' +
+        '<button class="btn-sm" data-histact="restore" data-histid="' + esc(String(h.id)) + '">恢复到本机</button>' +
+      '</div></div>';
+  }).join("") : '<div class="hint">云端还没有历史版本：第一次上传不会产生历史，之后每次上传都会把旧版本存一条。</div>';
+}
+function loadHistory(){
+  if (!state.user) return;
+  state.histRows = null; state.histErr = ""; renderHistory();
+  syncApi.history().then(function(rows){
+    state.histRows = rows; state.histErr = ""; renderHistory();
+  }, function(e){
+    state.histRows = null; state.histErr = syncErrMsg(e, "读取云端历史失败"); renderHistory();
+  });
+}
+function toggleHistory(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录再查看云端历史"); return; }
+  state.histOpen = !state.histOpen;
+  if (state.histOpen) loadHistory(); else renderHistory();
+}
+/* 恢复到本机：只替换本机数据，不写云端；之后想同步上去需手动点上传 */
+function restoreHistory(id){
+  if (!state.user){ toast("请先登录"); return; }
+  if (state.syncStatus.busy) return;
+  if (!confirm("用这一版覆盖本机当前数据？\n\n本机当前数据不会自动备份，云端数据也不受影响。\n建议先导出备份。")) return;
+  accountBusy(true, "hist");
+  syncApi.historyDetail(id).then(function(row){
+    if (!row){ toast("这一版历史已经读不到了（可能已被清理）"); return; }
+    state.tickets = Array.isArray(row.tickets) ? row.tickets : [];
+    state.devices = Array.isArray(row.devices) ? row.devices : [];
+    applyCloudMeta(row.meta, false);
+    saveData(); saveDev(); saveMeta();
+    applyAppearance(); renderQuickChips(); updateTopSub(); updateWtCount(); updateStorageInfo();
+    var q = $("#q") ? $("#q").value.trim() : "";
+    if (q) runSearch(q); else goHome();
+    if ($("#page-dev") && !$("#page-dev").classList.contains("hidden")) showDevAll();
+    markSync("已恢复到 v" + (row.version == null ? "?" : row.version) + "（本机）");
+    toast("已恢复到 v" + (row.version == null ? "?" : row.version) + "，如需同步到云端请点上传");
+  }, function(e){
+    toast(syncErrMsg(e, "读取历史版本失败"));
+  }).then(function(){ accountBusy(false); });
+}
+
+/* ---------------- 页面切换 ---------------- */
+function go(page){
+  /* page 为主标签页：wt(工作票父页) / dev / set */
+  ["wt","search","add","dev","set"].forEach(function(p){
+    var el = $("#page-" + p);
+    if (el) el.classList.toggle("hidden", p !== page);
+  });
+  $$("nav.tabs button").forEach(function(b){
+    var dp = b.getAttribute("data-page");
+    b.classList.toggle("active", dp === page || (dp === "wt" && (page === "search" || page === "add")));
+  });
+  if (page === "wt") updateWtCount();
+  if (page === "add" && $("#formBody") && !$("#formBody").children.length){
+    buildForm();
+    if (!$("#fld_permitAt").value) $("#fld_permitAt").value = nowLocalInput();
+  }
+  if (page === "dev"){
+    loadDev(); updateDevCount();
+    if (!$("#devFormBody").children.length) buildDevForm();
+    var q = $("#qDev") ? $("#qDev").value.trim() : "";
+    if (q) runDevSearch(q);
+  }
+  if (page === "set"){ renderColorList(); updateStorageInfo(); applyAppearance(); updateDiag(); renderAccount(); renderProjectCard(); }
+  try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
+}
+function updateWtCount(){
+  var el = $("#wtCount");
+  if (!el) return;
+  var near = state.tickets.filter(function(t){ return timeState(t).key === "near" && (t.status || "已许可") === "已许可"; }).length;
+  el.textContent = "已登记 " + state.tickets.length + " 张工作票" + (near ? "，其中 " + near + " 张即将到期" : "") + "。";
+}
+
+/* ---------------- 示例数据 ---------------- */
+function loadDemo(){
+  var now = new Date();
+  var p = function(d){ return toDotDT(d.getTime()); };
+  var a = new Date(now.getTime() - 2*3600*1000);
+  var b = new Date(now.getTime() + 3*3600*1000);
+  var c = new Date(now.getTime() - 26*3600*1000);
+  var d = new Date(now.getTime() - 20*3600*1000);
+  var demo = [
+    { name:"2# 锅炉给水泵检修工作票", permitAt:p(a), deadline:p(b),
+      leader:"张国强", type:"电气一种票", status:"已许可" },
+    { name:"10kV 配电室电缆头制作工作票", permitAt:p(c), deadline:p(d),
+      leader:"李伟", type:"电气二种票", status:"已终结" },
+    { name:"原煤仓照明回路检修工作票", permitAt:p(c), deadline:p(d),
+      leader:"王强", type:"其他", status:"已押回" }
+  ];
+  demo.forEach(function(t){
+    t.id = uid(); t.createdAt = fmtNow(); t.updatedAt = t.createdAt;
+    state.tickets.push(t);
+  });
+  saveData(); renderQuickChips();
+  if ($("#q").value.trim()) runSearch($("#q").value);
+  toast("已载入 3 条示例票据");
+}
+
+/* ---------------- 事件绑定 ---------------- */
+function bind(){
+  $$("nav.tabs button").forEach(function(b){
+    b.setAttribute("type", "button");
+    if (b.addEventListener){
+      /* 后备：全局委托没处理这次点击时才生效 */
+      b.addEventListener("click", function(ev){
+        if (ev && ev.__navHandled) return;
+        go(b.getAttribute("data-page"));
+      });
+    }
+  });
+
+  $("#q").addEventListener("input", function(){ runSearch(this.value); });
+  $("#btnClearQ").addEventListener("click", function(){ $("#q").value = ""; runSearch(""); renderQuickChips(); });
+  /* 清除搜索记录 */
+  $("#btnClearRecent").addEventListener("click", function(){
+    var n = readRecent().length;
+    if (!n){ toast("还没有搜索记录"); return; }
+    if (!confirm("确定清除这 " + n + " 条搜索记录？（只清记录，不影响工作票数据）")) return;
+    storeSet(LS_RECENT, "[]");
+    renderRecent();
+    toast("搜索记录已清除");
+  });
+  $("#btnSortDeadline").addEventListener("click", function(){ showView("all", "deadline"); });
+  $("#btnSortCreated").addEventListener("click", function(){ showView("all", "created"); });
+  $("#btnNewTop").addEventListener("click", function(){ resetForm(); go("add"); });
+
+  $("#btnSave").addEventListener("click", saveForm);
+  $("#btnResetForm").addEventListener("click", resetForm);
+  $("#btnCancelEdit").addEventListener("click", function(){ resetForm(); go("search"); });
+
+  /* 时间框：边打边补点、实时提示格式 */
+  document.addEventListener("input", function(ev){
+    var el = ev.target;
+    if (!el || !el.getAttribute || !el.getAttribute("data-time")) return;
+    var pos = el.selectionStart;
+    var before = el.value;
+    var masked = maskTime(before);
+    if (masked !== before){
+      el.value = masked;
+      try { el.setSelectionRange(masked.length, masked.length); } catch(e){}
+    }
+    validateTimeFields();
+  });
+  /* 失焦时把能识别的各种写法统一成 12 位数字 */
+  document.addEventListener("blur", function(ev){
+    var el = ev.target;
+    if (!el || !el.getAttribute || !el.getAttribute("data-time")) return;
+    var norm = looseNorm(el.value);
+    if (norm && norm !== el.value) el.value = norm;
+    validateTimeFields();
+  }, true);
+
+  /* 表单里的时间快捷按钮 */
+  document.addEventListener("click", function(ev){
+    var id = ev.target && ev.target.id;
+    if (id === "btnFillPermitNow"){
+      $("#fld_permitAt").value = nowLocalInput();
+      validateTimeFields();
+      return;
+    }
+    if (id === "btnDeadline8" || id === "btnDeadline12"){
+      var base = parseDT($("#fld_permitAt").value) || Date.now();
+      var add = (id === "btnDeadline8" ? 8 : 12) * 3600 * 1000;
+      $("#fld_deadline").value = toDotDT(base + add);
+      validateTimeFields();
+      toast("已按批准开始时间往后推算，并转成 12 位数字格式");
+      return;
+    }
+  });
+
+  /* 设置：自定义颜色 */
+  var cp = $("#colorPick");
+  if (cp){
+    cp.addEventListener("input", function(){ applyAppearance(); });
+    cp.addEventListener("change", function(){ setAppearance({ brand: this.value }); });
+  }
+
+  /* 设置：项目分类管理 */
+  var pc = $("#cardProjects");
+  if (pc){
+    pc.addEventListener("click", function(ev){
+      var o = up(ev.target, "[data-projopt]");
+      if (o){
+        state.projects.sel[o.getAttribute("data-projopt")] = o.getAttribute("data-projval");
+        saveProjects();
+        return;
+      }
+      var a = up(ev.target, "[data-projadd]");
+      if (a){ projAddOption(a.getAttribute("data-projadd")); return; }
+      var dl = up(ev.target, "[data-projdel]");
+      if (dl){ projDelOption(dl.getAttribute("data-projdel")); return; }
+      if (up(ev.target, "[data-projsave]")){
+        var label = buildProjectLabel();
+        if (!label){ toast("请先把四段选项都选好"); return; }
+        var isNew = addProjectOption(label, true);
+        toast(isNew ? ("已保存项目「" + label + "」，并设为当前项目")
+                    : ("「" + label + "」已经保存过，已设为当前项目"));
+        return;
+      }
+      var pk = up(ev.target, "[data-projpick]");
+      if (pk){
+        state.projects.current = pk.getAttribute("data-projpick");
+        saveProjects();
+        toast("当前项目已切换为「" + state.projects.current + "」");
+        return;
+      }
+      var rm = up(ev.target, "[data-projremove]");
+      if (rm){ deleteProject(rm.getAttribute("data-projremove")); return; }
+    });
+  }
+
+  /* 导出面板：全部 / 分项目 */
+  var expSheet = $("#expSheet");
+  if (expSheet){
+    expSheet.addEventListener("click", function(ev){
+      if (up(ev.target, "#expClose")){ closeExport(); return; }
+      var b = up(ev.target, "[data-exp-val]");
+      if (b){
+        expState.mode = b.getAttribute("data-exp-val");
+        renderExportSheet();
+        return;
+      }
+      if (up(ev.target, "#btnExpGo")){ doExport(); return; }
+      if (up(ev.target, "#btnExpCancel")){ closeExport(); toast("已取消导出"); return; }
+      var c = up(ev.target, ".chip[data-expproj]");
+      if (c){
+        var pv = c.getAttribute("data-expproj");
+        expState.picked[pv] = !expState.picked[pv];
+        renderExportSheet();
+        return;
+      }
+    });
+    $("#expMask").addEventListener("click", closeExport);
+  }
+
+  /* 抽屉 */
+  $("#mask").addEventListener("click", closeDetail);
+  $("#shClose").addEventListener("click", closeDetail);
+  $("#shEdit").addEventListener("click", function(){ var id = sheetId; closeDetail(); if (id) startEdit(id); });
+  $("#shExtend").addEventListener("click", function(){
+    var t = null;
+    state.tickets.forEach(function(x){ if (x.id === sheetId) t = x; });
+    if (!t) return;
+    var cur = parseDT(t.deadline);
+    var v = prompt("把批准工作结束时间顺延到（照 " + TIME_PH + " 填写）：",
+                   cur != null ? toDotDT(cur) : nowLocalInput());
+    if (v == null) return;
+    var ts = parseDT(v);
+    if (ts == null){ toast("时间格式看不懂，请照 " + TIME_PH + " 填写"); return; }
+    t.deadline = toDotDT(ts);
+    t.updatedAt = fmtNow();
+    saveData(); renderQuickChips(); openDetail(t.id);
+    toast("已顺延至 " + fmtCN(ts));
+  });
+  $("#shCopy").addEventListener("click", function(){
+    var t = null;
+    state.tickets.forEach(function(x){ if (x.id === sheetId) t = x; });
+    if (!t) return;
+    var lines = [];
+    FIELDS.forEach(function(f){
+      var v = fieldValue(t, f);
+      if (v) lines.push(f.label + "：" + v);
+    });
+    if (t.finishedAt) lines.push("终结时间：" + t.finishedAt);
+    copyText(lines.join("\n"), "票据信息已复制");
+  });
+  $("#shDel").addEventListener("click", function(){
+    var t = null;
+    state.tickets.forEach(function(x){ if (x.id === sheetId) t = x; });
+    if (!t) return;
+    if (!confirm("确定删除「" + (t.name || "未命名工作票") + "」？不可撤销。\n（建议先导出备份）")) return;
+    state.tickets = state.tickets.filter(function(x){ return x.id !== sheetId; });
+    saveData(); closeDetail(); renderQuickChips();
+    if ($("#q").value.trim()) runSearch($("#q").value);
+    toast("已删除");
+  });
+
+  /* 数据交换 */
+  $("#btnExport").addEventListener("click", exportJson);
+  $("#btnBackupQuick").addEventListener("click", exportJson);
+  $("#btnExportCsv").addEventListener("click", function(){ openExport("ticket"); });
+  $("#btnShare").addEventListener("click", shareBackup);
+  $("#btnCopyBackup").addEventListener("click", copyBackupText);
+  $("#btnPasteImport").addEventListener("click", importFromClipboard);
+  $("#btnImport").addEventListener("click", function(){ $("#fileImport").click(); });
+  /* 读文件：按内容自动识别是 CSV 还是备份 JSON */
+  function readImportFile(file){
+    if (!file) return;
+    var r = new FileReader();
+    r.onload = function(){
+      var text = String(r.result);
+      var name = String(file.name || "").toLowerCase();
+      var isCsv = /\.csv$/.test(name) || (name.indexOf(".json") < 0 && text.indexOf(",") > 0 && text.indexOf("工作票名称") >= 0);
+      if (isCsv) importCsv(text); else importJson(text);
+    };
+    r.onerror = function(){ toast("读取文件失败，请换一种方式导入"); };
+    r.readAsText(file, "utf-8");
+  }
+  $("#fileImport").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    readImportFile(f);
+    this.value = "";
+  });
+  /* CSV 批量录入 */
+  $("#btnImportCsv").addEventListener("click", function(){ $("#csvImport").click(); });
+  $("#btnCsvTemplate").addEventListener("click", exportCsvTemplate);
+  $("#csvImport").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    if (f) readImportFile(f);
+    this.value = "";
+  });
+  /* 分段导入 */
+  $("#btnChunkImport").addEventListener("click", function(){
+    if (chunk.on){ closeChunk(); } else { openChunk(); }
+  });
+  $("#btnChunkAdd").addEventListener("click", chunkAdd);
+  $("#btnChunkDone").addEventListener("click", chunkFinish);
+  $("#btnChunkCancel").addEventListener("click", function(){ closeChunk(); toast("已取消分段导入"); });
+  /* 工作日志展开 / 收起 */
+  $("#btnToggleLog").addEventListener("click", function(){
+    var box = $("#logBox");
+    if (!box) return;
+    var show = box.classList.contains("hidden");
+    box.classList.toggle("hidden", !show);
+    this.textContent = show ? "📋 收起工作日志" : "📋 查看工作日志";
+  });
+
+  /* 工作票父页 → 两个子页面 */
+  $("#btnGoSearch").addEventListener("click", function(){ go("search"); });
+  $("#btnGoAdd").addEventListener("click", function(){ resetForm(); go("add"); });
+  $("#btnBackWt").addEventListener("click", function(){ go("wt"); });
+  $("#btnBackWt2").addEventListener("click", function(){ go("wt"); });
+
+  /* 设备记录页 */
+  $("#qDev").addEventListener("input", function(){ runDevSearch(this.value); });
+  $("#btnClearQDev").addEventListener("click", function(){ $("#qDev").value = ""; runDevSearch(""); $("#qDev").focus(); });
+  $("#btnDevNew").addEventListener("click", openDevForm);
+  $("#btnDevBack").addEventListener("click", function(){
+    var card = $("#devFormCard"); if (card) card.classList.add("hidden");
+    resetDevForm();
+    toast("已返回设备记录");
+  });
+  $("#btnDevAll").addEventListener("click", showDevAll);
+  $("#btnDevExport").addEventListener("click", function(){ openExport("dev"); });
+  $("#btnDevExportJson").addEventListener("click", exportDevBackup);
+  $("#btnDevSave").addEventListener("click", saveDevForm);
+  $("#btnDevReset").addEventListener("click", function(){ resetDevForm(); toast("已清空表单"); });
+  $("#btnDevCancelEdit").addEventListener("click", function(){
+    var card = $("#devFormCard"); if (card) card.classList.add("hidden");
+    resetDevForm();
+  });
+  $("#devOut").addEventListener("click", function(ev){
+    var b = up(ev.target, "button[data-devact]");
+    if (!b) return;
+    var host = up(b, ".ticket");
+    if (!host) return;
+    var id = host.getAttribute("data-devid");
+    if (b.getAttribute("data-devact") === "edit") startDevEdit(id); else delDev(id);
+  });
+
+  /* 账号与同步（按钮由 renderAccount 动态显隐，这里统一委托绑定） */
+  var accCard = $("#cardAccount");
+  if (accCard){
+    accCard.addEventListener("click", function(ev){
+      var b = up(ev.target, "button");
+      if (!b) return;
+      var id = b.id;
+      if (id === "btnLogin") doLogin();
+      else if (id === "btnRegister") doRegister();
+      else if (id === "btnLogout") doLogout();
+      else if (id === "btnSyncUp") syncUpload();
+      else if (id === "btnSyncDown") syncDownload();
+    });
+    accCard.addEventListener("keydown", function(ev){
+      if (ev.key === "Enter" && ev.target && ev.target.id === "accPass"){ ev.preventDefault(); doLogin(); }
+    });
+  }
+  $$("#segMerge [data-merge-val]").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.mergePref = b.getAttribute("data-merge-val");
+      $$("#segMerge [data-merge-val]").forEach(function(x){ x.classList.toggle("active", x === b); });
+    });
+  });
+  if ($("#syncMask")) $("#syncMask").addEventListener("click", closeSyncPick);
+  if ($("#syncPickClose")) $("#syncPickClose").addEventListener("click", closeSyncPick);
+  if ($("#btnSyncOverwrite")) $("#btnSyncOverwrite").addEventListener("click", function(){ applyRemote("overwrite"); });
+  if ($("#btnSyncMerge")) $("#btnSyncMerge").addEventListener("click", function(){ applyRemote("merge"); });
+  if ($("#btnSyncCancel")) $("#btnSyncCancel").addEventListener("click", function(){ closeSyncPick(); toast("已取消下载"); });
+
+  /* 云端版本冲突弹窗 */
+  if ($("#conflictMask")) $("#conflictMask").addEventListener("click", closeConflict);
+  if ($("#conflictClose")) $("#conflictClose").addEventListener("click", closeConflict);
+  if ($("#btnConflictDiff")) $("#btnConflictDiff").addEventListener("click", showConflictDiff);
+  if ($("#btnConflictForce")) $("#btnConflictForce").addEventListener("click", forceOverwrite);
+  if ($("#btnConflictCancel")) $("#btnConflictCancel").addEventListener("click", function(){
+    closeConflict();
+    toast("已取消上传，本机与云端都没有改动");
+  });
+
+  /* 云端历史 */
+  if ($("#btnHistory")) $("#btnHistory").addEventListener("click", toggleHistory);
+  if ($("#btnHistoryRefresh")) $("#btnHistoryRefresh").addEventListener("click", loadHistory);
+  if ($("#histList")) $("#histList").addEventListener("click", function(ev){
+    var b = up(ev.target, "button[data-histact]");
+    if (b && b.getAttribute("data-histact") === "restore") restoreHistory(b.getAttribute("data-histid"));
+  });
+
+  /* 空状态里的两个入口：载入示例 / 清空数据（清空前会先确认） */
+  document.addEventListener("click", function(ev){
+    var d = ev.target;
+    var demo = up(d, "button[data-demo]");
+    if (demo){ loadDemo(); return; }
+    var wipe = up(d, "button[data-wipe]");
+    if (wipe){
+      if (!state.tickets.length){ toast("本来就没有数据"); return; }
+      if (!confirm("确定清空全部 " + state.tickets.length + " 张工作票？\n建议先在设置里导出备份。")) return;
+      if (!confirm("再次确认：此操作不可恢复。")) return;
+      state.tickets = [];
+      saveData(); closeDetail(); renderQuickChips(); runSearch($("#q").value);
+      toast("已清空");
+    }
+  });
+
+  document.addEventListener("keydown", function(ev){
+    if (ev.key === "Escape"){
+      closeDetail(); closeSyncPick(); closeExport();
+      if (state.syncConflict && state.syncConflict.open) closeConflict();
+    }
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter" && !$("#page-add").classList.contains("hidden")) saveForm();
+    if (ev.key === "/" && document.activeElement && document.activeElement.tagName !== "INPUT"
+        && document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "SELECT"){
+      ev.preventDefault(); go("search"); $("#q").focus();
+    }
+  });
+}
+
+/* ---------------- 启动（每步独立兜底） ---------------- */
+function step(name, fn){
+  try { fn(); return true; }
+  catch(e){
+    try { if (window.console && console.error) console.error("启动步骤失败：" + name, e); } catch(e2){}
+    return false;
+  }
+}
+step("读取数据", load);
+step("读取设备记录", loadDev);
+step("读取项目分类", loadProjects);
+step("应用外观", applyAppearance);
+step("构建表单", buildForm);
+step("清空表单", resetForm);
+step("渲染配色", renderColorList);
+step("绑定事件", bind);
+step("恢复登录状态", restoreSession);
+step("最近搜索", renderRecent);
+step("快捷筛选", renderQuickChips);
+step("存储信息", updateStorageInfo);
+step("顶部副标题", updateTopSub);
+step("工作票计数", updateWtCount);
+step("关于与日志", renderAbout);
+step("运行状态", updateDiag);
+step("移除脚本提示", function(){
+  var n = document.getElementById("nojs");
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+});
+/* 每分钟刷新一次倒计时与「即将到期」数量（看详情/看列表时不打扰） */
+setInterval(function(){
+  try {
+    if (state.inView) return;
+    if ($("#sheet") && $("#sheet").classList.contains("show")) return;
+    if ($("#syncSheet") && $("#syncSheet").classList.contains("show")) return;
+    updateTopSub();
+    renderQuickChips();
+    var q = $("#q") ? $("#q").value.trim() : "";
+    if (q) runSearch(q);
+  } catch(e){}
+}, 60000);
+
+window.addEventListener("storage", function(ev){
+  if (ev.key === LS_DATA){
+    load(); renderQuickChips(); updateTopSub(); updateDiag();
+    if (state.inView) goHome();
+  }
+  if (ev.key === LS_META){ load(); applyAppearance(); }
+  if (ev.key === LS_PROJECTS){
+    loadProjects();
+    var qp = $("#q") ? $("#q").value.trim() : "";
+    if (qp) runSearch(qp); else if (state.inView) showView(state.viewKind, state.sort);
+  }
+});
+</script>
+</body>
+</html>
