@@ -3463,17 +3463,28 @@ function cloudHeaders(token, prefer){
   if (prefer) h["Prefer"] = prefer;
   return h;
 }
-/* 统一的 JSON 请求：把网络异常与 HTTP 错误都收敛成可读中文 */
+/* 统一的 JSON 请求：把网络异常与 HTTP 错误都收敛成可读中文
+   网络层失败（fetch 直接失败、连响应都没拿到：手机桌面图标冷启动的第一发请求、或 supabase.co 这一跳被间歇性阻断）
+   自动重试 2 次，每次间隔 1 秒；HTTP 有响应但状态码不对（4xx/5xx）不重试，避免放大限流与服务端错误。 */
+var HTTP_RETRY = 2, HTTP_RETRY_WAIT = 1000;
 function httpJson(url, method, headers, body){
   var opt = { method: method || "GET", headers: headers, cache: "no-store" };
   if (body != null) opt.body = JSON.stringify(body);
-  return fetch(url, opt).then(function(res){
-    return res.text().then(function(txt){
-      var data = null;
-      if (txt){ try { data = JSON.parse(txt); } catch(e){ data = null; } }
-      return { ok: res.ok, status: res.status, data: data, raw: txt };
+  var attempt = 0;
+  var once = function(){
+    return fetch(url, opt).then(function(res){
+      return res.text().then(function(txt){
+        var data = null;
+        if (txt){ try { data = JSON.parse(txt); } catch(e){ data = null; } }
+        return { ok: res.ok, status: res.status, data: data, raw: txt };
+      });
+    })["catch"](function(err){
+      if (attempt >= HTTP_RETRY) throw err;
+      attempt++;
+      return new Promise(function(resolve){ setTimeout(resolve, HTTP_RETRY_WAIT); }).then(once);
     });
-  });
+  };
+  return once();
 }
 function cloudFail(msg){ var e = new Error(msg); e.friendly = true; return e; }
 var CLOUD_MSG = [
