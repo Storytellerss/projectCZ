@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f4f6fb">
+<meta name="theme-color" content="#eef1f5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="工作管理">
@@ -21,8 +21,8 @@
   "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f4f6fb",
-  "theme_color": "#2563eb",
+  "background_color": "#eef1f5",
+  "theme_color": "#0a4d8c",
   "icons": [
     { "src": "icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
@@ -30,42 +30,44 @@
 }'>
 <style>
 /* ===== 配色变量：底色（浅/深）+ 主题色（可调） ===== */
+/* 电厂风格：电力蓝 + 金属灰 + 中性白；浅色像厂房地坪，深色面向夜间值班与机房弱光 */
 :root{
-  --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#68727f; --line:#e3e8f0;
-  --soft:#f1f5f9; --faint:#98a2b3; --faint-line:#c3cbd6;
-  --ok:#0f9d58; --ok-bg:#e7f7ee; --ok-ink:#0b6b3d; --ok-line:#c6ead7;
-  --warn:#b45309; --warn-bg:#fdf3e3; --warn-ink:#7c4a03; --warn-line:#f5dfba;
-  --danger:#d92d20; --danger-bg:#fdeceb; --danger-line:#f4c9c6;
-  --header-bg:rgba(244,246,251,.92); --nav-bg:rgba(255,255,255,.96);
+  --bg:#eef1f5; --card:#ffffff; --ink:#1c2530; --muted:#5c6672; --line:#d8dee6;
+  --soft:#eaeef3; --faint:#94a0ad; --faint-line:#c4ccd6;
+  --ok:#1a7f4b; --ok-bg:#e7f7ee; --ok-ink:#14683e; --ok-line:#c2e3d2;
+  --warn:#a35a00; --warn-bg:#fdf3e3; --warn-ink:#7a4300; --warn-line:#eedcbb;
+  --danger:#c0392b; --danger-bg:#fdeceb; --danger-line:#eec6c2;
+  --header-bg:rgba(238,241,245,.94); --nav-bg:rgba(255,255,255,.97);
   --toast-bg:#111827; --toast-ink:#ffffff;
-  --mark-bg:#fff3a3; --mark-ink:#1f2733; --grab:#e4e7ec;
-  --radius:14px;
-  --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+  --mark-bg:#fff3a3; --mark-ink:#1f2733; --grab:#dfe4ea;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 18px rgba(16,24,40,.05);
   color-scheme:light;
 }
 :root[data-theme="dark"]{
-  --bg:#0f141b; --card:#18202b; --ink:#e8edf5; --muted:#97a3b4; --line:#2a3544;
-  --soft:#222c38; --faint:#7b8798; --faint-line:#3c4859;
-  --ok:#4ade80; --ok-bg:#14301f; --ok-ink:#86efac; --ok-line:#245c3a;
-  --warn:#fbbf24; --warn-bg:#3a2c10; --warn-ink:#fde68a; --warn-line:#5b431a;
-  --danger:#f87171; --danger-bg:#3b1a1a; --danger-line:#6b2626;
-  --header-bg:rgba(15,20,27,.92); --nav-bg:rgba(24,32,43,.96);
-  --toast-bg:#e8edf5; --toast-ink:#111827;
-  --mark-bg:#7a6414; --mark-ink:#ffe9a3; --grab:#333f4f;
+  --bg:#0d1218; --card:#151c24; --ink:#e4eaf2; --muted:#8e9aa8; --line:#26313e;
+  --soft:#1b232d; --faint:#7a8695; --faint-line:#37424f;
+  --ok:#3fbf6f; --ok-bg:#12301d; --ok-ink:#86efac; --ok-line:#245c3a;
+  --warn:#e8a838; --warn-bg:#372a10; --warn-ink:#fde68a; --warn-line:#58411a;
+  --danger:#e05c5c; --danger-bg:#3a1a1a; --danger-line:#6b2a2a;
+  --header-bg:rgba(13,18,24,.94); --nav-bg:rgba(21,28,36,.96);
+  --toast-bg:#e4eaf2; --toast-ink:#111827;
+  --mark-bg:#7a6414; --mark-ink:#ffe9a3; --grab:#313b47;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px rgba(0,0,0,.32);
   color-scheme:dark;
 }
-/* 主题色：由脚本根据设置覆盖，默认蓝 */
+/* 主题色：由脚本根据设置覆盖，默认电力蓝（国网蓝） */
 :root{
-  --brand:#2563eb;
-  --brand-d:#1d4ed8;
-  --brand-l:#e8f0ff;
-  --brand-ink:#1e40af;
-  --brand-line:#cfe0ff;
+  --brand:#0a4d8c;
+  --brand-d:#083f73;
+  --brand-l:#e7eef6;
+  --brand-ink:#083a69;
+  --brand-line:#b9cde0;
 }
 :root[data-theme="dark"]{
-  --brand-l:#1b2c44;
-  --brand-ink:#bfdbfe;
+  --brand:#789dc0;
+  --brand-l:#12263c;
+  --brand-ink:#9db8d1;
 }
 /* ===== 字号：小（默认）/ 中 / 大 ===== */
 :root{ --fs:15px; --fs-s:13px; --fs-xs:12px; --fs-l:16px; }
@@ -91,8 +93,10 @@ header.top{
 }
 .topin{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:10px}
 .logo{
-  width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+  width:38px;height:38px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
   background:var(--brand);color:#fff;font-weight:700;font-size:17px;
+  /* 铭牌质感：底部一条内阴影 + 一层极淡外投影 */
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.12), 0 1px 2px rgba(16,24,40,.08);
 }
 :root[data-theme="dark"] .logo{color:#0b1220}
 .title{font-weight:700;font-size:var(--fs-l);line-height:1.2}
@@ -101,7 +105,8 @@ header.top{
 /* ---------- 卡片 / 表单 ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
 .card h2{margin:0 0 10px;font-size:var(--fs-l);display:flex;align-items:center;gap:8px}
-.card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex:0 0 auto}
+/* 卡片标题前的分区标记：短竖条，像仪表面板的分区标识 */
+.card h2 .dot{width:3px;height:14px;border-radius:2px;background:var(--brand);flex:0 0 auto}
 .hint{color:var(--muted);font-size:var(--fs-xs);margin:6px 0 0}
 .field{margin-bottom:12px}
 label.f{display:block;font-size:var(--fs-xs);color:var(--muted);margin:0 0 5px}
@@ -125,7 +130,9 @@ input.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(217,45,32,.12)}
 /* ---------- 按钮 ---------- */
 button{font-family:inherit;font-size:var(--fs-l);cursor:pointer;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px}
 button:active{transform:translateY(1px)}
-.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600;
+  /* 顶部略亮的极淡渐变，做出按钮质感；不支持 color-mix 的浏览器自动退回上面的纯色 */
+  background:linear-gradient(180deg, color-mix(in srgb, var(--brand) 92%, #fff) 0%, var(--brand) 100%);}
 :root[data-theme="dark"] .btn-primary{color:#0b1220}
 .btn-danger{border-color:var(--danger-line);color:var(--danger)}
 .btn-sm{padding:7px 11px;font-size:var(--fs-s);border-radius:9px}
@@ -142,6 +149,30 @@ input[type=search]{padding-left:36px}
 .chip:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l)}
 .chip.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
 .chip.on:hover{color:#fff}
+/* ---------- 查询页快捷查看：一级项目 / 二级状态 / 操作区 ---------- */
+.projbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.projbtn{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:7px 13px;
+  font-family:inherit;font-size:var(--fs-s);font-weight:600;color:var(--ink);cursor:pointer;
+  max-width:min(100%,300px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.projbtn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l)}
+.projbtn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.projbtn.on:hover{color:#fff}
+.projbtn .n{font-size:var(--fs-xs);font-weight:400;opacity:.75;margin-left:5px}
+.chips.lvl2 .chip{background:var(--soft);border-color:var(--line);color:var(--muted);padding:4px 10px}
+.chips.lvl2 .chip:hover{color:var(--brand);border-color:var(--brand);background:var(--brand-l)}
+.chips.lvl2 .chip.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand-ink);font-weight:700}
+.quick-acts{margin-top:10px;align-items:center}
+#btnNewTop{padding:10px 18px}
+.sortbtn.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand-ink);font-weight:700}
+:root[data-theme="dark"] .projbtn.on{color:#0b1220}
+:root[data-theme="dark"] .chips.lvl2 .chip.on{color:var(--brand-ink)}
+/* 深色下主色已提亮，选中态改用深色文字保证对比 */
+:root[data-theme="dark"] .chip.on,
+:root[data-theme="dark"] .chip.on:hover{color:#0b1220}
+@media(max-width:580px){
+  .projbtn{max-width:100%}
+  .quick-acts #btnNewTop{flex:1 1 100%}
+}
 .seg.compact button{min-width:62px;padding:7px 8px;gap:2px}
 /* ---------- 结果 ---------- */
 .ticket{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
@@ -151,7 +182,7 @@ input[type=search]{padding-left:36px}
 .thead{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
 .tname{font-weight:700;font-size:var(--fs-l)}
 .tmeta{color:var(--muted);font-size:var(--fs-s)}
-.badge{font-size:var(--fs-xs);border-radius:999px;padding:3px 9px;background:var(--brand-l);color:var(--brand);font-weight:600;white-space:nowrap}
+.badge{font-size:var(--fs-xs);border-radius:6px;padding:3px 9px;background:var(--brand-l);color:var(--brand);font-weight:600;white-space:nowrap}
 .badge.ok{background:var(--ok-bg);color:var(--ok-ink)}
 .badge.warn{background:var(--warn-bg);color:var(--warn-ink)}
 .badge.bad{background:var(--danger-bg);color:var(--danger)}
@@ -282,7 +313,7 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
 
 <header class="top">
   <div class="topin">
-    <div class="logo">票</div>
+    <div class="logo" title="电厂工作管理">⚡</div>
     <div>
       <div class="title">工作管理</div>
       <div class="sub" id="topSub">批准开始 · 批准结束 · 负责人</div>
@@ -326,20 +357,24 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
       </div>
     </div>
 
-    <div id="searchBanner"></div>
-    <div id="searchOut"></div>
-
     <div class="card" id="quickCard">
       <h2><span class="dot"></span>快捷查看</h2>
-      <div class="chips" id="quickChips"></div>
-      <div class="chips" id="projFilterChips"></div>
-      <div class="actions" style="margin-top:10px">
-        <button class="btn-sm" id="btnNewTop">＋ 登记新票</button>
-        <button class="btn-sm" id="btnSortDeadline">按批准结束时间排序</button>
-        <button class="btn-sm" id="btnSortCreated">按登记时间排序</button>
+      <div class="section-title">项目</div>
+      <div class="projbtns" id="projFilterChips"></div>
+      <div class="section-title">状态</div>
+      <div class="chips lvl2" id="quickChips"></div>
+      <div class="section-title">操作</div>
+      <div class="actions quick-acts">
+        <button class="btn-primary" id="btnNewTop">＋ 登记新票</button>
+        <button class="btn-sm sortbtn" id="btnSortDeadline">⏱ 按批准结束时间排序</button>
+        <button class="btn-sm sortbtn" id="btnSortCreated">🕒 按登记时间排序</button>
+        <button class="btn-sm" id="btnQuickReset">↺ 重置筛选</button>
       </div>
-      <div class="hint">「即将到期」按批准工作结束时间算，4 小时内会标黄、超过会标红。</div>
+      <div class="hint" id="quickHint"></div>
     </div>
+
+    <div id="searchBanner"></div>
+    <div id="searchOut"></div>
 
     <div class="card" id="helpCard">
       <h2><span class="dot"></span>使用说明</h2>
@@ -387,7 +422,7 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
       <div class="colorlist" id="colorList"></div>
       <div class="pickerline">
         <label class="f" style="margin:0">自定义颜色：</label>
-        <input type="color" id="colorPick" value="#2563eb">
+        <input type="color" id="colorPick" value="#0a4d8c">
         <span class="hint" id="colorNow" style="margin:0"></span>
       </div>
       <div class="hint">主题色用于按钮、选中的标签和高亮文字。</div>
@@ -418,7 +453,7 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
     </div>
 
     <div class="card" id="cardAccount">
-      <h2><span class="dot"></span>账号与同步（云端）</h2>
+      <h2><span class="dot"></span>账号与云端数据</h2>
       <div class="hint" id="cloudHint"></div>
 
       <div id="loginBox">
@@ -434,7 +469,7 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
           <button class="btn-sm btn-primary" id="btnLogin">登录</button>
           <button class="btn-sm" id="btnRegister">注册</button>
         </div>
-        <div class="hint">首次使用点「注册」即可，账号不用填邮箱。登录只影响同步，<b>不登录时本地功能完全可用</b>。</div>
+        <div class="hint">首次使用点「注册」即可，账号不用填邮箱。登录只影响云端功能，<b>不登录时本地功能完全可用</b>。</div>
       </div>
 
       <div id="userBox" class="hidden">
@@ -444,22 +479,35 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
         </div>
       </div>
 
-      <div id="syncBox" class="hidden" style="margin-top:12px">
+      <div id="syncBox" class="hidden" style="margin-top:14px">
+        <div class="section-title">📁 我的云端数据</div>
         <div class="actions">
-          <button class="btn-sm btn-primary" id="btnSyncUp">⬆ 上传到云端</button>
-          <button class="btn-sm" id="btnSyncDown">⬇ 从云端下载</button>
+          <button class="btn-sm btn-primary" id="btnSyncUp">⬆ 保存我的数据到云端</button>
+          <button class="btn-sm" id="btnSyncDown">⬇ 从云端取回我的数据</button>
         </div>
         <div class="hint" id="syncInfo"></div>
-      </div>
 
-      <div id="histBox" class="hidden" style="margin-top:14px">
-        <div class="hint" style="font-weight:700;color:var(--ink)">云端历史（最近 20 个版本）</div>
-        <div class="actions" style="margin-top:8px">
-          <button class="btn-sm" id="btnHistory">📜 查看云端历史</button>
-          <button class="btn-sm hidden" id="btnHistoryRefresh">↻ 刷新历史</button>
+        <div id="histBox" class="hidden" style="margin-top:12px">
+          <div class="hint" style="font-weight:700;color:var(--ink)">🕘 我的历史存档（最近 20 次）</div>
+          <div class="actions" style="margin-top:8px">
+            <button class="btn-sm" id="btnHistory">📜 查看我的历史存档</button>
+            <button class="btn-sm hidden" id="btnHistoryRefresh">↻ 刷新</button>
+          </div>
+          <div id="histList" class="hidden" style="margin-top:10px"></div>
+          <div class="hint" id="histInfo"></div>
         </div>
-        <div id="histList" class="hidden" style="margin-top:10px"></div>
-        <div class="hint" id="histInfo"></div>
+
+        <div class="section-title">🏢 公用云端数据（大家共享）</div>
+        <div class="hint">公用区是所有人共用的一份数据：谁都能看、能取回，也能把自己的数据放进去。放进去时默认只做「合并」，不会冲掉别人已有的记录。</div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn-sm btn-primary" id="btnPubUp">⬆ 把我的数据放进公用区</button>
+          <button class="btn-sm" id="btnPubDown">⬇ 从公用区取回数据</button>
+          <button class="btn-sm" id="btnPubHist">🕘 查看公用区历史存档</button>
+          <button class="btn-sm hidden" id="btnPubHistRefresh">↻ 刷新</button>
+        </div>
+        <div class="hint" id="pubInfo"></div>
+        <div id="pubHistList" class="hidden" style="margin-top:10px"></div>
+        <div class="hint" id="pubHistInfo"></div>
       </div>
     </div>
 
@@ -507,7 +555,8 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
       <h2><span class="dot"></span>关于 & 工作日志</h2>
       <div class="hint" style="line-height:1.8">
         工具作者：<b>Chenzheng</b><br>
-        当前版本：<b>v<span id="aboutVer">1.0</span></b><br>
+        当前版本：<b>Version <span id="aboutVer">1.0.0</span></b><br>
+        本版本为<b>最终大版本</b>，后续只做小修补，不再叠加大版本号。<br>
         修改内容：<span id="aboutCount">1</span> 条记录
       </div>
       <div class="actions" style="margin-top:8px">
@@ -547,9 +596,6 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
       <div class="hint">导入表格的表头与「导出表格」完全一致（含分相、振动分列和三个单位列），先在 Excel 里按模板填好、另存为 UTF-8 CSV 再导入；设备名称相同的行会按编号覆盖，项目列会自动补进项目列表。</div>
     </div>
 
-    <div id="devBanner"></div>
-    <div id="devOut"></div>
-
     <div class="card hidden" id="devFormCard">
       <h2><span class="dot"></span><span id="devFormTitle">新增设备</span></h2>
       <div id="devFormBody"></div>
@@ -559,6 +605,9 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
         <button class="btn-sm hidden" id="btnDevCancelEdit">取消编辑</button>
       </div>
     </div>
+
+    <div id="devBanner"></div>
+    <div id="devOut"></div>
   </section>
 
 </div>
@@ -583,49 +632,80 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
   </div>
 </div>
 
-<!-- ============ 同步：下载方式选择 ============ -->
+<!-- ============ 取回：怎么处理本机数据 ============ -->
 <div class="sheet-mask" id="syncMask"></div>
 <div class="sheet" id="syncSheet">
   <div class="grab"></div>
   <div class="sheet-head">
     <div class="grow">
-      <div class="tname">从云端下载</div>
+      <div class="tname" id="syncPickTitle">从云端取回我的数据</div>
       <div class="tmeta" id="syncPickInfo"></div>
     </div>
     <button class="icobtn" id="syncPickClose" title="关闭">✕</button>
   </div>
   <div class="hint" id="syncLocalInfo"></div>
-  <div class="hint" style="margin-top:8px">合并时按 id 去重，同一个 id 保留哪一份由下面选择（覆盖本地则直接用云端替换）。</div>
-  <div class="seg" id="segMerge" style="margin-top:10px">
-    <button type="button" data-merge-val="remote" class="active"><span class="si">☁</span>合并·云端优先</button>
-    <button type="button" data-merge-val="local"><span class="si">📱</span>合并·本机优先</button>
+  <div class="hint" style="margin-top:8px">要怎么处理？下面两条路选一条：</div>
+  <div class="actions" style="margin-top:10px">
+    <button class="btn-sm btn-danger" id="btnSyncOverwrite">用云端的替换本机（本机数据会被整份覆盖）</button>
+    <button class="btn-sm btn-primary" id="btnSyncMerge">两边合并（两边的记录都留着）</button>
+  </div>
+  <div class="hint" style="margin-top:10px">选「两边合并」时，两边都有、又分不出谁更新的记录，按下面这条决定：</div>
+  <div class="seg" id="segMerge" style="margin-top:8px">
+    <button type="button" data-merge-val="remote" class="active"><span class="si">☁</span>以云端为准</button>
+    <button type="button" data-merge-val="local"><span class="si">📱</span>以本机为准</button>
   </div>
   <div class="actions" style="margin-top:14px">
-    <button class="btn-sm btn-primary" id="btnSyncOverwrite">覆盖本地（用云端数据替换）</button>
-    <button class="btn-sm" id="btnSyncMerge">合并</button>
     <button class="btn-sm" id="btnSyncCancel">取消</button>
   </div>
 </div>
 
-<!-- ============ 同步：版本冲突处理 ============ -->
+<!-- ============ 冲突：云端被别的设备改过了 ============ -->
 <div class="sheet-mask" id="conflictMask"></div>
 <div class="sheet" id="conflictSheet">
   <div class="grab"></div>
   <div class="sheet-head">
     <div class="grow">
-      <div class="tname">云端版本冲突</div>
+      <div class="tname">云端数据在你操作期间被其他设备改过了</div>
       <div class="tmeta" id="conflictInfo"></div>
     </div>
     <button class="icobtn" id="conflictClose" title="关闭">✕</button>
   </div>
-  <div class="banner warn"><span>⚠</span><div>为免覆盖其他设备的修改，这次上传没有写入云端。可以先看差异，再决定是否强制覆盖。</div></div>
+  <div class="banner warn"><span>⚠</span><div>为避免覆盖别人的修改，这次没有写进云端。可以先看看差在哪，再决定要不要用你这台设备的覆盖云端。</div></div>
   <div id="conflictDiff" class="hidden" style="margin-top:12px"></div>
   <div class="actions" style="margin-top:14px">
-    <button class="btn-sm" id="btnConflictDiff">🔍 查看差异</button>
-    <button class="btn-sm btn-danger" id="btnConflictForce">强制覆盖云端</button>
+    <button class="btn-sm" id="btnConflictDiff">🔍 看看差在哪</button>
+    <button class="btn-sm btn-danger" id="btnConflictForce">用我这台设备的覆盖云端</button>
     <button class="btn-sm" id="btnConflictCancel">取消</button>
   </div>
-  <div class="hint">「强制覆盖」会以云端当前版本为基准重新上传，云端版本号会再加 1；覆盖前的旧快照仍可在「云端历史」里找回。</div>
+  <div class="hint">选「用我这台设备的覆盖云端」会以云端现在的内容为底重新写入一份；写之前云端当前内容会自动存进历史存档，随时能恢复回来。</div>
+</div>
+
+<!-- ============ 公用区上传：合并 / 整份替换 + 提交说明 ============ -->
+<div class="sheet-mask" id="pubMask"></div>
+<div class="sheet" id="pubSheet">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <div class="grow">
+      <div class="tname">把我的数据放进公用区</div>
+      <div class="tmeta" id="pubUpInfo"></div>
+    </div>
+    <button class="icobtn" id="pubUpClose" title="关闭">✕</button>
+  </div>
+  <div class="hint">你要怎么把数据放进公用区？</div>
+  <div class="seg" id="segPubMode" style="margin-top:8px">
+    <button type="button" data-pubmode="merge" class="active"><span class="si">➕</span>合并进去（推荐）</button>
+    <button type="button" data-pubmode="replace"><span class="si">♻</span>整份替换</button>
+  </div>
+  <div class="hint" id="pubModeHint"></div>
+  <div class="field" style="margin-top:12px">
+    <label class="f" for="pubMsg">这次放进公用区的是什么？（可不填）</label>
+    <input type="text" id="pubMsg" maxlength="50" placeholder="例如：10月6日检修票 / 本周新增设备 / 锅炉专业补录" autocomplete="off">
+    <div class="hint">最多 50 字；不填的话，历史存档里显示「X 月 X 日上传」。</div>
+  </div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn-sm btn-primary" id="btnPubUpGo">放进公用区</button>
+    <button class="btn-sm" id="btnPubUpCancel">取消</button>
+  </div>
 </div>
 
 <!-- ============ 导出：全部 / 分项目 ============ -->
@@ -655,9 +735,9 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
 </div>
 
 <nav class="tabs">
-  <button data-page="wt" class="active"><span class="ti">📄</span>工作票</button>
-  <button data-page="dev"><span class="ti">🛠</span>设备记录</button>
-  <button data-page="set"><span class="ti">⚙</span>设置</button>
+  <button data-page="wt" class="active"><span class="ti">🗂</span>工作票</button>
+  <button data-page="dev"><span class="ti">⚙</span>设备记录</button>
+  <button data-page="set"><span class="ti">🔧</span>设置</button>
 </nav>
 
 <div class="toast" id="toast"></div>
@@ -680,8 +760,13 @@ footer.foot{text-align:center;color:var(--faint);font-size:var(--fs-xs);padding:
 /* ===== 工具信息与工作日志 =====
    以后每次改动，把 VERSION 往上加一位，并在 CHANGELOG 最前面插一条（最新的写最上面）。 */
 var AUTHOR = "Chenzheng";
-var VERSION = "2.7";
+var VERSION = "1.0.0";
 var CHANGELOG = [
+  "1.0.0｜最终大版本：界面全面电厂风格化（电力蓝 #0a4d8c + 金属灰 + 中性白配色、仪表盘式卡片标记、工业风图标、铭牌质感 Logo）；版本号体系由 v3.x 收口为 Version 1.0.0，作为本工具的最终大版本，后续仅做小修补、不再叠加大版本号；本次只改视觉与版本号字面值，数据结构、存储键、SQL、云端表结构与业务逻辑均未改动（备份格式版本 packV2 仍为 2，老备份照常读入）",
+  "3.1｜云端数据分「个人区 / 公用区」双区：设置页「账号与同步」拆成「📁 我的云端数据 / 🏢 公用云端数据（大家共享）」两块，公用区谁都能看、能取回、能把自己的数据放进去；公用区上传可选「合并进去（默认，同一条记录保留较新的那份，公用区已有的不动）」或「整份替换」，写入前做版本比对，对不上不静默覆盖而是弹「云端数据在你操作期间被其他设备改过了」面板（看看差在哪 / 用我这台设备的覆盖云端 / 取消）；新增公用区历史存档（每次改动后自动存一份、最多 20 份，列表按「时间 + 提交说明（或 X 月 X 日上传）+ 上传者 + 数据量」展示、不出现任何版本号，一键「恢复到这一份」，恢复只动公用区）；公用区上传面板新增「提交说明」输入框（可不填，最多 50 字）；界面文案全面人话化（保存到云端 / 从云端取回 / 用云端的替换本机 / 两边合并 / 历史存档，去掉版本号等黑话）；云端新增 supabase_public_v1.sql（user_snapshots 加 scope 字段、主键改 (user_id, scope)、新增 public_snapshot_history 表与 upload_public_snapshot / trim_public_history 函数），本机存储键与记录结构、导出与备份格式均未改动",
+  "3.0｜修复工作票编辑保存后停在「登记新工作票」空表单、搜索与筛选上下文全丢：进入编辑前用 state.editOrigin 记下来源视图（搜索结果 / 快捷查看列表 / 无来源），编辑保存后不再无条件留在登记页，而是回跳到来源视图——搜索来源则还原关键字并重跑 runSearch（列表已含最新修改），快捷查看来源则还原项目筛选与排序后重跑 showView；「取消编辑」由固定跳查询页改为与保存一致按来源回跳；resetForm 同步清空 editOrigin 免残留；首页「＋ 登记工作票」新建保存的收尾逻辑保持不变；只改来源记录与跳转分支，不改数据结构、不改导出与备份内容、不改云端逻辑",
+  "2.9｜修复设备记录页点「编辑」看不到编辑界面：编辑表单卡片 #devFormCard 原先排在结果列表 #devOut 之后，列表一长表单就落到视口下方（脚本又把页面滚回顶部），看起来像没反应、必须先清空搜索；改为把表单卡片放在搜索卡片与结果列表之间，编辑 / 新增都会在页面顶部立即出现，且打开编辑不改动搜索关键字与搜索结果；纯 DOM 顺序调整，不改数据结构、不改导出与备份格式、不改云端逻辑",
+  "2.8｜查询页「快捷查看」改为项目 → 状态两级筛选：项目区只取工作票记录里用到的项目（含未分类，设备记录独有的项目不再混入）并带数量，状态区（即将到期 / 已超时未终结 / 今天许可的 / 全部）数量按当前项目动态计算；项目按钮用品牌色填充示选中、状态 chip 用浅底示选中，新增「＋ 登记新票」主操作、「⏱ / 🕒」排序选中态与「↺ 重置筛选」；切换项目保持状态、切换状态保持项目，返回首页保留筛选；纯界面与筛选逻辑调整，不改数据结构、不改导出与备份内容",
   "2.7｜设备记录新增导入：设备页新增「导入表格（CSV）」「下载导入模板（CSV）」「导入设备备份」，导入表头与「导出表格」完全一致（含分相、振动分列与三个单位列），表头宽松匹配、单位列留空时用默认单位，名称+编号相同的行覆盖原记录、否则新增，项目列自动补进项目列表，导入后自动刷新列表；「导入备份文件」也会自动识别设备 CSV；不改存储结构、不改导出与备份格式",
   "2.6｜设备记录卡片中「相序」字段的颜色字（黄 / 绿 / 红 / 蓝 / 黑）按对应颜色显示，其他文字或数字保持默认颜色；纯显示层增强，不改数据结构、不改导出与备份内容",
   "2.5｜支持添加到手机桌面：加了 PWA 所需的 meta 与 manifest，桌面显示发电厂风格图标（冷却塔 + 闪电），打开为全屏无地址栏；HTML 本身逻辑与数据结构无变化，本地功能与 v2.4 完全一致",
@@ -813,9 +898,12 @@ var LEGACY_FIELDS = [
   { key:"safety",  label:"安全措施 / 备注" }
 ];
 
+/* 默认主题色：电力蓝（国网蓝）。旧版默认蓝 #2563eb 视为「没自定义过」，跟随新默认值。 */
+var DEFAULT_BRAND = "#0a4d8c";
+var OLD_DEFAULT_BRAND = "#2563eb";
 /* 主题色预设 */
 var COLORS = [
-  { v:"#2563eb", n:"蓝" },
+  { v:DEFAULT_BRAND, n:"蓝" },
   { v:"#0f766e", n:"青" },
   { v:"#15803d", n:"绿" },
   { v:"#b45309", n:"橙" },
@@ -824,13 +912,15 @@ var COLORS = [
 ];
 var THEMES = { light:"浅色", dark:"深色" };
 var SIZES = { small:"小", medium:"中", large:"大" };
-var THEME_COLORS = { light:"#f4f6fb", dark:"#0f141b" };
+var THEME_COLORS = { light:"#eef1f5", dark:"#0d1218" };
 var NEAR_MS = 4 * 3600 * 1000;   /* 4 小时内视为即将到期 */
 
 var state = {
   tickets: [],
-  meta: { theme:"light", size:"small", brand:"#2563eb" },
+  meta: { theme:"light", size:"small", brand:DEFAULT_BRAND },
   editingId: null,
+  /* 进入编辑前记录的来源视图（search / view / null），保存或取消编辑后按它回跳 */
+  editOrigin: null,
   sort: "deadline",
   inView: false,
   devices: [],
@@ -841,11 +931,24 @@ var state = {
   /* 查询页的项目筛选：null = 不筛选；"" = 只看未分类；其他 = 只看该项目 */
   projFilter: null,
   viewKind: "all",
+  /* 查询页二级状态筛选：near / late / today / all */
+  qv: "all",
   /* 云端：当前登录用户（未登录为 null）、同步状态、下载时待处理的云端快照与合并偏好 */
   user: null,
   syncStatus: { busy:false, which:"", at:"", text:"" },
   syncRemote: null,
   mergePref: "remote",
+  /* 这次取回的是哪一块云端数据：personal（我的云端数据）/ public（公用云端数据） */
+  cloudScope: "personal",
+  /* 公用区上传面板：模式（merge 合并进去 / replace 整份替换）、刚读到的云端版本、提交说明草稿、面板上的现状说明 */
+  publicMode: "merge",
+  publicBaseVersion: 0,
+  publicCommitMsg: "",
+  publicInfo: "",
+  /* 公用区历史存档区块：展开状态、列表、错误提示 */
+  publicHistoryOpen: false,
+  publicHistoryRows: null,
+  publicHistoryErr: "",
   /* 云端版本号（乐观锁基准，随 work_auth_v1 一起存） */
   syncVersion: 0,
   /* 版本冲突弹窗上下文：{ open, current, base } */
@@ -1055,7 +1158,10 @@ function load(){
       if (o && typeof o === "object"){
         if (o.theme && THEMES[o.theme]) state.meta.theme = o.theme;
         if (o.size && SIZES[o.size]) state.meta.size = o.size;
-        if (o.brand && /^#[0-9a-fA-F]{6}$/.test(o.brand)) state.meta.brand = o.brand;
+        /* 老设置里存的旧默认蓝 #2563eb 视为「没自定义过」，跟随新版电力蓝默认值 */
+        if (o.brand && /^#[0-9a-fA-F]{6}$/.test(o.brand)){
+          state.meta.brand = (String(o.brand).toLowerCase() === OLD_DEFAULT_BRAND) ? DEFAULT_BRAND : o.brand;
+        }
       }
     }
   } catch(e){}
@@ -1184,16 +1290,28 @@ function applyProjFilter(list){
   if (state.projFilter === null) return list;
   return list.filter(function(r){ return projectOf(r) === state.projFilter; });
 }
+/* 查询页一级筛选的项目清单：只统计工作票（不读设备记录），末尾按需补「未分类」(空字符串) */
+function ticketProjects(){
+  var out = [];
+  state.tickets.forEach(function(t){
+    var p = projectOf(t);
+    if (p && out.indexOf(p) < 0) out.push(p);
+  });
+  out.sort(function(a, b){ return String(a).localeCompare(String(b), "zh"); });
+  var hasBlank = false;
+  state.tickets.forEach(function(t){ if (!projectOf(t)) hasBlank = true; });
+  if (hasBlank) out.push("");
+  return out;
+}
 function renderProjectFilter(){
   var el = $("#projFilterChips"); if (!el) return;
-  var opts = exportOptions("ticket");
-  if (!opts.length){ el.innerHTML = ""; return; }
   var cur = state.projFilter;
-  var h = '<span class="muted" style="font-size:var(--fs-xs);align-self:center">项目：</span>' +
-    '<span class="chip' + (cur === null ? " on" : "") + '" data-pf="all">全部</span>';
-  opts.forEach(function(p){
-    h += '<span class="chip' + (cur !== null && cur === p ? " on" : "") + '" data-pf="' +
-      (p === "" ? "none" : "one") + '" data-pfval="' + esc(p) + '">' + esc(p || "未分类") + '</span>';
+  var h = '<button type="button" class="projbtn' + (cur === null ? " on" : "") + '" data-pf="all">全部' +
+    '<span class="n">' + state.tickets.length + '</span></button>';
+  ticketProjects().forEach(function(p){
+    h += '<button type="button" class="projbtn' + (cur !== null && cur === p ? " on" : "") + '" data-pf="' +
+      (p === "" ? "none" : "one") + '" data-pfval="' + esc(p) + '" title="' + esc(p || "未分类") + '">' +
+      esc(p || "未分类") + '<span class="n">' + projectCount("ticket", p) + '</span></button>';
   });
   el.innerHTML = h;
 }
@@ -1319,12 +1437,12 @@ function updateDiag(){
 }
 
 /* ---------------- 外观：底色 / 主题色 / 字号 ---------------- */
-/* 把 "#2563eb" 变成 "rgba(37,99,235,alpha)"，用于生成浅色底 */
+/* 把 "#0a4d8c" 变成 "rgba(10,77,140,alpha)"，用于生成浅色底 */
 function hexToRgba(hex, a){
   var h = String(hex || "").replace("#","");
   if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
   var n = parseInt(h, 16);
-  if (isNaN(n)) return "rgba(37,99,235," + a + ")";
+  if (isNaN(n)) return "rgba(10,77,140," + a + ")";
   return "rgba(" + ((n>>16)&255) + "," + ((n>>8)&255) + "," + (n&255) + "," + a + ")";
 }
 function lighten(hex, ratio){
@@ -1351,7 +1469,7 @@ function renderAbout(){
   var v = $("#aboutVer"); if (v) v.textContent = VERSION;
   var c = $("#aboutCount"); if (c) c.textContent = CHANGELOG.length;
   var f = $("#footText");
-  if (f) f.textContent = "工作管理 v" + VERSION + " · 作者 " + AUTHOR + " · 本地功能无需联网，云端功能需要网络";
+  if (f) f.textContent = "工作管理 Version " + VERSION + " · 作者 " + AUTHOR + " · 本地功能无需联网，云端功能需要网络";
   var list = $("#logList");
   if (list){
     list.innerHTML = CHANGELOG.map(function(s){
@@ -1365,17 +1483,18 @@ function renderAbout(){
 function applyAppearance(){
   var t = THEMES[state.meta.theme] ? state.meta.theme : "light";
   var s = SIZES[state.meta.size] ? state.meta.size : "small";
-  var c = /^#[0-9a-fA-F]{6}$/.test(state.meta.brand || "") ? state.meta.brand : "#2563eb";
+  var c = /^#[0-9a-fA-F]{6}$/.test(state.meta.brand || "") ? state.meta.brand : DEFAULT_BRAND;
   state.meta.theme = t; state.meta.size = s; state.meta.brand = c;
 
   var root = document.documentElement;
   root.setAttribute("data-theme", t);
   root.setAttribute("data-size", s);
-  root.style.setProperty("--brand", c);
-  root.style.setProperty("--brand-d", t === "dark" ? lighten(c, .3) : darken(c, .18));
+  /* 深色下把主色提亮，避免深底上的深蓝看不清 */
+  root.style.setProperty("--brand", t === "dark" ? lighten(c, .45) : c);
+  root.style.setProperty("--brand-d", t === "dark" ? lighten(c, .15) : darken(c, .18));
   root.style.setProperty("--brand-l", t === "dark" ? hexToRgba(c, .22) : hexToRgba(c, .12));
-  root.style.setProperty("--brand-ink", t === "dark" ? lighten(c, .55) : darken(c, .25));
-  root.style.setProperty("--brand-line", t === "dark" ? hexToRgba(c, .45) : hexToRgba(c, .35));
+  root.style.setProperty("--brand-ink", t === "dark" ? lighten(c, .6) : darken(c, .25));
+  root.style.setProperty("--brand-line", t === "dark" ? hexToRgba(c, .5) : hexToRgba(c, .35));
 
   var mc = document.querySelector('meta[name="theme-color"]');
   if (mc) mc.setAttribute("content", t === "dark" ? THEME_COLORS.dark : THEME_COLORS.light);
@@ -1585,6 +1704,7 @@ function runSearch(rawQ){
       out.innerHTML = "";
     }
     $("#quickCard").classList.remove("hidden");
+    renderQuickChips();
     return;
   }
   state.inView = false;
@@ -1711,25 +1831,51 @@ function renderRecent(){
 }
 
 /* 快捷筛选 */
+/* 二级状态口径：先按项目过滤，再分状态；数量随项目动态变化 */
 function quickViews(){
-  var list = state.tickets.filter(function(t){ return (t.status || "已许可") === "已许可"; });
-  var late = list.filter(function(t){ return timeState(t).key === "late"; });
-  var near = list.filter(function(t){ return timeState(t).key === "near"; });
-  return { active:list, late:late, near:near };
-}
-function renderQuickChips(){
-  var el = $("#quickChips"); if (!el) return;
-  var v = quickViews();
-  el.innerHTML =
-    '<span class="chip" data-view="near">⏱ 即将到期（' + v.near.length + '）</span>' +
-    '<span class="chip" data-view="late">⚠ 已超时未终结（' + v.late.length + '）</span>' +
-    '<span class="chip" data-view="today">📅 今天许可的（' + state.tickets.filter(function(t){
+  var base = applyProjFilter(state.tickets);
+  var list = base.filter(function(t){ return (t.status || "已许可") === "已许可"; });
+  return {
+    all: base,
+    active: list,
+    late: list.filter(function(t){ return timeState(t).key === "late"; }),
+    near: list.filter(function(t){ return timeState(t).key === "near"; }),
+    today: base.filter(function(t){
       var ts = parseDT(t.permitAt);
       return ts != null && new Date(ts).toDateString() === new Date().toDateString();
-    }).length + '）</span>' +
-    '<span class="chip" data-view="all">📋 全部（' + state.tickets.length + '）</span>';
+    })
+  };
 }
-/* 回到查询主页：清掉列表、恢复快捷查看 */
+var QV_LABEL = { near:"即将到期", late:"已超时未终结", today:"今天许可的", all:"全部" };
+function updateSortButtons(){
+  var d = $("#btnSortDeadline"), c = $("#btnSortCreated");
+  if (d) d.classList.toggle("on", state.sort !== "created");
+  if (c) c.classList.toggle("on", state.sort === "created");
+}
+function renderQuickChips(){
+  renderProjectFilter();
+  var el = $("#quickChips"); if (!el) return;
+  var v = quickViews();
+  var cur = QV_LABEL[state.qv] ? state.qv : (state.qv = "all");
+  var mk = function(k, ico, text){
+    return '<span class="chip' + (cur === k ? " on" : "") + '" data-view="' + k + '">' +
+      ico + " " + text + '（' + v[k].length + '）</span>';
+  };
+  el.innerHTML = mk("near","⏱","即将到期") + mk("late","⚠","已超时未终结") +
+    mk("today","📅","今天许可的") + mk("all","📋","全部");
+  var hint = $("#quickHint");
+  if (hint){
+    if (!state.tickets.length){
+      hint.innerHTML = "还没有工作票：先点「＋ 登记新票」录一张，之后这里可以按项目与状态快速筛选。";
+    } else {
+      var pname = (state.projFilter === null) ? "全部" : (state.projFilter || "未分类");
+      hint.innerHTML = "当前筛选：项目 <b>" + esc(pname) + "</b> · 状态 <b>" + esc(QV_LABEL[cur]) +
+        "</b>，共 <b>" + v[cur].length + "</b> 张。「即将到期」按批准工作结束时间算，4 小时内会标黄、超过会标红。";
+    }
+  }
+  updateSortButtons();
+}
+/* 回到查询主页：清掉列表与关键字，保留当前项目 / 状态筛选（便于连续查看） */
 function goHome(){
   state.inView = false;
   var banner = $("#searchBanner"), out = $("#searchOut");
@@ -1740,7 +1886,6 @@ function goHome(){
   var qc = $("#quickCard");
   if (qc) qc.classList.remove("hidden");
   renderQuickChips();
-  renderProjectFilter();
   renderRecent();
   try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
 }
@@ -1748,8 +1893,9 @@ function showView(kind, sort){
   var out = $("#searchOut"), banner = $("#searchBanner");
   if (!out || !banner) return;
   state.inView = true;
+  /* 两级筛选区保持可见，方便连续切换项目 / 状态 */
   var qc = $("#quickCard");
-  if (qc) qc.classList.add("hidden");
+  if (qc) qc.classList.remove("hidden");
   var q = $("#q");
   /* 从列表点进来时先把搜索框清掉，免得下次渲染又跳回搜索结果 */
   if (q && q.value){ q.value = ""; }
@@ -1757,20 +1903,21 @@ function showView(kind, sort){
   var v = quickViews();
   if (kind === "near"){ title = "即将到期（4 小时内）"; list = v.near; }
   else if (kind === "late"){ title = "已超过批准工作结束时间"; list = v.late; }
-  else if (kind === "today"){ title = "今天许可的工作票"; list = state.tickets.filter(function(t){
-      var ts = parseDT(t.permitAt);
-      return ts != null && new Date(ts).toDateString() === new Date().toDateString();
-    }); }
+  else if (kind === "today"){ title = "今天许可的工作票"; list = v.today; }
   else {
     title = (sort === "created") ? "全部工作票（按登记时间，新的在前）" : "全部工作票（按批准工作结束时间，早的在前）";
     list = state.tickets.slice().sort(sort === "created" ? sortByCreated : sortByDeadline);
   }
   state.viewKind = kind;
+  state.qv = QV_LABEL[kind] ? kind : "all";
   if (sort) state.sort = sort;
   list = applyProjFilter(list);
+  renderQuickChips();
 
   banner.innerHTML = '<div class="banner ' + (kind === "late" ? "warn" : "info") + '">' +
-    '<span>📌</span><div>' + esc(title) + '：<b>' + list.length + '</b> 张</div>' +
+    '<span>📌</span><div>' + esc(title) +
+    (state.projFilter === null ? "" : '（项目：' + esc(state.projFilter || "未分类") + '）') +
+    '：<b>' + list.length + '</b> 张</div>' +
     '<button class="btn-sm" data-home="1" style="margin-left:auto">← 返回首页</button></div>';
 
   if (!list.length){
@@ -1822,11 +1969,15 @@ document.addEventListener("click", function(ev){
   var dis = up(t, "[data-dismiss]");
   if (dis){ var bn = up(dis, ".banner"); if (bn && bn.parentNode) bn.parentNode.removeChild(bn); return; }
 
-  var view = up(t, ".chip[data-view]");
-  if (view){ showView(view.getAttribute("data-view")); return; }
+  var view = up(t, "[data-view]");
+  if (view){
+    state.qv = view.getAttribute("data-view");
+    showView(state.qv, state.sort);
+    return;
+  }
 
-  /* 查询页的「项目」筛选 chip */
-  var pfc = up(t, ".chip[data-pf]");
+  /* 查询页一级筛选：项目 */
+  var pfc = up(t, "[data-pf]");
   if (pfc){
     var pfk = pfc.getAttribute("data-pf");
     var pfv = pfc.getAttribute("data-pfval");
@@ -1834,8 +1985,8 @@ document.addEventListener("click", function(ev){
     renderProjectFilter();
     var pvq = $("#q") ? $("#q").value.trim() : "";
     if (pvq) runSearch(pvq);
-    else if (state.inView) showView(state.viewKind, state.sort);
-    else goHome();
+    else if (state.inView) showView(state.qv, state.sort);
+    else renderQuickChips();
     return;
   }
 
@@ -1892,7 +2043,7 @@ function buildForm(){
 function fieldHTML(f){
   if (!f) return "";
   var id = "fld_" + f.key;
-  var label = esc(f.label) + (f.key === "name" ? ' <span style="color:#d92d20">*</span>' : "");
+  var label = esc(f.label) + (f.key === "name" ? ' <span style="color:var(--danger)">*</span>' : "");
   var h = '<div class="field"><label class="f" for="' + id + '">' + label + '</label>';
   if (f.type === "textarea"){
     h += '<textarea id="' + id + '" data-key="' + esc(f.key) + '" placeholder="' + esc(f.ph||"") + '"></textarea>';
@@ -1956,14 +2107,39 @@ function fillForm(t){
 }
 function resetForm(){
   state.editingId = null;
+  state.editOrigin = null;
   var ft = $("#formTitle"); if (ft) ft.textContent = "登记新工作票";
   var ce = $("#btnCancelEdit"); if (ce) ce.classList.add("hidden");
   fillForm({ status:"已许可", permitAt: nowLocalInput(), project: state.projects.current || "" });
+}
+/* 记录编辑前的来源视图：搜索结果 / 快捷查看列表 / 无来源（首页） */
+function captureEditOrigin(){
+  var q = $("#q") ? String($("#q").value || "").trim() : "";
+  if (q) return { kind:"search", q:q };
+  if (state.inView) return { kind:"view", view:state.viewKind || "all", sort:state.sort || "deadline", proj:state.projFilter };
+  return null;
+}
+/* 保存 / 取消编辑后按来源视图回跳：搜索关键字、项目筛选、状态筛选、排序全部保留 */
+function backToOrigin(o){
+  if (o && o.kind === "search"){
+    go("search");
+    var qi = $("#q"); if (qi) qi.value = o.q;
+    runSearch(o.q);
+    return;
+  }
+  if (o && o.kind === "view"){
+    go("search");
+    if (o.proj !== undefined) state.projFilter = o.proj;
+    showView(o.view, o.sort);
+    return;
+  }
+  go("wt");
 }
 function startEdit(id){
   var t = null;
   state.tickets.forEach(function(x){ if (x.id === id) t = x; });
   if (!t) return;
+  state.editOrigin = captureEditOrigin();
   state.editingId = id;
   go("add");
   var ft = $("#formTitle"); if (ft) ft.textContent = "编辑：" + (t.name || "未命名工作票");
@@ -2019,9 +2195,16 @@ function saveForm(){
   }
   saveData();
   if (data.project) rememberProject(data.project);
+  var wasEdit = !!state.editingId;
+  var origin = state.editOrigin;
   resetForm();
   renderQuickChips();
-  if ($("#q").value.trim()) runSearch($("#q").value);
+  if (wasEdit){
+    /* 编辑保存：回到编辑前的来源视图（搜索结果 / 快捷查看列表） */
+    backToOrigin(origin);
+  } else if ($("#q").value.trim()){
+    runSearch($("#q").value);
+  }
 }
 /* 处理「终结时间」：改为已终结时写入当下时间；一直已终结则保留原值；改回其他状态则清空。
    与 updatedAt 相互独立，顺延结束时间不影响它。 */
@@ -2215,7 +2398,7 @@ function buildDevForm(){
         }).join("") + '</div>';
     }
     return '<div class="field"><label class="f" for="devf_' + esc(f.key) + '">' +
-      esc(f.label) + (f.key === "name" ? ' <span style="color:#d92d20">*</span>' : "") + '</label>' +
+      esc(f.label) + (f.key === "name" ? ' <span style="color:var(--danger)">*</span>' : "") + '</label>' +
       '<input type="text" id="devf_' + esc(f.key) + '" data-devkey="' + esc(f.key) + '" ' +
       'placeholder="' + esc(f.ph || "") + '" autocomplete="off"></div>';
   }).join("");
@@ -2304,7 +2487,7 @@ function saveDevForm(){
   resetDevForm();
   var card = $("#devFormCard");
   if (card) card.classList.add("hidden");
-  if ($("#qDev").value.trim()) runDevSearch($("#qDev").value);
+  if ($("#qDev").value.trim()) runDevSearch($("#qDev").value); else showDevAll();
 }
 function devScore(d, rawQ){
   var q = String(rawQ || "").trim(), qn = norm(q);
@@ -3302,6 +3485,10 @@ var CLOUD_MSG = [
   ["Unable to validate email", "账号只能用字母、数字、下划线、点和短横线，请换一个"],
   ["rate limit", "操作太频繁，请稍后再试"],
   ["not authenticated", "登录状态已失效，请重新登录"],
+  ["upload_public_snapshot", "云端还没建公用区相关函数：请先在 Supabase 里执行 supabase_public_v1.sql"],
+  ["trim_public_history", "云端还没建公用区相关函数：请先在 Supabase 里执行 supabase_public_v1.sql"],
+  ["public_snapshot_history", "云端还没有公用区历史存档表：请先在 Supabase 里执行 supabase_public_v1.sql"],
+  ["user_snapshots.scope", "云端 user_snapshots 表还缺 scope 字段：请先在 Supabase 里执行 supabase_public_v1.sql"],
   ["could not find the function", "云端还没建 upload_snapshot 函数，请先执行 supabase_sync_v2.sql"],
   ["function public.upload_snapshot", "云端还没建 upload_snapshot 函数，请先执行 supabase_sync_v2.sql"],
   ["permission denied for function", "云端函数权限不足，请检查 SQL 里的函数授权（grant execute）"],
@@ -3324,7 +3511,7 @@ function cloudError(r, fallback){
 function syncErrMsg(e, fallback){
   if (e && e.friendly) return e.message;
   var m = String((e && e.message) || "");
-  if (/failed to fetch|networkerror|load failed|network/i.test(m)) return "连不上云端（可能断网或项目地址填错），本次同步没有执行";
+  if (/failed to fetch|networkerror|load failed|network/i.test(m)) return "连不上云端（可能断网或项目地址填错），本次操作没有执行";
   return m ? (fallback + "：" + m.slice(0, 140)) : fallback;
 }
 function userEmail(u){ return String(u || "").trim().toLowerCase() + "@" + SUPABASE_CONFIG.emailDomain; }
@@ -3366,6 +3553,9 @@ function applySession(d){
   var mail = String(u.email || "");
   var at = mail.indexOf("@");
   var name = at > 0 ? mail.slice(0, at) : ((state.user && state.user.name) || "");
+  /* 换了账号：公用区那一块的暂存状态要清掉，免得显示上一个人的内容 */
+  var newId = u.id || ((state.user && state.user.id) || "");
+  if (state.user && state.user.id && newId && state.user.id !== newId) resetPublicState();
   state.user = {
     id: u.id || ((state.user && state.user.id) || ""),
     name: name || "已登录",
@@ -3375,7 +3565,7 @@ function applySession(d){
   };
   saveAuth(); renderAccount();
 }
-function signOutLocal(){ state.user = null; saveAuth(); renderAccount(); }
+function signOutLocal(){ state.user = null; resetPublicState(); saveAuth(); renderAccount(); }
 function restoreSession(){
   if (!cloudReady()){ renderAccount(); return; }
   var o = readAuth();
@@ -3401,7 +3591,7 @@ function refreshSession(silent){
 }
 function ensureToken(){
   if (!cloudReady()) return Promise.reject(cloudFail("未配置云端，仅本地使用"));
-  if (!state.user) return Promise.reject(cloudFail("请先登录再同步"));
+  if (!state.user) return Promise.reject(cloudFail("请先登录"));
   if (state.user.token && state.user.exp && Date.now() < state.user.exp - 60000) return Promise.resolve(state.user.token);
   return refreshSession().then(function(){ return state.user.token; });
 }
@@ -3448,7 +3638,7 @@ function doRegister(){
         return upsertProfile(u).then(function(){
           toast("注册成功，已自动登录：" + state.user.name);
         }, function(e){
-          toast("注册成功（账号资料未写入云端，不影响同步）：" + syncErrMsg(e, "写入失败"));
+          toast("注册成功（账号资料未写入云端，不影响云端功能）：" + syncErrMsg(e, "写入失败"));
         });
       }
       toast("已提交注册，但云端还要求邮箱验证：请到 Supabase 后台关闭 Confirm email 后重新注册");
@@ -3578,6 +3768,76 @@ var syncApi = {
     if (!cloudReady() || !state.user || !state.user.token) return Promise.resolve(false);
     return restRpc("trim_snapshot_history", state.user.token, {})
       .then(function(){ return true; }, function(){ return false; });
+  },
+
+  /* ---------- 公用区（所有登录用户共用同一份，写在公共行上） ---------- */
+  /* 读公用区那一行；没有就返回 null（代表公用区还空着） */
+  downloadPublic: function(){
+    return ensureToken().then(function(tok){
+      var q = SYNC_TABLE + "?select=*&scope=eq.public&order=updated_at.desc&limit=1";
+      return restGet(q, tok).then(function(d){
+        var rows = Array.isArray(d) ? d : [];
+        return rows.length ? rows[0] : null;
+      });
+    });
+  },
+  /* 写公用区：payload 省略时用本机数据；mode = merge（默认，合并进去）/ replace（整份替换）
+     返回 { ok, new_version, current_version }，ok=false 表示云端被别的设备改过、没有写入 */
+  uploadPublic: function(baseVersion, mode, commitMsg, payload){
+    var src = payload || { tickets: state.tickets, devices: state.devices, meta: syncMetaPayload() };
+    return ensureToken().then(function(tok){
+      return restRpc("upload_public_snapshot", tok, {
+        p_tickets: src.tickets || [],
+        p_devices: src.devices || [],
+        p_meta: src.meta || {},
+        p_base_version: Number(baseVersion) || 0,
+        p_device_label: deviceLabel(),
+        p_commit_msg: String(commitMsg || "").slice(0, 50),
+        p_mode: (mode === "replace") ? "replace" : "merge"
+      });
+    }).then(function(d){
+      var row = Array.isArray(d) ? d[0] : d;
+      if (!row || typeof row !== "object"){
+        throw cloudFail("云端没有返回写入结果，请确认已执行 supabase_public_v1.sql");
+      }
+      return {
+        ok: !!row.ok,
+        new_version: Number(row.new_version) || 0,
+        current_version: Number(row.current_version) || 0
+      };
+    });
+  },
+  /* 公用区历史存档：只取列表要用的字段（不带大 JSON） */
+  publicHistory: function(){
+    return ensureToken().then(function(tok){
+      var q = "public_snapshot_history?select=id,version,saved_at,device_label,commit_msg," +
+        "ticket_count,device_count,saved_by_name&order=saved_at.desc&limit=20";
+      return restGet(q, tok).then(function(d){ return Array.isArray(d) ? d : []; });
+    });
+  },
+  /* 公用区概况（轻量）：只读最近一次的存档行，用来在设置页显示「公用区现有…」 */
+  publicSummary: function(){
+    return ensureToken().then(function(tok){
+      var q = "public_snapshot_history?select=saved_at,device_label,saved_by_name," +
+        "ticket_count,device_count,commit_msg&order=saved_at.desc&limit=1";
+      return restGet(q, tok).then(function(d){ return (Array.isArray(d) && d.length) ? d[0] : null; });
+    });
+  },
+  /* 某一份公用历史存档的完整内容 */
+  publicHistoryDetail: function(id){
+    return ensureToken().then(function(tok){
+      var q = "public_snapshot_history?id=eq." + encodeURIComponent(id) + "&select=*";
+      return restGet(q, tok).then(function(d){
+        var rows = Array.isArray(d) ? d : [];
+        return rows.length ? rows[0] : null;
+      });
+    });
+  },
+  /* 公用历史清理：只保留最近 20 份；上传成功后静默调用，失败不影响主流程 */
+  trimPublicHistory: function(){
+    if (!cloudReady() || !state.user || !state.user.token) return Promise.resolve(false);
+    return restRpc("trim_public_history", state.user.token, {})
+      .then(function(){ return true; }, function(){ return false; });
   }
 };
 function deviceLabel(){
@@ -3591,8 +3851,8 @@ function deviceLabel(){
 function syncInfoText(){
   if (!state.user) return "";
   var s = state.syncStatus;
-  return s.at ? ("上次同步：" + s.at + (s.text ? "（" + s.text + "）" : ""))
-              : "还没有同步过：上传会用本机数据覆盖云端那一行，下载前会让你选择如何处理本地数据。";
+  return s.at ? ("上次与云端交换数据：" + s.at + (s.text ? "（" + s.text + "）" : ""))
+              : "还没有和云端交换过数据：「保存我的数据到云端」会把本机数据存上去；取回时会先让你选择怎么处理本机数据。";
 }
 function renderSyncInfo(){ var el = $("#syncInfo"); if (el) el.textContent = syncInfoText(); }
 function markSync(text){ state.syncStatus.at = fmtNow(); state.syncStatus.text = text; saveAuth(); renderSyncInfo(); }
@@ -3653,16 +3913,23 @@ function mergeRecords(local, remote, remoteFirst){
   });
   return { list:out, add:stat.add, upd:stat.upd, keep:stat.keep };
 }
-/* 按钮统一的忙碌态：禁用 + 「同步中…/登录中…」 */
+/* 按钮统一的忙碌态：禁用 + 「保存中…/读取中…/登录中…」 */
 function accountBusy(busy, which){
   state.syncStatus.busy = !!busy;
   state.syncStatus.which = busy ? (which || "") : "";
   var up = $("#btnSyncUp"), dn = $("#btnSyncDown"), lg = $("#btnLogin"), rg = $("#btnRegister");
   var hb = $("#btnHistory"), hr = $("#btnHistoryRefresh");
+  var pu = $("#btnPubUp"), pd = $("#btnPubDown"), ph = $("#btnPubHist"), phr = $("#btnPubHistRefresh");
+  var pg = $("#btnPubUpGo");
   if (hb) hb.disabled = !!busy;
   if (hr) hr.disabled = !!busy;
-  if (up){ up.disabled = !!busy; up.textContent = (busy && which === "up") ? "同步中…" : "⬆ 上传到云端"; }
-  if (dn){ dn.disabled = !!busy; dn.textContent = (busy && which === "down") ? "同步中…" : "⬇ 从云端下载"; }
+  if (ph) ph.disabled = !!busy;
+  if (phr) phr.disabled = !!busy;
+  if (pg) pg.disabled = !!busy;
+  if (up){ up.disabled = !!busy; up.textContent = (busy && which === "up") ? "保存中…" : "⬆ 保存我的数据到云端"; }
+  if (dn){ dn.disabled = !!busy; dn.textContent = (busy && which === "down") ? "读取中…" : "⬇ 从云端取回我的数据"; }
+  if (pu){ pu.disabled = !!busy; pu.textContent = (busy && which === "pubup") ? "放进中…" : "⬆ 把我的数据放进公用区"; }
+  if (pd){ pd.disabled = !!busy; pd.textContent = (busy && which === "pubdown") ? "读取中…" : "⬇ 从公用区取回数据"; }
   if (lg){ lg.disabled = !!busy; lg.textContent = (busy && which === "login") ? "登录中…" : "登录"; }
   if (rg){ rg.disabled = !!busy; rg.textContent = (busy && which === "reg") ? "注册中…" : "注册"; }
 }
@@ -3675,53 +3942,82 @@ function renderAccount(){
   var ready = cloudReady(), on = !!(ready && state.user);
   var hint = $("#cloudHint");
   if (hint) hint.innerHTML = ready ? "" :
-    '<span class="muted">未配置云端，仅本地使用</span>：登录与同步不可用，其余功能完全照常。' +
+    '<span class="muted">未配置云端，仅本地使用</span>：登录与云端数据不可用，其余功能完全照常。' +
     '（在脚本顶部 SUPABASE_CONFIG 里填入项目地址与 anon key 即可启用）';
   var lb = $("#loginBox"); if (lb) lb.classList.toggle("hidden", !ready || on);
   var ub = $("#userBox"); if (ub) ub.classList.toggle("hidden", !on);
   var sb = $("#syncBox"); if (sb) sb.classList.toggle("hidden", !on);
   var un = $("#userName"); if (un) un.textContent = on ? state.user.name : "—";
   var ui = $("#userId");
-  if (ui) ui.textContent = on ? ((state.user.id || "") + "　本机版本基准 v" + (Number(state.syncVersion) || 0)) : "";
-  renderSyncInfo(); renderHistory(); updateTopUser();
+  if (ui) ui.textContent = on ? (state.user.id || "") : "";
+  renderSyncInfo(); renderPublicInfo(); renderHistory(); renderPublicHistory(); updateTopUser();
   accountBusy(state.syncStatus.busy, state.syncStatus.which);
+}
+/* 换人登录 / 退出登录时，把公用区那一块的暂存状态清干净 */
+function resetPublicState(){
+  state.publicInfo = "";
+  state.publicHistoryOpen = false;
+  state.publicHistoryRows = null;
+  state.publicHistoryErr = "";
+  state.publicBaseVersion = 0;
+  state.publicCommitMsg = "";
+  state.publicMode = "merge";
+}
+/* 公用区现状说明：只在真正读过 / 写过公用区之后才有内容，避免每次进设置页都去拉数据 */
+function renderPublicInfo(){
+  var el = $("#pubInfo"); if (!el) return;
+  el.textContent = state.user ? (state.publicInfo || "") : "";
+}
+/* 进设置页时轻量读一次公用区概况（只读一行统计，不拉整包数据；读不到就安静地不显示） */
+function loadPublicSummary(){
+  if (!cloudReady() || !state.user || state.syncStatus.busy || state.publicInfo) return;
+  syncApi.publicSummary().then(function(s){
+    if (!state.user) return;
+    state.publicInfo = s
+      ? ("公用区现有：工作票 " + (Number(s.ticket_count) || 0) + " 张 · 设备 " + (Number(s.device_count) || 0) +
+         " 台 · 最后一次改动 " + fmtCloudTime(s.saved_at) + (s.saved_by_name ? "（" + s.saved_by_name + "）" : "") +
+         (s.commit_msg ? "：" + s.commit_msg : ""))
+      : "公用区现在还是空的：你放进去的就是第一份。";
+    renderPublicInfo();
+  }, function(){ /* 读不到就不显示，不打扰用户 */ });
 }
 function syncUpload(forceBase){
   if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
-  if (!state.user){ toast("请先登录再同步"); return; }
+  if (!state.user){ toast("请先登录再保存到云端"); return; }
   if (state.syncStatus.busy) return;
-  /* base = 本机认得的云端版本；「强制覆盖」时由冲突弹窗传入云端当前版本 */
+  /* base = 本机认得的云端版本；「用我这台设备的覆盖云端」时由冲突弹窗传入云端当前版本 */
   var base = (forceBase == null) ? (Number(state.syncVersion) || 0) : (Number(forceBase) || 0);
   accountBusy(true, "up");
   syncApi.upload(base).then(function(res){
     if (!res.ok){
       /* 云端版本 ≠ 本机基准：绝不静默覆盖，交给用户决定 */
-      markSync("版本冲突");
-      state.syncConflict = { open:true, current: res.current_version, base: base };
+      markSync("云端被别的设备改过");
+      state.syncConflict = { open:true, current: res.current_version, base: base, scope:"personal" };
       openConflict();
       return;
     }
     state.syncVersion = res.new_version;
     saveAuth();
-    markSync("上传成功 v" + state.syncVersion);
-    toast("上传成功（云端 v" + state.syncVersion + "）：工作票 " + state.tickets.length +
-      " 张，设备 " + state.devices.length + " 台");
-    syncApi.trimHistory();                 /* 静默清理历史，失败不影响主流程 */
+    markSync("已保存到云端");
+    toast("已保存到云端：工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
+    syncApi.trimHistory();                 /* 静默清理历史存档，失败不影响主流程 */
     if (state.histOpen) loadHistory();
   }, function(e){
-    markSync("上传失败");
-    toast(syncErrMsg(e, "上传失败"));
+    markSync("保存到云端失败");
+    toast(syncErrMsg(e, "保存到云端失败"));
   }).then(function(){
     /* 冲突弹窗还开着时保持忙碌态，等用户选完再恢复按钮 */
     if (!(state.syncConflict && state.syncConflict.open)) accountBusy(false);
   });
 }
-/* ---------------- 版本冲突弹窗（复用 .sheet 样式） ---------------- */
+/* ---------------- 冲突弹窗：云端在你操作期间被别的设备改过（复用 .sheet 样式） ---------------- */
 function openConflict(){
   var c = state.syncConflict || {};
+  var pub = (c.scope === "public");
   var info = $("#conflictInfo");
-  if (info) info.textContent = "云端版本 v" + c.current + "，本机基于 v" + c.base +
-    "：这期间云端已被其他设备改过，为避免覆盖别人的修改，本次上传已暂停。";
+  if (info) info.textContent = pub
+    ? "你要写入公用区的时候，公用区已经被别人改过了。为避免把别人的记录冲掉，这次没有写进去。"
+    : "你要保存到云端的时候，云端已经被其他设备改过了。为避免覆盖别人的修改，这次没有写进去。";
   var d = $("#conflictDiff");
   if (d){ d.classList.add("hidden"); d.innerHTML = ""; }
   $("#conflictMask").classList.add("show");
@@ -3733,51 +4029,58 @@ function closeConflict(){
   state.syncConflict = null;
   accountBusy(false);                      /* 关闭后按钮恢复可用 */
 }
-/* 查看差异：只读对比，本机与云端都不写 */
+/* 看看差在哪：只读对比，本机与云端都不写 */
 function showConflictDiff(){
   var d = $("#conflictDiff");
+  var pub = !!(state.syncConflict && state.syncConflict.scope === "public");
   if (d){ d.classList.remove("hidden"); d.innerHTML = '<div class="hint">正在对比…</div>'; }
-  syncApi.download(true).then(function(row){
+  var job = pub ? syncApi.downloadPublic() : syncApi.download(true);
+  job.then(function(row){
     if (!d) return;
-    if (!row){ d.innerHTML = '<div class="banner warn"><span>⚠</span><div>云端快照读不到了。</div></div>'; return; }
+    if (!row){ d.innerHTML = '<div class="banner warn"><span>⚠</span><div>' + (pub ? "公用区" : "云端") + "的数据读不到了。</div></div>"; return; }
     var t = diffStat(state.tickets, row.tickets), v = diffStat(state.devices, row.devices);
     d.innerHTML = '<div class="kv">' +
-      '<div class="k">工作票</div><div class="v">仅本机 ' + t.onlyLocal + ' 条 · 仅云端 ' + t.onlyRemote +
-        ' 条 · 两边都有但不同 ' + t.changed + ' 条（本机共 ' + t.localTotal + ' / 云端共 ' + t.remoteTotal + '）</div>' +
-      '<div class="k">设备记录</div><div class="v">仅本机 ' + v.onlyLocal + ' 条 · 仅云端 ' + v.onlyRemote +
-        ' 条 · 两边都有但不同 ' + v.changed + ' 条（本机共 ' + v.localTotal + ' / 云端共 ' + v.remoteTotal + '）</div>' +
-      '</div><div class="hint">以上只是对比结果，本机与云端的数据都没有被修改。</div>';
+      '<div class="k">工作票</div><div class="v">仅本机 ' + t.onlyLocal + ' 条 · 仅' + (pub ? "公用区" : "云端") + ' ' + t.onlyRemote +
+        ' 条 · 两边都有但不同 ' + t.changed + ' 条（本机共 ' + t.localTotal + ' / ' + (pub ? "公用区" : "云端") + '共 ' + t.remoteTotal + '）</div>' +
+      '<div class="k">设备记录</div><div class="v">仅本机 ' + v.onlyLocal + ' 条 · 仅' + (pub ? "公用区" : "云端") + ' ' + v.onlyRemote +
+        ' 条 · 两边都有但不同 ' + v.changed + ' 条（本机共 ' + v.localTotal + ' / ' + (pub ? "公用区" : "云端") + '共 ' + v.remoteTotal + '）</div>' +
+      '</div><div class="hint">以上只是对比结果，本机与' + (pub ? "公用区" : "云端") + '的数据都没有被修改。</div>';
   }, function(e){
     if (d) d.innerHTML = '<div class="banner warn"><span>⚠</span><div>' + esc(syncErrMsg(e, "读取云端数据失败")) + '</div></div>';
   });
 }
-/* 强制覆盖：以云端当前版本为基准重新上传，成功后版本 = 当前 + 1 */
+/* 用我这台设备的覆盖云端：以云端现在的版本为底重新写一份 */
 function forceOverwrite(){
-  var cur = state.syncConflict ? state.syncConflict.current : 0;
-  closeConflict();                         /* 先恢复按钮，紧接着 syncUpload 会重新置忙 */
-  syncUpload(cur);
+  var c = state.syncConflict || {};
+  closeConflict();                         /* 先恢复按钮，紧接着上传流程会重新置忙 */
+  if (c.scope === "public") doPublicUpload(Number(c.current) || 0, c.pubMode, c.pubPayload, c.pubMsg);
+  else syncUpload(Number(c.current) || 0);
 }
 function syncDownload(){
   if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
-  if (!state.user){ toast("请先登录再同步"); return; }
+  if (!state.user){ toast("请先登录"); return; }
   if (state.syncStatus.busy) return;
   accountBusy(true, "down");
   syncApi.download().then(function(row){
-    if (!row){ markSync("云端暂无数据"); toast("云端还没有这个账号的数据，请先在本机点「上传到云端」"); return; }
-    markSync("已读取云端快照 v" + state.syncVersion);
-    openSyncPick(row);
+    if (!row){ markSync("云端暂无数据"); toast("云端还没有这个账号的数据，请先点「保存我的数据到云端」"); return; }
+    markSync("已读取云端数据");
+    openSyncPick(row, "personal");
   }, function(e){
-    markSync("下载失败");
-    toast(syncErrMsg(e, "下载失败"));
+    markSync("从云端取回失败");
+    toast(syncErrMsg(e, "从云端取回失败"));
   }).then(function(){ accountBusy(false); });
 }
-function openSyncPick(row){
+function openSyncPick(row, scope){
   state.syncRemote = row;
+  state.cloudScope = (scope === "public") ? "public" : "personal";
+  var pub = (state.cloudScope === "public");
+  var title = $("#syncPickTitle");
+  if (title) title.textContent = pub ? "从公用区取回数据" : "从云端取回我的数据";
   var info = $("#syncPickInfo");
   if (info){
-    info.textContent = "云端快照：工作票 " + ((row.tickets || []).length) + " 张 · 设备 " +
+    info.textContent = (pub ? "公用区内容：" : "云端内容：") + "工作票 " + ((row.tickets || []).length) + " 张 · 设备 " +
       ((row.devices || []).length) + " 台" +
-      (row.updated_at ? " · 更新于 " + String(row.updated_at).replace("T", " ").slice(0, 16) : "") +
+      (row.updated_at ? " · 更新于 " + fmtCloudTime(row.updated_at) : "") +
       (row.device_label ? " · 来自 " + row.device_label : "");
   }
   var loc = $("#syncLocalInfo");
@@ -3793,9 +4096,11 @@ function closeSyncPick(){
 function applyRemote(mode){
   var row = state.syncRemote;
   if (!row) return;
+  var pub = (state.cloudScope === "public");
+  var where = pub ? "公用区" : "云端";
   var tRemote = Array.isArray(row.tickets) ? row.tickets : [];
   var dRemote = Array.isArray(row.devices) ? row.devices : [];
-  var pref = state.mergePref === "local" ? "本机优先" : "云端优先";
+  var pref = state.mergePref === "local" ? "本机为准" : "云端为准";
   var stat = null;
   if (mode === "overwrite"){
     state.tickets = tRemote.slice();
@@ -3817,16 +4122,16 @@ function applyRemote(mode){
   if (q) runSearch(q); else goHome();
   if ($("#page-dev") && !$("#page-dev").classList.contains("hidden")) showDevAll();
   if (mode === "overwrite"){
-    markSync("已覆盖本地 v" + (Number(state.syncVersion) || 0));
-    toast("已用云端数据覆盖本地：工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
+    markSync("已用" + where + "的替换本机");
+    toast("已用" + where + "的数据替换本机：工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
     return;
   }
-  markSync("已合并·" + pref);
-  toast("已合并（同 id 按最后修改时间取新的）：新增 " + stat.add + " 条、更新 " + stat.upd +
+  markSync("已两边合并（" + pref + "）");
+  toast("已两边合并（同一条记录保留较新的那份）：新增 " + stat.add + " 条、更新 " + stat.upd +
     " 条、保留 " + stat.keep + " 条；现共工作票 " + state.tickets.length + " 张，设备 " + state.devices.length + " 台");
 }
 
-/* ---------------- 云端历史（最近 20 个版本，可恢复到本机） ---------------- */
+/* ---------------- 我的历史存档（最近 20 次，可恢复到本机） ---------------- */
 /* 云端 saved_at 是带微秒的 UTC 时间串，先去掉小数秒再按本机时区显示 */
 function fmtCloudTime(s){
   if (!s) return "时间未知";
@@ -3839,7 +4144,7 @@ function renderHistory(){
   var on = !!(cloudReady() && state.user);
   box.classList.toggle("hidden", !on);
   var btn = $("#btnHistory"), rf = $("#btnHistoryRefresh"), list = $("#histList"), info = $("#histInfo");
-  if (btn) btn.textContent = state.histOpen ? "📜 收起云端历史" : "📜 查看云端历史";
+  if (btn) btn.textContent = state.histOpen ? "📜 收起我的历史存档" : "📜 查看我的历史存档";
   if (rf) rf.classList.toggle("hidden", !state.histOpen);
   if (list) list.classList.toggle("hidden", !state.histOpen);
   if (!on || !list) return;
@@ -3850,23 +4155,21 @@ function renderHistory(){
     return;
   }
   if (state.histRows == null){
-    list.innerHTML = '<div class="hint">正在读取云端历史…</div>';
+    list.innerHTML = '<div class="hint">正在读取历史存档…</div>';
     if (info) info.textContent = "";
     return;
   }
   if (info) info.textContent = state.histRows.length
-    ? ("共 " + state.histRows.length + " 个历史版本（云端最多保留 20 个）。恢复到本机不会改动云端数据。")
+    ? ("共 " + state.histRows.length + " 次存档（最多保留 20 次）。「恢复到本机」只改这台设备的数据，云端不受影响。")
     : "";
   list.innerHTML = state.histRows.length ? state.histRows.map(function(h){
-    var ver = (h.version == null ? "?" : h.version);
     return '<div class="ticket" style="padding:10px 12px;margin-bottom:8px">' +
-      '<div class="tname">v' + esc(String(ver)) + '</div>' +
-      '<div class="tmeta">' + esc(fmtCloudTime(h.saved_at)) +
-        (h.device_label ? ' · 来自 ' + esc(h.device_label) : '') + '</div>' +
+      '<div class="tname">' + esc(fmtCloudTime(h.saved_at)) + '</div>' +
+      '<div class="tmeta">' + (h.device_label ? ('来自 ' + esc(h.device_label)) : '来自云端') + '</div>' +
       '<div class="actions" style="margin-top:8px">' +
         '<button class="btn-sm" data-histact="restore" data-histid="' + esc(String(h.id)) + '">恢复到本机</button>' +
       '</div></div>';
-  }).join("") : '<div class="hint">云端还没有历史版本：第一次上传不会产生历史，之后每次上传都会把旧版本存一条。</div>';
+  }).join("") : '<div class="hint">还没有历史存档：第一次保存到云端不会留下存档，之后每次保存都会把上一份存一条。</div>';
 }
 function loadHistory(){
   if (!state.user) return;
@@ -3874,23 +4177,24 @@ function loadHistory(){
   syncApi.history().then(function(rows){
     state.histRows = rows; state.histErr = ""; renderHistory();
   }, function(e){
-    state.histRows = null; state.histErr = syncErrMsg(e, "读取云端历史失败"); renderHistory();
+    state.histRows = null; state.histErr = syncErrMsg(e, "读取历史存档失败"); renderHistory();
   });
 }
 function toggleHistory(){
   if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
-  if (!state.user){ toast("请先登录再查看云端历史"); return; }
+  if (!state.user){ toast("请先登录再查看历史存档"); return; }
   state.histOpen = !state.histOpen;
   if (state.histOpen) loadHistory(); else renderHistory();
 }
-/* 恢复到本机：只替换本机数据，不写云端；之后想同步上去需手动点上传 */
+/* 恢复到本机：只替换本机数据，不动云端；之后想存上去需手动点「保存我的数据到云端」 */
 function restoreHistory(id){
   if (!state.user){ toast("请先登录"); return; }
   if (state.syncStatus.busy) return;
-  if (!confirm("用这一版覆盖本机当前数据？\n\n本机当前数据不会自动备份，云端数据也不受影响。\n建议先导出备份。")) return;
   accountBusy(true, "hist");
   syncApi.historyDetail(id).then(function(row){
-    if (!row){ toast("这一版历史已经读不到了（可能已被清理）"); return; }
+    if (!row){ toast("这一份存档已经读不到了（可能已被清理）"); return; }
+    var when = fmtCloudTime(row.saved_at);
+    if (!confirm("用 " + when + " 那一份替换本机当前数据？\n\n本机当前数据不会自动备份，云端数据也不受影响。\n建议先导出备份。")) return;
     state.tickets = Array.isArray(row.tickets) ? row.tickets : [];
     state.devices = Array.isArray(row.devices) ? row.devices : [];
     applyCloudMeta(row.meta, false);
@@ -3899,11 +4203,203 @@ function restoreHistory(id){
     var q = $("#q") ? $("#q").value.trim() : "";
     if (q) runSearch(q); else goHome();
     if ($("#page-dev") && !$("#page-dev").classList.contains("hidden")) showDevAll();
-    markSync("已恢复到 v" + (row.version == null ? "?" : row.version) + "（本机）");
-    toast("已恢复到 v" + (row.version == null ? "?" : row.version) + "，如需同步到云端请点上传");
+    markSync("已恢复到本机（" + when + "）");
+    toast("已恢复到 " + when + " 那一份（只改本机），如需存到云端请点「保存我的数据到云端」");
   }, function(e){
-    toast(syncErrMsg(e, "读取历史版本失败"));
+    toast(syncErrMsg(e, "读取存档失败"));
   }).then(function(){ accountBusy(false); });
+}
+
+/* ---------------- 公用区：上传 / 取回 / 历史存档 ---------------- */
+/* 读一次公用区现状：把版本号记下来做基准，并把「现在有什么」显示到提示行 */
+function loadPublicSnapshot(){
+  return syncApi.downloadPublic().then(function(row){
+    state.publicBaseVersion = row ? (Number(row.version) || 0) : 0;
+    state.publicInfo = row
+      ? ("公用区现有：工作票 " + ((row.tickets || []).length) + " 张 · 设备 " + ((row.devices || []).length) + " 台" +
+         (row.updated_at ? " · 更新于 " + fmtCloudTime(row.updated_at) : "") +
+         (row.device_label ? " · 来自 " + row.device_label : ""))
+      : "公用区现在还是空的：你放进去的就是第一份。";
+    renderPublicInfo();
+    return row;
+  });
+}
+function updatePubModeUI(){
+  $$("#segPubMode [data-pubmode]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-pubmode") === state.publicMode);
+  });
+  var h = $("#pubModeHint");
+  if (h) h.textContent = (state.publicMode === "replace")
+    ? "整份替换：用你这台设备的数据完全替换公用区现在的内容。写入前，公用区现在的内容会自动存一份存档，随时能恢复回来。"
+    : "合并进去：你本地有、公用区没有的，补充进去；两边都有的，保留较新的那份；公用区已有、你本地没有的，原样留着。";
+}
+function openPublicUp(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录"); return; }
+  if (state.syncStatus.busy) return;
+  accountBusy(true, "pubup");
+  state.publicMode = "merge";
+  state.publicCommitMsg = "";
+  loadPublicSnapshot().then(function(){
+    var info = $("#pubUpInfo"); if (info) info.textContent = state.publicInfo;
+    var msg = $("#pubMsg"); if (msg) msg.value = "";
+    updatePubModeUI();
+    $("#pubMask").classList.add("show");
+    $("#pubSheet").classList.add("show");
+  }, function(e){
+    toast(syncErrMsg(e, "读取公用区失败"));
+  }).then(function(){ accountBusy(false); });
+}
+function closePublicUp(){
+  $("#pubMask").classList.remove("show");
+  $("#pubSheet").classList.remove("show");
+}
+/* 放进公用区：mode = merge（默认）/ replace；payload 省略时用本机数据；
+   版本对不上时不写，弹冲突面板（冲突面板里记下这次要写的内容，强制覆盖时原样再来一次） */
+function doPublicUpload(forceBase, mode, payload, msg){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录"); return; }
+  if (state.syncStatus.busy) return;
+  var msgEl = $("#pubMsg");
+  if (msgEl && forceBase == null) state.publicCommitMsg = String(msgEl.value || "").trim().slice(0, 50);
+  var useMode = (mode === "replace" || mode === "merge") ? mode : state.publicMode;
+  var useMsg = (typeof msg === "string") ? msg : state.publicCommitMsg;
+  var base = (forceBase == null) ? (Number(state.publicBaseVersion) || 0) : (Number(forceBase) || 0);
+  accountBusy(true, "pubup");
+  syncApi.uploadPublic(base, useMode, useMsg, payload).then(function(res){
+    if (!res.ok){
+      state.publicBaseVersion = res.current_version;
+      state.syncConflict = { open:true, current: res.current_version, base: base, scope:"public",
+                             pubMode: useMode, pubPayload: payload || null, pubMsg: useMsg };
+      openConflict();
+      return;
+    }
+    closePublicUp();
+    state.publicBaseVersion = res.new_version;
+    markSync("已放进公用区");
+    toast("已放进公用区（" + (useMode === "replace" ? "整份替换" : "合并进去") + "）。公用区现在的内容可在「查看公用区历史存档」里看到。");
+    syncApi.trimPublicHistory();                        /* 静默清理，失败不影响主流程 */
+    if (state.publicHistoryOpen) loadPublicHistory();
+    loadPublicSnapshot()["catch"](function(){});        /* 刷新现状提示（失败无所谓） */
+  }, function(e){
+    markSync("放进公用区失败");
+    toast(syncErrMsg(e, "放进公用区失败"));
+  }).then(function(){
+    if (!(state.syncConflict && state.syncConflict.open)) accountBusy(false);
+  });
+}
+/* 从公用区取回：读取公用区那一份，再让用户选择怎么处理本机数据 */
+function publicDownload(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录"); return; }
+  if (state.syncStatus.busy) return;
+  accountBusy(true, "pubdown");
+  syncApi.downloadPublic().then(function(row){
+    if (!row){ markSync("公用区还没有数据"); toast("公用区现在还是空的：请先点「把我的数据放进公用区」"); return; }
+    state.publicBaseVersion = Number(row.version) || 0;
+    state.publicInfo = "公用区现有：工作票 " + ((row.tickets || []).length) + " 张 · 设备 " + ((row.devices || []).length) +
+      " 台" + (row.updated_at ? " · 更新于 " + fmtCloudTime(row.updated_at) : "");
+    renderPublicInfo();
+    markSync("已读取公用区数据");
+    openSyncPick(row, "public");
+  }, function(e){
+    markSync("从公用区取回失败");
+    toast(syncErrMsg(e, "从公用区取回失败"));
+  }).then(function(){ accountBusy(false); });
+}
+/* 「X 月 X 日」：提交说明留空时，历史列表用这个当主行文案 */
+function monthDayOf(s){
+  var d = new Date(String(s || "").replace(/\.\d+/, "").replace(" ", "T"));
+  if (isNaN(d.getTime())) return "";
+  return (d.getMonth() + 1) + "月" + d.getDate() + "日";
+}
+function renderPublicHistory(){
+  var btn = $("#btnPubHist"), rf = $("#btnPubHistRefresh"), list = $("#pubHistList"), info = $("#pubHistInfo");
+  var on = !!(cloudReady() && state.user);
+  if (btn) btn.textContent = state.publicHistoryOpen ? "🕘 收起公用区历史存档" : "🕘 查看公用区历史存档";
+  if (rf) rf.classList.toggle("hidden", !state.publicHistoryOpen);
+  if (list) list.classList.toggle("hidden", !state.publicHistoryOpen);
+  if (!on || !list){ if (info) info.textContent = ""; return; }
+  if (!state.publicHistoryOpen){ if (info) info.textContent = ""; return; }
+  if (state.publicHistoryErr){
+    list.innerHTML = '<div class="banner warn"><span>⚠</span><div>' + esc(state.publicHistoryErr) + '</div></div>';
+    if (info) info.textContent = "";
+    return;
+  }
+  if (state.publicHistoryRows == null){
+    list.innerHTML = '<div class="hint">正在读取公用区历史存档…</div>';
+    if (info) info.textContent = "";
+    return;
+  }
+  if (info) info.textContent = state.publicHistoryRows.length
+    ? ("公用区共 " + state.publicHistoryRows.length + " 次存档（最多保留 20 次）。「恢复到这一份」只改公用区，不动本机、也不动任何人的个人数据。")
+    : "";
+  list.innerHTML = state.publicHistoryRows.length ? state.publicHistoryRows.map(function(h){
+    var main = h.commit_msg ? String(h.commit_msg) : (monthDayOf(h.saved_at) + "上传");
+    var sub = (h.saved_by_name ? (h.saved_by_name + " 上传 · ") : "") +
+      "工作票 " + (Number(h.ticket_count) || 0) + " 张 · 设备 " + (Number(h.device_count) || 0) + " 台";
+    return '<div class="ticket" style="padding:10px 12px;margin-bottom:8px">' +
+      '<div class="tname">' + esc(main) + '</div>' +
+      '<div class="tmeta">' + esc(fmtCloudTime(h.saved_at)) + ' · ' + esc(sub) + '</div>' +
+      '<div class="actions" style="margin-top:8px">' +
+        '<button class="btn-sm" data-pubhistact="restore" data-pubhistid="' + esc(String(h.id)) + '">恢复到这一份</button>' +
+      '</div></div>';
+  }).join("") : '<div class="hint">公用区还没有历史存档：第一次放进公用区不会留下存档，之后每次改动都会自动存一份。</div>';
+}
+function loadPublicHistory(){
+  if (!state.user) return;
+  state.publicHistoryRows = null; state.publicHistoryErr = "";
+  renderPublicHistory();
+  syncApi.publicHistory().then(function(rows){
+    state.publicHistoryRows = rows; state.publicHistoryErr = ""; renderPublicHistory();
+  }, function(e){
+    state.publicHistoryRows = null; state.publicHistoryErr = syncErrMsg(e, "读取公用区历史存档失败"); renderPublicHistory();
+  });
+}
+function togglePublicHistory(){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录再查看公用区历史存档"); return; }
+  state.publicHistoryOpen = !state.publicHistoryOpen;
+  if (state.publicHistoryOpen) loadPublicHistory(); else renderPublicHistory();
+}
+/* 恢复到这一份：把选中的存档写回公用区（只改公用区，本机数据不动） */
+function restorePublicHistory(id){
+  if (!cloudReady()){ toast("未配置云端，仅本地使用"); return; }
+  if (!state.user){ toast("请先登录"); return; }
+  if (state.syncStatus.busy) return;
+  accountBusy(true, "pubrestore");
+  var when = "";
+  syncApi.publicHistoryDetail(id).then(function(h){
+    if (!h){ toast("这一份存档已经读不到了（可能已被清理）"); return; }
+    when = fmtCloudTime(h.saved_at);
+    var who = h.saved_by_name ? (h.saved_by_name + " 上传的") : "存档";
+    if (!confirm("确定要把公用数据恢复到 " + when + " " + who + "那一份吗？\n\n" +
+                 "恢复前，系统会先把「现在的内容」也存一份存档，万一恢复错了还能再回来。\n" +
+                 "只影响公用区，本机数据与任何人的个人数据都不动。")) return;
+    return loadPublicSnapshot().then(function(){
+      var base = Number(state.publicBaseVersion) || 0;
+      var note = "恢复到 " + when + " 那一份";
+      return syncApi.uploadPublic(base, "replace", note, h).then(function(res){
+        if (!res.ok){
+          state.publicBaseVersion = res.current_version;
+          state.syncConflict = { open:true, current: res.current_version, base: base, scope:"public",
+                                 pubMode:"replace", pubPayload: h, pubMsg: note };
+          openConflict();
+          return;
+        }
+        state.publicBaseVersion = res.new_version;
+        syncApi.trimPublicHistory();
+        loadPublicHistory();
+        loadPublicSnapshot()["catch"](function(){});
+        markSync("已恢复公用数据");
+        toast("已恢复到 " + when + " 那一份。本机数据没变，如需取回到本机请点「从公用区取回数据」。");
+      });
+    });
+  }, function(e){
+    toast(syncErrMsg(e, "读取公用区历史存档失败"));
+  }).then(function(){
+    if (!(state.syncConflict && state.syncConflict.open)) accountBusy(false);
+  });
 }
 
 /* ---------------- 页面切换 ---------------- */
@@ -3928,7 +4424,7 @@ function go(page){
     var q = $("#qDev") ? $("#qDev").value.trim() : "";
     if (q) runDevSearch(q);
   }
-  if (page === "set"){ renderColorList(); updateStorageInfo(); applyAppearance(); updateDiag(); renderAccount(); renderProjectCard(); }
+  if (page === "set"){ renderColorList(); updateStorageInfo(); applyAppearance(); updateDiag(); renderAccount(); renderProjectCard(); loadPublicSummary(); }
   try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ window.scrollTo(0,0); }
 }
 function updateWtCount(){
@@ -3987,13 +4483,24 @@ function bind(){
     renderRecent();
     toast("搜索记录已清除");
   });
-  $("#btnSortDeadline").addEventListener("click", function(){ showView("all", "deadline"); });
-  $("#btnSortCreated").addEventListener("click", function(){ showView("all", "created"); });
+  $("#btnSortDeadline").addEventListener("click", function(){ state.qv = "all"; showView("all", "deadline"); });
+  $("#btnSortCreated").addEventListener("click", function(){ state.qv = "all"; showView("all", "created"); });
   $("#btnNewTop").addEventListener("click", function(){ resetForm(); go("add"); });
+  $("#btnQuickReset").addEventListener("click", function(){
+    state.projFilter = null;
+    state.qv = "all";
+    state.inView = false;
+    goHome();
+    toast("已重置筛选：全部项目 · 全部状态");
+  });
 
   $("#btnSave").addEventListener("click", saveForm);
   $("#btnResetForm").addEventListener("click", resetForm);
-  $("#btnCancelEdit").addEventListener("click", function(){ resetForm(); go("search"); });
+  $("#btnCancelEdit").addEventListener("click", function(){
+    var o = state.editOrigin;
+    resetForm();
+    backToOrigin(o);
+  });
 
   /* 时间框：边打边补点、实时提示格式 */
   document.addEventListener("input", function(ev){
@@ -4261,6 +4768,10 @@ function bind(){
       else if (id === "btnLogout") doLogout();
       else if (id === "btnSyncUp") syncUpload();
       else if (id === "btnSyncDown") syncDownload();
+      else if (id === "btnPubUp") openPublicUp();
+      else if (id === "btnPubDown") publicDownload();
+      else if (id === "btnPubHist") togglePublicHistory();
+      else if (id === "btnPubHistRefresh") loadPublicHistory();
     });
     accCard.addEventListener("keydown", function(ev){
       if (ev.key === "Enter" && ev.target && ev.target.id === "accPass"){ ev.preventDefault(); doLogin(); }
@@ -4276,7 +4787,20 @@ function bind(){
   if ($("#syncPickClose")) $("#syncPickClose").addEventListener("click", closeSyncPick);
   if ($("#btnSyncOverwrite")) $("#btnSyncOverwrite").addEventListener("click", function(){ applyRemote("overwrite"); });
   if ($("#btnSyncMerge")) $("#btnSyncMerge").addEventListener("click", function(){ applyRemote("merge"); });
-  if ($("#btnSyncCancel")) $("#btnSyncCancel").addEventListener("click", function(){ closeSyncPick(); toast("已取消下载"); });
+  if ($("#btnSyncCancel")) $("#btnSyncCancel").addEventListener("click", function(){ closeSyncPick(); toast("已取消取回，本机数据没有改动"); });
+
+  /* 公用区：上传面板（合并 / 整份替换 + 提交说明） */
+  $$("#segPubMode [data-pubmode]").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.publicMode = (b.getAttribute("data-pubmode") === "replace") ? "replace" : "merge";
+      updatePubModeUI();
+    });
+  });
+  if ($("#pubMask")) $("#pubMask").addEventListener("click", closePublicUp);
+  if ($("#pubUpClose")) $("#pubUpClose").addEventListener("click", closePublicUp);
+  if ($("#btnPubUpCancel")) $("#btnPubUpCancel").addEventListener("click", closePublicUp);
+  if ($("#btnPubUpGo")) $("#btnPubUpGo").addEventListener("click", function(){ doPublicUpload(); });
+  if ($("#pubMsg")) $("#pubMsg").addEventListener("input", function(){ state.publicCommitMsg = String(this.value || "").slice(0, 50); });
 
   /* 云端版本冲突弹窗 */
   if ($("#conflictMask")) $("#conflictMask").addEventListener("click", closeConflict);
@@ -4285,15 +4809,21 @@ function bind(){
   if ($("#btnConflictForce")) $("#btnConflictForce").addEventListener("click", forceOverwrite);
   if ($("#btnConflictCancel")) $("#btnConflictCancel").addEventListener("click", function(){
     closeConflict();
-    toast("已取消上传，本机与云端都没有改动");
+    toast("已取消，本机与云端都没有改动");
   });
 
-  /* 云端历史 */
+  /* 我的历史存档 */
   if ($("#btnHistory")) $("#btnHistory").addEventListener("click", toggleHistory);
   if ($("#btnHistoryRefresh")) $("#btnHistoryRefresh").addEventListener("click", loadHistory);
   if ($("#histList")) $("#histList").addEventListener("click", function(ev){
     var b = up(ev.target, "button[data-histact]");
     if (b && b.getAttribute("data-histact") === "restore") restoreHistory(b.getAttribute("data-histid"));
+  });
+
+  /* 公用区历史存档 */
+  if ($("#pubHistList")) $("#pubHistList").addEventListener("click", function(ev){
+    var b = up(ev.target, "button[data-pubhistact]");
+    if (b && b.getAttribute("data-pubhistact") === "restore") restorePublicHistory(b.getAttribute("data-pubhistid"));
   });
 
   /* 空状态里的两个入口：载入示例 / 清空数据（清空前会先确认） */
@@ -4314,7 +4844,7 @@ function bind(){
 
   document.addEventListener("keydown", function(ev){
     if (ev.key === "Escape"){
-      closeDetail(); closeSyncPick(); closeExport();
+      closeDetail(); closeSyncPick(); closeExport(); closePublicUp();
       if (state.syncConflict && state.syncConflict.open) closeConflict();
     }
     if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter" && !$("#page-add").classList.contains("hidden")) saveForm();
